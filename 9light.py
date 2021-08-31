@@ -8,7 +8,10 @@ import RPi.GPIO as GPIO
 from time import sleep, time
 from math import cos, pi
 import flask
+from waitress import serve
 from random import randint
+import atexit
+
 
 class States(enum.Enum):
     NONE = 0
@@ -79,6 +82,9 @@ class NineLight:
 
     def on_exit_REQUEST(self):
         self.timer.canceled = True
+
+    def cleanup(self):
+        self.bell.cleanup()
 
     class Bell:
         def __init__(self, parent, button, buzzer):
@@ -220,11 +226,8 @@ def main():
     ]
     ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE, after_state_change=nl.onStateChange)
 
-    api.run(host='0.0.0.0', port=5000)
+    serve(api, host='0.0.0.0', port=5000)
+    atexit.register(nl.cleanup)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except:
-        raise
-        nl.bell.cleanup()
+    main()
