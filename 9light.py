@@ -6,6 +6,7 @@ from transitions import Machine
 from rpi_ws281x import *
 from time import sleep, time
 from math import cos, pi
+import flask
 
 class States(enum.Enum):
     NONE = 0
@@ -45,6 +46,16 @@ class NineLight:
 
         self.led_strip = Adafruit_NeoPixel(led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness, led_channel)
         self.led_strip.begin()
+
+    def getStatus(self):
+        return self.state.name.lower()
+
+    def setStatus(self, target):
+        try:
+            self.trigger(target)
+        except:
+            return False
+        return True
 
     def setAllPixels(self, color_rgb, top=False, bottom=False):
         if top:
@@ -87,8 +98,21 @@ class NineLight:
                 self.setBrightness(self.light_wave.getInt())
                 sleep(0.02)
 
+nl = NineLight()
+api = flask.Flask(__name__)
+
+@api.route('/9light/set', methods=['GET'])
+def api_set():
+    target = flask.request.args.get("status")
+    nl.setStatus(target)
+    return flask.jsonify({"status": nl.getStatus()})
+
+@api.route('/9light/get', methods=['GET'])
+def api_get():
+    return flask.jsonify({"status": nl.getStatus()})
+
+
 def main():
-    nl = NineLight()
     transitions = [
         { 'trigger' : 'none', 'source': '*', 'dest': States.NONE, 'after': nl.setupLightThread },
         { 'trigger' : 'call', 'source': '*', 'dest': States.CALL, 'after': nl.setupLightThread },
@@ -98,15 +122,8 @@ def main():
     ]
     ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE)
 
-    nl.call()
-    sleep(3)
-    nl.video()
-    sleep(3)
-    nl.request()
-    sleep(3)
-    nl.unicorn()
-    sleep(3)
-    nl.none()
+    #api_thread = Thread(target=lambda a: api.run(host='0.0.0.0', port=5000), daemon=True)
+    api.run(host='0.0.0.0', port=5000)
 
 if __name__ == "__main__":
         main()
