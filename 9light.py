@@ -111,7 +111,7 @@ class NineLight:
         def ringThread(self):
             for i in range(5):
                 GPIO.output(self.buzzer, 1)
-                sleep(0.05)
+                sleep(0.1)
                 GPIO.output(self.buzzer, 0)
                 sleep(0.05)
 
