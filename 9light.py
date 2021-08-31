@@ -8,6 +8,7 @@ import RPi.GPIO as GPIO
 from time import sleep, time
 from math import cos, pi
 import flask
+from random import randint
 
 class States(enum.Enum):
     NONE = 0
@@ -151,17 +152,32 @@ class NineLight:
         def lightThread(self):
             self.clearAllPixels()
             if self.parent.state == States.CALL:
-                self.setAllPixels((255, 150, 0), top=False, bottom=True)
+                self.setAllPixels((255, 150, 0), bottom=True)
 
             elif self.parent.state == States.VIDEO:
-                self.setAllPixels((255, 0, 0), top=True, bottom=False)
+                self.setAllPixels((255, 0, 0), top=True)
 
             elif self.parent.state == States.REQUEST:
-                self.setAllPixels((0, 200, 250), top=True, bottom=False)
+                self.setAllPixels((0, 200, 250), top=True)
                 self.light_wave = PulseWave(0.8, 30, 255)
                 while (self.light_thread_terminate != True):
                     self.setBrightness(self.light_wave.getInt())
                     sleep(0.02)
+
+            elif self.parent.state == States.UNICORN:
+                pos = True
+                while (self.light_thread_terminate != True):
+                    col = self.getRandomColor()
+                    self.clearAllPixels()
+                    self.setAllPixels(col, top=pos, bottom=not(pos))
+                    sleep(0.05)
+                    pos = not(pos)
+
+        def getRandomColor(self):
+            col = []
+            for i in range(3):
+                col.append(int(randint(0, 10) * 255 / 10))
+            return col
 
 nl = NineLight(18, 23, 24)
 api = flask.Flask(__name__)
@@ -183,7 +199,7 @@ def main():
         { 'trigger': 'call', 'source': '*', 'dest': States.CALL },
         { 'trigger': 'video', 'source': '*', 'dest': States.VIDEO },
         { 'trigger': 'request', 'source': States.VIDEO, 'dest': States.REQUEST },
-        { 'trigger': 'unicorn', 'source': '*', 'dest': States.UNICORN }
+        { 'trigger': 'unicorn', 'source': States.NONE, 'dest': States.UNICORN }
     ]
     ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE, after_state_change=nl.onStateChange)
 
