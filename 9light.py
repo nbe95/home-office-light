@@ -30,22 +30,27 @@ class PulseWave:
         cosine = 0.5 * (cos(2 * pi * t / self.period_s) + 1)
         return int(cosine * (self.max_val - self.min_val) + self.min_val)
 
+class Timeout(Thread):
+    def __init__(self, func, timeout_s):
+        super(Timeout, self).__init__()
+        self.func = func
+        self.timeout = timeout_s
+        self.canceled = False
+        self.start()
+
+    def run(self):
+        sleep(self.timeout)
+        if not self.canceled:
+            self.func()
+
 class NineLight:
+    timeout_request_s = 30
+
     def __init__(self):
-        self.light_thread = None
-        self.light_thread_terminate = False
-
-        # LED strip configuration
-        led_count      = 13      # Number of LED pixels.
-        led_pin        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
-        led_freq_hz    = 800000  # LED signal frequency in hertz (usually 800khz)
-        led_dma        = 10      # DMA channel to use for generating signal (try 10)
-        led_brightness = 255     # Set to 0 for darkest and 255 for brightest
-        led_invert     = False   # True to invert the signal (when using NPN transistor level shift)
-        led_channel    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-
-        self.led_strip = Adafruit_NeoPixel(led_count, led_pin, led_freq_hz, led_dma, led_invert, led_brightness, led_channel)
-        self.led_strip.begin()
+        self.timer = None
+        self.led = self.Led(self)
+        self.led.light_thread = None
+        self.led.light_thread_terminate = False
 
     def getStatus(self):
         return self.state.name.lower()
@@ -57,46 +62,71 @@ class NineLight:
             return False
         return True
 
-    def setAllPixels(self, color_rgb, top=False, bottom=False):
-        if top:
-            for p in range(0, 7):
-                self.led_strip.setPixelColorRGB(p, *color_rgb)
-        if bottom:
-            for p in range(7, 13):
-                self.led_strip.setPixelColorRGB(p, *color_rgb)
-        self.led_strip.show()
+    def onStateChange(self):
+        self.led.setupLightThread()
 
-    def setBrightness(self, brightness):
-        self.led_strip.setBrightness(brightness)
-        self.led_strip.show()
+    def on_enter_REQUEST(self):
+        self.timer = Timeout(self.video, self.timeout_request_s)
 
-    def clearAllPixels(self):
-        self.setAllPixels((0, 0, 0), top=True, bottom=True)
-        self.setBrightness(255)
+    def on_exit_REQUEST(self):
+        self.timer.canceled = True
 
-    def setupLightThread(self):
-        if self.light_thread is not None:
-            self.light_thread_terminate = True
-            self.light_thread.join()
+    class Led:
+        led_configuration = (
+            13,     # number of LED pixels
+            18,     # GPIO pin connected to the pixels (18 uses PWM!)
+            800000, # LED signal frequency in hertz (usually 800khz)
+            10,     # DMA channel to use for generating signal (try 10)
+            False,  # True to invert the signal (when using NPN transistor level shift)
+            255,    # set to 0 for darkest and 255 for brightest
+            0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+        )
 
-        self.light_thread_terminate = False
-        self.light_thread = Thread(target=self.lightThread, daemon=True)
-        self.light_thread.start()
+        def __init__(self, parent):
+            self.parent = parent
+            self.strip = Adafruit_NeoPixel(*self.led_configuration)
+            self.strip.begin()
 
-    def lightThread(self):
-        self.clearAllPixels()
-        if self.state == States.CALL:
-            self.setAllPixels((255, 150, 0), top=False, bottom=True)
+        def setAllPixels(self, color_rgb, top=False, bottom=False):
+            if top:
+                for p in range(0, 7):
+                    self.strip.setPixelColorRGB(p, *color_rgb)
+            if bottom:
+                for p in range(7, 13):
+                    self.strip.setPixelColorRGB(p, *color_rgb)
+            self.strip.show()
 
-        elif self.state == States.VIDEO:
-            self.setAllPixels((255, 0, 0), top=True, bottom=False)
+        def setBrightness(self, brightness):
+            self.strip.setBrightness(brightness)
+            self.strip.show()
 
-        elif self.state == States.REQUEST:
-            self.setAllPixels((0, 200, 250), top=True, bottom=False)
-            self.light_wave = PulseWave(0.8, 30, 255)
-            while (self.light_thread_terminate != True):
-                self.setBrightness(self.light_wave.getInt())
-                sleep(0.02)
+        def clearAllPixels(self):
+            self.setAllPixels((0, 0, 0), top=True, bottom=True)
+            self.setBrightness(255)
+
+        def setupLightThread(self):
+            if self.light_thread is not None:
+                self.light_thread_terminate = True
+                self.light_thread.join()
+
+            self.light_thread_terminate = False
+            self.light_thread = Thread(target=self.lightThread, daemon=True)
+            self.light_thread.start()
+
+        def lightThread(self):
+            self.clearAllPixels()
+            if self.parent.state == States.CALL:
+                self.setAllPixels((255, 150, 0), top=False, bottom=True)
+
+            elif self.parent.state == States.VIDEO:
+                self.setAllPixels((255, 0, 0), top=True, bottom=False)
+
+            elif self.parent.state == States.REQUEST:
+                self.setAllPixels((0, 200, 250), top=True, bottom=False)
+                self.light_wave = PulseWave(0.8, 30, 255)
+                while (self.light_thread_terminate != True):
+                    self.setBrightness(self.light_wave.getInt())
+                    sleep(0.02)
 
 nl = NineLight()
 api = flask.Flask(__name__)
@@ -114,13 +144,13 @@ def api_get():
 
 def main():
     transitions = [
-        { 'trigger' : 'none', 'source': '*', 'dest': States.NONE, 'after': nl.setupLightThread },
-        { 'trigger' : 'call', 'source': '*', 'dest': States.CALL, 'after': nl.setupLightThread },
-        { 'trigger' : 'video', 'source': '*', 'dest': States.VIDEO, 'after': nl.setupLightThread },
-        { 'trigger' : 'request', 'source': States.VIDEO, 'dest': States.REQUEST, 'after': nl.setupLightThread },
-        { 'trigger' : 'unicorn', 'source': '*', 'dest': States.UNICORN, 'after': nl.setupLightThread }
+        { 'trigger': 'none', 'source': '*', 'dest': States.NONE },
+        { 'trigger': 'call', 'source': '*', 'dest': States.CALL },
+        { 'trigger': 'video', 'source': '*', 'dest': States.VIDEO },
+        { 'trigger': 'request', 'source': States.VIDEO, 'dest': States.REQUEST },
+        { 'trigger': 'unicorn', 'source': '*', 'dest': States.UNICORN }
     ]
-    ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE)
+    ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE, after_state_change=nl.onStateChange)
 
     #api_thread = Thread(target=lambda a: api.run(host='0.0.0.0', port=5000), daemon=True)
     api.run(host='0.0.0.0', port=5000)
