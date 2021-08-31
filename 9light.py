@@ -70,10 +70,10 @@ class NineLight:
         self.led.setupLightThread()
 
     def on_enter_VIDEO(self):
-        self.bell.disable()
         self.timer = Timeout(self.bell.enable, 2)
 
     def on_exit_VIDEO(self):
+        self.bell.disable()
         self.timer.canceled = True
 
     def on_enter_REQUEST(self):
@@ -88,7 +88,7 @@ class NineLight:
 
     class Bell:
         def __init__(self, parent, button, buzzer):
-            self.enabled = True
+            self.enabled = False
             self.parent = parent
             self.button = button
             self.buzzer = buzzer
