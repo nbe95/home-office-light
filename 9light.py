@@ -52,8 +52,6 @@ class NineLight:
         self.timer = None
         self.bell = self.Bell(self, button_pin, buzzer_pin)
         self.led = self.Led(self, led_pin)
-        self.led.light_thread = None
-        self.led.light_thread_terminate = False
 
     def getStatus(self):
         return self.state.name.lower()
@@ -68,6 +66,13 @@ class NineLight:
     def onStateChange(self):
         self.led.setupLightThread()
 
+    def on_enter_VIDEO(self):
+        self.bell.disable()
+        self.timer = Timeout(self.bell.enable, 2)
+
+    def on_exit_VIDEO(self):
+        self.timer.canceled = True
+
     def on_enter_REQUEST(self):
         self.bell.ring()
         self.timer = Timeout(self.video, self.timeout_request_s)
@@ -77,6 +82,7 @@ class NineLight:
 
     class Bell:
         def __init__(self, parent, button, buzzer):
+            self.enabled = True
             self.parent = parent
             self.button = button
             self.buzzer = buzzer
@@ -88,8 +94,15 @@ class NineLight:
             GPIO.setup(self.buzzer, GPIO.OUT)
             GPIO.add_event_detect(self.button, GPIO.RISING, callback=self.press, bouncetime=1000)
 
+        def disable(self):
+            self.enabled = False
+
+        def enable(self):
+            self.enabled = True
+
         def press(self, channel):
-            self.parent.request()
+            if self.enabled:
+                self.parent.request()
 
         def ring(self):
             self.ring_thread = Thread(target=self.ringThread, daemon=True)
@@ -118,10 +131,14 @@ class NineLight:
 
         def __init__(self, parent, led_pin):
             self.parent = parent
+
             self.led_configuration[1] = led_pin
             self.strip = Adafruit_NeoPixel(*self.led_configuration)
             self.strip.begin()
             self.clearAllPixels()
+
+            self.light_thread = None
+            self.light_thread_terminate = False
 
         def setAllPixels(self, color_rgb, top=False, bottom=False):
             if top:
@@ -203,7 +220,6 @@ def main():
     ]
     ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE, after_state_change=nl.onStateChange)
 
-    #api_thread = Thread(target=lambda a: api.run(host='0.0.0.0', port=5000), daemon=True)
     api.run(host='0.0.0.0', port=5000)
 
 if __name__ == "__main__":
