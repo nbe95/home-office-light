@@ -1,0 +1,9 @@
+[Unit]
+Description=Super fancy 9Light service for home-office indication
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/local/9light/
+ExecStart=/usr/local/src/9light/9light.py
+Restart=always
