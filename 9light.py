@@ -4,6 +4,7 @@ import enum
 from threading import Thread
 from transitions import Machine
 from rpi_ws281x import *
+import RPi.GPIO as GPIO
 from time import sleep, time
 from math import cos, pi
 import flask
@@ -46,9 +47,10 @@ class Timeout(Thread):
 class NineLight:
     timeout_request_s = 30
 
-    def __init__(self):
+    def __init__(self, led_pin, button_pin, buzzer_pin):
         self.timer = None
-        self.led = self.Led(self)
+        self.bell = self.Bell(self, button_pin, buzzer_pin)
+        self.led = self.Led(self, led_pin)
         self.led.light_thread = None
         self.led.light_thread_terminate = False
 
@@ -66,13 +68,44 @@ class NineLight:
         self.led.setupLightThread()
 
     def on_enter_REQUEST(self):
+        self.bell.ring()
         self.timer = Timeout(self.video, self.timeout_request_s)
 
     def on_exit_REQUEST(self):
         self.timer.canceled = True
 
+    class Bell:
+        def __init__(self, parent, button, buzzer):
+            self.parent = parent
+            self.button = button
+            self.buzzer = buzzer
+            self.setup()
+
+        def setup(self):
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(self.button, GPIO.IN)
+            GPIO.setup(self.buzzer, GPIO.OUT)
+            GPIO.add_event_detect(self.button, GPIO.RISING, callback=self.press, bouncetime=1000)
+
+        def press(self, channel):
+            self.parent.request()
+
+        def ring(self):
+            self.ring_thread = Thread(target=self.ringThread, daemon=True)
+            self.ring_thread.start()
+
+        def ringThread(self):
+            for i in range(5):
+                GPIO.output(self.buzzer, 1)
+                sleep(0.05)
+                GPIO.output(self.buzzer, 0)
+                sleep(0.05)
+
+        def cleanup(self):
+            GPIO.cleanup()
+
     class Led:
-        led_configuration = (
+        led_configuration = [
             13,     # number of LED pixels
             18,     # GPIO pin connected to the pixels (18 uses PWM!)
             800000, # LED signal frequency in hertz (usually 800khz)
@@ -80,12 +113,14 @@ class NineLight:
             False,  # True to invert the signal (when using NPN transistor level shift)
             255,    # set to 0 for darkest and 255 for brightest
             0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-        )
+        ]
 
-        def __init__(self, parent):
+        def __init__(self, parent, led_pin):
             self.parent = parent
+            self.led_configuration[1] = led_pin
             self.strip = Adafruit_NeoPixel(*self.led_configuration)
             self.strip.begin()
+            self.clearAllPixels()
 
         def setAllPixels(self, color_rgb, top=False, bottom=False):
             if top:
@@ -128,7 +163,7 @@ class NineLight:
                     self.setBrightness(self.light_wave.getInt())
                     sleep(0.02)
 
-nl = NineLight()
+nl = NineLight(18, 23, 24)
 api = flask.Flask(__name__)
 
 @api.route('/9light/set', methods=['GET'])
@@ -156,4 +191,8 @@ def main():
     api.run(host='0.0.0.0', port=5000)
 
 if __name__ == "__main__":
+    try:
         main()
+    except:
+        raise
+        nl.bell.cleanup()
