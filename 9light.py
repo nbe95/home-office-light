@@ -124,7 +124,7 @@ class NineLight:
 
         def setAllPixels(self, color_rgb, top=False, bottom=False):
             if top:
-                for p in range(0, 7):
+                for p in range(0, 6):
                     self.strip.setPixelColorRGB(p, *color_rgb)
             if bottom:
                 for p in range(7, 13):
