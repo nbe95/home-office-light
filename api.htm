@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>9light API</title>
+    </head>
+    <body>
+        <iframe name="result_frame" width="400" height="60" src="/9light/get"></iframe>
+
+        <p>
+            <form action="/9light/get" method="GET" target="result_frame">
+                <button type="submit">Get Status</button>
+            </form>
+        </p>
+
+        <p>
+            <form action="/9light/set" method="GET" target="result_frame">
+                <select name="status">
+                    <option value="none" selected>None</option>
+                    <option value="call">Call</option>
+                    <option value="video">Video</option>
+                    <option value="request">Request</option>
+                    <option value="unicorn">I'm a unicorn&hellip;</option>
+                </select>
+                <button type="submit">Set Status</button>
+            </form>
+        </p>
+
+    </body>
+</html>

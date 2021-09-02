@@ -205,6 +205,14 @@ class NineLight:
 nl = NineLight(18, 23, 24)
 api = flask.Flask(__name__)
 
+@api.route('/')
+def api_redirect():
+    return flask.redirect('/9light/')
+
+@api.route('/9light/')
+def api_help():
+    return flask.send_file('api.htm')
+
 @api.route('/9light/set', methods=['GET'])
 def api_set():
     target = flask.request.args.get("status")
