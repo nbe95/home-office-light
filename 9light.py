@@ -13,13 +13,6 @@ from random import randint
 import atexit
 
 
-class States(enum.Enum):
-    NONE = 0
-    CALL = 1
-    VIDEO = 2
-    REQUEST = 3
-    UNICORN = 99
-
 class PulseWave:
     def __init__(self, period_s, min_val, max_val):
         self.period_s = period_s
@@ -85,6 +78,13 @@ class NineLight:
 
     def cleanup(self):
         self.bell.cleanup()
+
+    class States(enum.Enum):
+        NONE = 0
+        CALL = 1
+        VIDEO = 2
+        REQUEST = 3
+        UNICORN = 99
 
     class Bell:
         def __init__(self, parent, button, buzzer):
@@ -174,20 +174,20 @@ class NineLight:
 
         def lightThread(self):
             self.clearAllPixels()
-            if self.parent.state == States.CALL:
+            if self.parent.state == self.parent.States.CALL:
                 self.setAllPixels((255, 150, 0), bottom=True)
 
-            elif self.parent.state == States.VIDEO:
+            elif self.parent.state == self.parent.States.VIDEO:
                 self.setAllPixels((255, 0, 0), top=True)
 
-            elif self.parent.state == States.REQUEST:
+            elif self.parent.state == self.parent.States.REQUEST:
                 self.setAllPixels((0, 200, 250), top=True)
                 self.light_wave = PulseWave(0.8, 30, 255)
                 while (self.light_thread_terminate != True):
                     self.setBrightness(self.light_wave.getInt())
                     sleep(0.02)
 
-            elif self.parent.state == States.UNICORN:
+            elif self.parent.state == self.parent.States.UNICORN:
                 pos = True
                 while (self.light_thread_terminate != True):
                     col = self.getRandomColor()
@@ -226,13 +226,13 @@ def api_get():
 
 def main():
     transitions = [
-        { 'trigger': 'none', 'source': '*', 'dest': States.NONE },
-        { 'trigger': 'call', 'source': '*', 'dest': States.CALL },
-        { 'trigger': 'video', 'source': '*', 'dest': States.VIDEO },
-        { 'trigger': 'request', 'source': States.VIDEO, 'dest': States.REQUEST },
-        { 'trigger': 'unicorn', 'source': States.NONE, 'dest': States.UNICORN }
+        { 'trigger': 'none', 'source': '*', 'dest': nl.States.NONE },
+        { 'trigger': 'call', 'source': '*', 'dest': nl.States.CALL },
+        { 'trigger': 'video', 'source': '*', 'dest': nl.States.VIDEO },
+        { 'trigger': 'request', 'source': nl.States.VIDEO, 'dest': nl.States.REQUEST },
+        { 'trigger': 'unicorn', 'source': nl.States.NONE, 'dest': nl.States.UNICORN }
     ]
-    ma = Machine(nl, states=States, transitions=transitions, initial=States.NONE, after_state_change=nl.onStateChange)
+    ma = Machine(nl, states=nl.States, transitions=transitions, initial=nl.States.NONE, after_state_change=nl.onStateChange)
 
     serve(api, host='0.0.0.0', port=5000)
     atexit.register(nl.cleanup)
