@@ -41,6 +41,46 @@ class Timeout(Thread):
         if not self.canceled:
             self.func()
 
+class StableButton():
+    def __init__(self, cb_read_state, threshold_ms):
+        self.threshold_ms = threshold_ms
+        self.cb_read_state = cb_read_state
+        self.cb_pressed = None
+        self.cb_released = None
+        self.check_thread = None
+        self.check_abort = False
+
+    def setCallbackPressed(self, cb):
+        self.cb_pressed = cb
+
+    def setCallbackReleased(self, cb):
+        self.cb_released = cb
+
+    def trigger(self, channel):
+        if self.check_thread is not None and self.check_thread.is_alive():
+            self.check_abort = True
+            self.check_thread.join()
+
+        state = self.cb_read_state()
+        self.check_abort = False
+        self.check_thread = Thread(target=self.checkThread, args=(state,), daemon=True)
+        self.check_thread.start()
+
+    def checkThread(self, state):
+        end = time() + (self.threshold_ms / 1000)
+        while time() < end:
+            if self.check_abort or self.cb_read_state() != state:
+                return False
+            sleep(0.001)
+
+        if state:
+            if self.cb_pressed is not None:
+                self.cb_pressed()
+        else:
+            if self.cb_released is not None:
+                self.cb_released()
+        return True
+
 class NineLight:
     timeout_request_s = 30
 
@@ -92,13 +132,18 @@ class NineLight:
             self.parent = parent
             self.button = button
             self.buzzer = buzzer
+            self.stable_button = StableButton(self.readButton, 50)
             self.setup()
 
         def setup(self):
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.button, GPIO.IN)
             GPIO.setup(self.buzzer, GPIO.OUT)
-            GPIO.add_event_detect(self.button, GPIO.RISING, callback=self.press, bouncetime=1000)
+            self.stable_button.setCallbackPressed(self.press)
+            GPIO.add_event_detect(self.button, GPIO.BOTH, callback=self.stable_button.trigger)
+
+        def readButton(self):
+            return GPIO.input(self.button)
 
         def disable(self):
             self.enabled = False
@@ -106,7 +151,7 @@ class NineLight:
         def enable(self):
             self.enabled = True
 
-        def press(self, channel):
+        def press(self):
             if self.enabled:
                 self.parent.request()
 
