@@ -279,7 +279,7 @@ def main():
     ]
     ma = Machine(nl, states=nl.States, transitions=transitions, initial=nl.States.NONE, after_state_change=nl.onStateChange)
 
-    serve(api, host='0.0.0.0', port=5000)
+    serve(api, host='0.0.0.0', port=9000)
     atexit.register(nl.cleanup)
 
 if __name__ == "__main__":
