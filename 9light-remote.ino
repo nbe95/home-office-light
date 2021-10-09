@@ -39,8 +39,8 @@ void update_leds(const bool wave = true)
 {
     CRGB rgb = led_color;
     if (wave) {
-        const float period_s = 0.8;
-        const int min_val = 30;
+        const float period_s = 2.0;
+        const int min_val = 40;
         const int max_val = 255;
         
         float cosine = 0.5 * (cos(TWO_PI * millis() / 1000 / period_s) + 1);
