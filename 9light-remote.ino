@@ -15,6 +15,7 @@ BridgeHttpClient http_client;
 const char* const api PROGMEM = "http://srv-rpi3.m5a.bettgen.de:9000/9light";
 
 CRGB leds[LED_NUM];
+CRGB led_color(0, 0, 0);
 
 void set_status(const char* status_value)
 {
@@ -29,12 +30,28 @@ void set_status(const char* status_value)
     if (http_client.available()) {
         http_client.readBytesUntil('\n', response, sizeof(response));
         SerialUSB.print(F("Got response: "));
-        SerialUSB.print(response);
+        SerialUSB.println(response);
+
+        const char response_call[]    = "{\"status\":\"call\"}";
+        const char response_video[]   = "{\"status\":\"video\"}";
+        const char response_unicorn[] = "{\"status\":\"unicorn\"}";
+        const char response_request[] = "{\"status\":\"request\"}";
+        const char response_none[]    = "{\"status\":\"none\"}";
+
+        if (memcmp(response, response_none, sizeof(response_none)) == 0) {
+            led_color = CRGB(0, 0, 0); 
+        } else if (memcmp(response, response_call, sizeof(response_call)) == 0) {
+            led_color = CRGB(255, 150, 0); 
+        } else if (memcmp(response, response_video, sizeof(response_video)) == 0) {
+            led_color = CRGB(255, 0, 0);
+        } else if (memcmp(response, response_request, sizeof(response_request)) == 0) {
+            led_color = CRGB(0, 200, 255);
+        } else if (memcmp(response, response_unicorn, sizeof(response_unicorn)) == 0) {
+            led_color = CRGB(0, 255, 0);
+        }   
     }
 }
 
-unsigned long wave_start_time = 0;
-CRGB led_color(0, 0, 0);
 void update_leds(const bool wave = true)
 {
     CRGB rgb = led_color;
@@ -75,19 +92,15 @@ void loop()
     update_leds();
     
     if (digitalRead(PIN_CALL) == LOW) {
-        led_color = CRGB(255, 150, 0);
         set_status("call");
         delay(200);
     } else if (digitalRead(PIN_VIDEO) == LOW) {
-        led_color = CRGB(255, 0, 0);
         set_status("video");
         delay(200);
     } else if (digitalRead(PIN_UNICORN) == LOW) {
-        led_color = CRGB(0, 255, 0);
         set_status("unicorn");        
         delay(200);
     } else if (digitalRead(PIN_NONE) == LOW) {
-        led_color = CRGB(0, 0, 0);
         set_status("none");
         delay(200);
     }
