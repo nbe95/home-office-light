@@ -83,14 +83,20 @@ class StableButton():
 
 class NineLight:
     timeout_request_s = 30
+    expiration_remotes_s = 60 * 60 * 6
 
     def __init__(self, led_pin, button_pin, buzzer_pin):
         self.timer = None
+        self.remotes = []
         self.bell = self.Bell(self, button_pin, buzzer_pin)
         self.led = self.Led(self, led_pin)
 
     def getStatus(self):
-        return self.state.name.lower()
+        status = {
+            "status": self.state.name.lower(),
+            "remotes:": list(r[0] for r in self.remotes)
+        }
+        return status
 
     def setStatus(self, target):
         try:
@@ -98,6 +104,26 @@ class NineLight:
         except:
             return False
         return True
+
+    def addRemote(self, ip, expiration_s = None):
+        if expiration_s != None:
+            expires = expiration_s
+        else:
+            expires = time() + self.expiration_remptes_s
+
+        self.remotes.append((ip, expires))
+
+    def updateRemotes(self):
+        changed = False
+        new_remotes = []
+        for r in self.remotes:
+            if r[1] <= time():
+                changed = True
+            else:
+                new_remotes.append(r)
+
+        if changed:
+            self.remotes = new_remotes
 
     def onStateChange(self):
         self.led.setupLightThread()
@@ -265,11 +291,11 @@ def api_help():
 def api_set():
     target = flask.request.args.get("status")
     nl.setStatus(target)
-    return flask.jsonify({"status": nl.getStatus()})
+    return flask.jsonify(nl.getStatus())
 
 @api.route('/9light/get', methods=['GET'])
 def api_get():
-    return flask.jsonify({"status": nl.getStatus()})
+    return flask.jsonify(nl.getStatus())
 
 
 def main():
