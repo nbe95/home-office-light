@@ -8,6 +8,7 @@ import RPi.GPIO as GPIO
 from time import sleep, time
 from math import cos, pi
 import flask
+import requests
 from waitress import serve
 from random import randint
 import atexit
@@ -82,8 +83,11 @@ class StableButton():
         return True
 
 class NineLight:
+    local_http_port = 9000
+    remotes_http_port = 9001
+    remotes_expiration_s = 60 * 60 * 3
+    remotes_skip_once = None
     timeout_request_s = 30
-    expiration_remotes_s = 60 * 60 * 6
 
     def __init__(self, led_pin, button_pin, buzzer_pin):
         self.timer = None
@@ -95,7 +99,7 @@ class NineLight:
         self.updateRemotes()
         status = {
             "status": self.state.name.lower(),
-            "remotes:": list(r[0] for r in self.remotes)
+            "remotes": list(r[0] for r in self.remotes)
         }
         return status
 
@@ -107,14 +111,14 @@ class NineLight:
         return True
 
     def addRemote(self, ip, expiration_s = None):
-        for r in self.remotes:
-            if r[0] == ip:
-                return
-
         if expiration_s != None:
             expires = expiration_s
         else:
-            expires = time() + self.expiration_remotes_s
+            expires = time() + self.remotes_expiration_s
+
+        for r in self.remotes:
+            if r[0] == ip:
+                self.remotes.remove(r)
 
         self.remotes.append((ip, expires))
 
@@ -130,9 +134,17 @@ class NineLight:
         if changed:
             self.remotes = new_remotes
 
-    def onStateChange(self):
+    def sendToRemotes(self):
         self.updateRemotes()
+        payload = self.getStatus()
+        for r in self.remotes:
+            if r[0] != self.remotes_skip_once:
+                requests.get("http://{}:{}/9light/remote".format(r[0], self.remotes_http_port), json=payload)
+        self.remotes_skip_once = None
+
+    def onStateChange(self):
         self.led.setupLightThread()
+        self.sendToRemotes()
 
     def on_enter_VIDEO(self):
         self.timer = Timeout(self.bell.enable, 2)
@@ -295,17 +307,22 @@ def api_help():
 
 @api.route('/9light/set', methods=['GET'])
 def api_set():
-    target = flask.request.args.get("status")
-    nl.setStatus(target)
-
     is_remote = ("remote" in flask.request.args)
     if is_remote:
         nl.addRemote(flask.request.remote_addr)
+        nl.remotes_skip_once = flask.request.remote_addr
+
+    target = flask.request.args.get("status")
+    nl.setStatus(target)
 
     return flask.jsonify(nl.getStatus())
 
 @api.route('/9light/get', methods=['GET'])
 def api_get():
+    is_remote = ("remote" in flask.request.args)
+    if is_remote:
+        nl.addRemote(flask.request.remote_addr)
+
     return flask.jsonify(nl.getStatus())
 
 
@@ -319,7 +336,7 @@ def main():
     ]
     ma = Machine(nl, states=nl.States, transitions=transitions, initial=nl.States.NONE, after_state_change=nl.onStateChange)
 
-    serve(api, host='0.0.0.0', port=9000)
+    serve(api, host='0.0.0.0', port=NineLight.local_http_port)
     atexit.register(nl.cleanup)
 
 if __name__ == "__main__":
