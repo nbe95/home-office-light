@@ -107,6 +107,10 @@ class NineLight:
         return True
 
     def addRemote(self, ip, expiration_s = None):
+        for r in self.remotes:
+            if r[0] == ip:
+                return
+
         if expiration_s != None:
             expires = expiration_s
         else:
