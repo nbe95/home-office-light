@@ -124,7 +124,7 @@ class NineLight:
         CALL = 1
         VIDEO = 2
         REQUEST = 3
-        UNICORN = 99
+        COFFEE = 99
 
     class Bell:
         def __init__(self, parent, button, buzzer):
@@ -220,19 +220,22 @@ class NineLight:
         def lightThread(self):
             self.clearAllPixels()
             if self.parent.state == self.parent.States.CALL:
-                self.setAllPixels((255, 150, 0), bottom=True)
+                yellow = (255, 150, 0)
+                self.setAllPixels(yellow, bottom=True)
 
             elif self.parent.state == self.parent.States.VIDEO:
-                self.setAllPixels((255, 0, 0), top=True)
+                red = (255, 0, 0)
+                self.setAllPixels(red, top=True)
 
             elif self.parent.state == self.parent.States.REQUEST:
-                self.setAllPixels((0, 200, 250), top=True)
+                blue = (0, 200, 255)
+                self.setAllPixels(blue, top=True)
                 self.light_wave = PulseWave(0.8, 30, 255)
                 while (self.light_thread_terminate != True):
                     self.setBrightness(self.light_wave.getInt())
                     sleep(0.02)
 
-            elif self.parent.state == self.parent.States.UNICORN:
+            elif self.parent.state == self.parent.States.COFFEE:
                 pos = True
                 while (self.light_thread_terminate != True):
                     col = self.getRandomColor()
@@ -275,7 +278,7 @@ def main():
         { 'trigger': 'call', 'source': '*', 'dest': nl.States.CALL },
         { 'trigger': 'video', 'source': '*', 'dest': nl.States.VIDEO },
         { 'trigger': 'request', 'source': nl.States.VIDEO, 'dest': nl.States.REQUEST },
-        { 'trigger': 'unicorn', 'source': nl.States.NONE, 'dest': nl.States.UNICORN }
+        { 'trigger': 'coffee', 'source': nl.States.NONE, 'dest': nl.States.COFFEE }
     ]
     ma = Machine(nl, states=nl.States, transitions=transitions, initial=nl.States.NONE, after_state_change=nl.onStateChange)
 
