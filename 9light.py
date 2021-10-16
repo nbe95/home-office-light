@@ -110,7 +110,7 @@ class NineLight:
         if expiration_s != None:
             expires = expiration_s
         else:
-            expires = time() + self.expiration_remptes_s
+            expires = time() + self.expiration_remotes_s
 
         self.remotes.append((ip, expires))
 
