@@ -92,6 +92,7 @@ class NineLight:
         self.led = self.Led(self, led_pin)
 
     def getStatus(self):
+        self.updateRemotes()
         status = {
             "status": self.state.name.lower(),
             "remotes:": list(r[0] for r in self.remotes)
@@ -126,6 +127,7 @@ class NineLight:
             self.remotes = new_remotes
 
     def onStateChange(self):
+        self.updateRemotes()
         self.led.setupLightThread()
 
     def on_enter_VIDEO(self):
@@ -291,6 +293,11 @@ def api_help():
 def api_set():
     target = flask.request.args.get("status")
     nl.setStatus(target)
+
+    is_remote = ("remote" in flask.request.args)
+    if is_remote:
+        nl.addRemote(flask.request.remote_addr)
+
     return flask.jsonify(nl.getStatus())
 
 @api.route('/9light/get', methods=['GET'])
