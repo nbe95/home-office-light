@@ -1,0 +1,86 @@
+#ifndef _9LIGHT_H_
+#define _9LIGHT_H_
+
+#include <BridgeClient.h>
+#include <BridgeHttpClient.h>
+#include <BridgeServer.h>
+#include <Adafruit_NeoPixel.h>
+#include <avr/power.h>
+#include "map.h"
+#include "timer.h"
+#include "animation.h"
+#include "helpers.h"
+
+
+class NineLightRemote
+{
+public:
+    // Type definitions
+    enum state {
+        UNDEFINED,
+        NONE,
+        CALL,
+        VIDEO,
+        REQUEST,
+        COFFEE
+    };
+    struct api_config {
+        const char*     endpoint;
+        const char*     url;
+        unsigned int    port;
+        unsigned int    remote_port;
+    };
+    struct led_config {
+        pin         do_pin;
+        uint16_t    num_leds;
+        uint16_t    options;
+    };
+    //struct button_map
+        //state   button;
+        //pin     di_pin;
+    //};
+
+    // Constructor and destructor
+    NineLightRemote(const api_config* const api_config, const led_config* const led_config);
+
+    // Public methods
+    void                setState(const state state) { m_state = state; };
+    state               getState() const { return m_state; };
+
+    bool                registerButton(const state state, const pin pin, const bool int_pullup = true);
+    void                setButtonTimeout(const Timer::ms timeout);
+
+    void                pollButtons();
+    void                pollRemoteRequest();
+    void                updateLeds();
+
+private:
+    static bool         stateToCStr(const state state, char* target);
+    static state        stateFromCStr(const char* buffer);
+    static state        parseJsonState(const char* buffer);
+
+    BridgeServer*       getHttpServer();
+    BridgeHttpClient*   getHttpClient();
+
+    void                sendStateRequest(const state state);
+
+    // Configuration
+    const api_config*   m_api_config;
+    const led_config*   m_led_config;
+    Map<state,pin>      m_button_map;
+    Timer               m_button_timer;
+
+    // Internal status
+    state               m_state = state::UNDEFINED;
+
+    // LED status
+    Adafruit_NeoPixel*  m_pixels;
+    state               m_leds_state = state::UNDEFINED;
+    Animation*          m_animation;
+
+    // Server and client
+    BridgeHttpClient*   m_http_client;
+    BridgeServer*       m_http_server;
+};
+
+#endif /* _9LIGHT_H_ */
