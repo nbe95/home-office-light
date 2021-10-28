@@ -1,21 +1,18 @@
 #ifndef _MAP_H_
 #define _MAP_H_
 
+// Simple map helper class
 template<class T_KEY, class T_VALUE>
 class Map
 {
 public:
-    struct key_value
-    {
-        T_KEY key;
-        T_VALUE value;
-    };
+    // Definition of template data structure
+    struct key_value { T_KEY key; T_VALUE value; };
 
-    Map():
-        m_storage(0),
-        m_items(0)
-    {};
+    // Constructor for an empty set
+    Map(): m_storage(0), m_items(0) {};
 
+    // Adds a key-value pair to the set (resizes the allocated memory)
     bool addPair(T_KEY key, T_VALUE value)
     {
         int index = getIndex(key);
@@ -34,6 +31,7 @@ public:
         return true;
     };
 
+    // Removes a specified key-value pair from the set (resizes the allocated memory)
     bool removePair(T_KEY key)
     {
         int index = getIndex(key);
@@ -55,6 +53,7 @@ public:
         return true;
     }
 
+    // Fetches the value of an element identified by its key
     bool getValue(T_KEY key, T_VALUE* target) const
     {
         int index = getIndex(key);
@@ -65,6 +64,7 @@ public:
         return true;
     }
 
+    // Fetches the numerical index (=array position) of an element identified by its key
     int getIndex(T_KEY key) const
     {
         for (int i = 0; i < getSize(); i++)
@@ -73,6 +73,7 @@ public:
         return -1;
     }
 
+    // Fetches the key of an element identified by its index
     bool getKeyByIndex(int index, T_KEY* target) const
     {
         if (index < 0 || index >= m_items)
@@ -82,6 +83,7 @@ public:
         return true;
     }
 
+    // Fetches the value of an element identified by its index
     bool getValueByIndex(int index, T_VALUE* target) const
     {
         if (index < 0 || index >= m_items)
@@ -91,6 +93,7 @@ public:
         return true;
     }
 
+    // Retreives the number of elements currently holded by the map
     int getSize() const
     {
         return m_items;
