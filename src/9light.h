@@ -43,18 +43,23 @@ public:
     // Constructor and destructor
     NineLightRemote(const api_config* const api_config, const led_config* const led_config);
 
-    // Public methods
+    // General methods
     void                setState(const state state) { m_state = state; };
     state               getState() const { return m_state; };
 
+    // Setup
     bool                registerButton(const state state, const pin pin, const bool int_pullup = true);
     void                setButtonTimeout(const Timer::ms timeout);
+    void                setupCylicRequest(const Timer::ms interval);
 
+    // Cylic routines
+    void                receiveRemoteRequest();
+    void                sendCyclicRequest();
     void                pollButtons();
-    void                pollRemoteRequest();
     void                updateLeds();
 
 private:
+    // Static helper functions
     static bool         stateToCStr(const state state, char* target);
     static state        stateFromCStr(const char* buffer);
     static state        parseJsonState(const char* buffer);
@@ -62,7 +67,9 @@ private:
     BridgeServer*       getHttpServer();
     BridgeHttpClient*   getHttpClient();
 
-    void                sendStateRequest(const state state);
+    // 9Light interface methods
+    void                sendStateRequest(const state state = state::UNDEFINED);
+
 
     // Configuration
     const api_config*   m_api_config;
@@ -72,13 +79,14 @@ private:
 
     // Internal status
     state               m_state = state::UNDEFINED;
+    Timer               m_cyclic_request_timer;
 
     // LED status
     Adafruit_NeoPixel*  m_pixels;
     state               m_leds_state = state::UNDEFINED;
     Animation*          m_animation;
 
-    // Server and client
+    // 9Light server and client
     BridgeHttpClient*   m_http_client;
     BridgeServer*       m_http_server;
 };

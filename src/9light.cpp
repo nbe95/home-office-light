@@ -47,7 +47,7 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
     if (button_pin == 0)
         return false;
 
-    m_button_map.add(target_state, button_pin);
+    m_button_map.addPair(target_state, button_pin);
     pinMode(button_pin, (int_pullup ? INPUT_PULLUP : INPUT));
 
     return true;
@@ -57,6 +57,12 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
 void NineLightRemote::setButtonTimeout(const Timer::ms timeout)
 {
     m_button_timer.setDuration(timeout);
+}
+
+
+void NineLightRemote::setupCylicRequest(const Timer::ms interval)
+{
+    m_cyclic_request_timer.setDuration(interval);
 }
 
 
@@ -150,13 +156,16 @@ void NineLightRemote::pollButtons()
 
     state button = state::UNDEFINED;
     pin di_pin = 0;
-    for (int i = 0; i < m_button_map.size(); i++)
+    for (int i = 0; i < m_button_map.getSize(); i++)
     {
-        m_button_map.getKey(i, &button);
-        m_button_map.getValue(button, &di_pin);
+        m_button_map.getKeyByIndex(i, &button);
+        m_button_map.getValueByIndex(i, &di_pin);
 
         if (di_pin != 0 && digitalRead(di_pin) == LOW)
         {
+            SerialUSB.print(F("Button with function '"));
+            SerialUSB.print(button);
+            SerialUSB.println(F("' pressed!"));
             sendStateRequest(button);
             m_button_timer.restart();
             return;
@@ -165,7 +174,7 @@ void NineLightRemote::pollButtons()
 }
 
 
-void NineLightRemote::pollRemoteRequest()
+void NineLightRemote::receiveRemoteRequest()
 {
     BridgeClient client = getHttpServer()->accept();
     if (client)
@@ -196,13 +205,35 @@ void NineLightRemote::pollRemoteRequest()
 }
 
 
+void NineLightRemote::sendCyclicRequest()
+{
+    if (!m_cyclic_request_timer.isSet())
+        return;
+
+    m_cyclic_request_timer.start();
+    if (m_cyclic_request_timer.check())
+    {
+        SerialUSB.println(F("Time for a cyclic status request in order to keep the remote registration status."));
+        sendStateRequest();
+        m_cyclic_request_timer.restart();
+    }
+}
+
+
+// Will set the 9Light state if state_req is set, otherwise will only get the current state.
 void NineLightRemote::sendStateRequest(const state state_req)
 {
     char query[80] = {0};
-    char state_str[10] = "undefined";
-    stateToCStr(state_req, state_str);
-
-    sprintf(query, "%s:%d%s/set?status=%s&remote", m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
+    if (state_req != state::UNDEFINED)
+    {
+        char state_str[10] = "undefined";
+        stateToCStr(state_req, state_str);
+        sprintf(query, "%s:%d%s/set?status=%s&remote", m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
+    }
+    else
+    {
+        sprintf(query, "%s:%d%s/get?remote", m_api_config->endpoint, m_api_config->port, m_api_config->url);
+    }
     SerialUSB.print(F("Sending HTTP request to: "));
     SerialUSB.println(query);
 

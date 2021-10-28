@@ -16,7 +16,7 @@ public:
         m_items(0)
     {};
 
-    bool add(T_KEY key, T_VALUE value)
+    bool addPair(T_KEY key, T_VALUE value)
     {
         int index = getIndex(key);
         if (index < 0)
@@ -34,14 +34,14 @@ public:
         return true;
     };
 
-    bool remove(T_KEY key)
+    bool removePair(T_KEY key)
     {
         int index = getIndex(key);
         if (index < 0)
             return false;
 
         int j = 0;
-        for (int i = 0; i < size(); i++)
+        for (int i = 0; i < getSize(); i++)
             if (i != index)
                 m_storage[j++] = m_storage[i];
 
@@ -58,31 +58,40 @@ public:
     bool getValue(T_KEY key, T_VALUE* target) const
     {
         int index = getIndex(key);
-        if (index < 0)
+        if (index < 0 || index >= m_items)
             return false;
 
         *target = m_storage[index].value;
         return true;
     }
 
-    bool getKey(int index, T_KEY* target) const
+    int getIndex(T_KEY key) const
     {
-        if (index < 0)
+        for (int i = 0; i < getSize(); i++)
+            if (m_storage[i].key == key)
+                return i;
+        return -1;
+    }
+
+    bool getKeyByIndex(int index, T_KEY* target) const
+    {
+        if (index < 0 || index >= m_items)
             return false;
 
         *target = m_storage[index].key;
         return true;
     }
 
-    int getIndex(T_KEY key) const
+    bool getValueByIndex(int index, T_VALUE* target) const
     {
-        for (int i = 0; i < size(); i++)
-            if (m_storage[i].key == key)
-                return i;
-        return -1;
+        if (index < 0 || index >= m_items)
+            return false;
+
+        *target = m_storage[index].value;
+        return true;
     }
 
-    int size() const
+    int getSize() const
     {
         return m_items;
     }
