@@ -8,7 +8,9 @@ import RPi.GPIO as GPIO
 from time import sleep, time
 from math import cos, pi
 import flask
-import requests
+import subprocess
+import shlex
+import json
 from waitress import serve
 from random import randint
 import atexit
@@ -136,10 +138,11 @@ class NineLight:
 
     def sendToRemotes(self):
         self.updateRemotes()
-        payload = self.getStatus()
+        payload = json.dumps(self.getStatus())
         for r in self.remotes:
             if r[0] != self.remotes_skip_once:
-                requests.get("http://{}:{}/9light/remote".format(r[0], self.remotes_http_port), json=payload)
+                cmd = "curl -fs -X GET \"http://{}:{}/9light/remote\" -d '{}' > /dev/null".format(r[0], self.remotes_http_port, payload)
+                subprocess.Popen(shlex.split(cmd))
         self.remotes_skip_once = None
 
     def onStateChange(self):
