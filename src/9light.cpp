@@ -185,7 +185,6 @@ void NineLightRemote::receiveRemoteRequest()
         {
             memset(request, 0, sizeof(request));
             bytes = client.readBytesUntil('\n', request, sizeof(request));
-            SerialUSB.println(request);
             if (bytes == 0)
                 break;
         } while (request[0] != '{');
