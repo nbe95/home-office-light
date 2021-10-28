@@ -99,19 +99,17 @@ void NineLightRemote::updateLeds()
             }
             case state::REQUEST:
             {
-                WaveAnimation* ptr = new WaveAnimation();
+                OnOffAnimation* ptr = new OnOffAnimation();
                 ptr->setBaseColor(Animation::rgb(0, 200, 255));
-                ptr->setPeriod(300);
-                ptr->setMinMax(0, 255);
+                ptr->setOnOffTime(200, 150);
                 m_animation = ptr;
                 break;
             }
             case state::COFFEE:
             {
-                WaveAnimation* ptr = new WaveAnimation();
+                OnOffAnimation* ptr = new OnOffAnimation();
                 ptr->setBaseColor(Animation::rgb(0, 255, 0));
-                ptr->setPeriod(100);
-                ptr->setMinMax(0, 255);
+                ptr->setOnOffTime(50, 50);
                 m_animation = ptr;
                 break;
             }
