@@ -58,6 +58,9 @@ public:
     void                pollButtons();
     void                updateLeds();
 
+    // 9Light interface methods
+    void                sendStateRequest(const state state = state::UNDEFINED);
+
 private:
     // Static helper functions
     static bool         stateToCStr(const state state, char* target);
@@ -66,9 +69,6 @@ private:
 
     BridgeServer*       getHttpServer();
     BridgeHttpClient*   getHttpClient();
-
-    // 9Light interface methods
-    void                sendStateRequest(const state state = state::UNDEFINED);
 
 
     // Configuration

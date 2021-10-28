@@ -35,8 +35,8 @@ void setup()
     // Setup cyclic status requests (keep remote registration status)
     Remote.setupCylicRequest(2UL * 60 * 60 * 1000);
 
-    // Set initial state
-    Remote.setState(NineLightRemote::state::NONE);
+    // Query initial state
+    Remote.sendStateRequest();
 }
 
 
