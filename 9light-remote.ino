@@ -32,8 +32,8 @@ void setup()
     Remote.registerButton(NineLightRemote::state::NONE,     13);
     Remote.setButtonTimeout(500);
 
-    // Setup cyclic status requests (keep remote registration status)
-    Remote.setupCylicRequest(2UL * 60 * 60 * 1000);
+    // Setup automatic status requests after being idle (keep remote registration status)
+    Remote.setupIdleRequest(2UL * 60 * 60 * 1000);
 
     // Query initial state
     Remote.sendStateRequest();
@@ -44,7 +44,7 @@ void loop()
 {
     // Call cyclic processes
     Remote.receiveRemoteRequest();
-    Remote.sendCyclicRequest();
+    Remote.sendRequestIfIdle();
     Remote.pollButtons();
     Remote.updateLeds();
 }

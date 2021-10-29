@@ -10,6 +10,7 @@
 
 #define HTTP_READ_TIMEOUT 10
 
+
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
     m_api_config(api_config),
     m_led_config(led_config),
@@ -61,9 +62,9 @@ void NineLightRemote::setButtonTimeout(const Timer::ms timeout)
 }
 
 
-void NineLightRemote::setupCylicRequest(const Timer::ms interval)
+void NineLightRemote::setupIdleRequest(const Timer::ms interval)
 {
-    m_cyclic_request_timer.setDuration(interval);
+    m_idle_timer.setDuration(interval);
 }
 
 
@@ -122,23 +123,6 @@ void NineLightRemote::updateLeds()
         }
     }
 
-    //// On/off animation
-    //if (m_leds_state == state::REQUEST)
-    //{
-        //// Full period expired?
-        //if (m_leds_timer.check())
-        //{
-            //m_leds_timer.restart();
-            //if (m_leds_state == state::COFFEE)
-                //m_leds_color = random(0xFFFFFF);
-        //}
-        //// Half period expired?
-        //else if (m_leds_timer.getElapsedTime() >= m_leds_timer.getDuration() / 2)
-        //{
-            //m_leds_color = 0;
-        //}
-    //}
-
     Animation::color col = 0;
     if (m_animation)
         col = m_animation->getColor();
@@ -196,17 +180,17 @@ void NineLightRemote::receiveRemoteRequest()
 }
 
 
-void NineLightRemote::sendCyclicRequest()
+void NineLightRemote::sendRequestIfIdle()
 {
-    if (!m_cyclic_request_timer.isSet())
+    if (!m_idle_timer.isSet())
         return;
 
-    m_cyclic_request_timer.start();
-    if (m_cyclic_request_timer.check())
+    m_idle_timer.start();
+    if (m_idle_timer.check())
     {
         SerialUSB.println(F("Time for a cyclic status request in order to keep the remote registration status."));
         sendStateRequest();
-        m_cyclic_request_timer.restart();
+        m_idle_timer.restart();
     }
 }
 
@@ -241,6 +225,8 @@ void NineLightRemote::sendStateRequest(const state state_req)
         if (result != state::UNDEFINED)
             setState(result);
     }
+
+    m_idle_timer.restart();
 }
 
 

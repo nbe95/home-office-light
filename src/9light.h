@@ -35,10 +35,6 @@ public:
         uint16_t    num_leds;
         uint16_t    options;
     };
-    //struct button_map
-        //state   button;
-        //pin     di_pin;
-    //};
 
     // Constructor and destructor
     NineLightRemote(const api_config* const api_config, const led_config* const led_config);
@@ -50,11 +46,11 @@ public:
     // Setup
     bool                registerButton(const state state, const pin pin, const bool int_pullup = true);
     void                setButtonTimeout(const Timer::ms timeout);
-    void                setupCylicRequest(const Timer::ms interval);
+    void                setupIdleRequest(const Timer::ms interval);
 
     // Cylic routines
     void                receiveRemoteRequest();
-    void                sendCyclicRequest();
+    void                sendRequestIfIdle();
     void                pollButtons();
     void                updateLeds();
 
@@ -79,7 +75,7 @@ private:
 
     // Internal status
     state               m_state = state::UNDEFINED;
-    Timer               m_cyclic_request_timer;
+    Timer               m_idle_timer;
 
     // LED status
     Adafruit_NeoPixel*  m_pixels;
