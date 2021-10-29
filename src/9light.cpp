@@ -13,7 +13,8 @@
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
     m_api_config(api_config),
     m_led_config(led_config),
-    m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options))
+    m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
+    m_button_map(Map<state,pin>(state::UNDEFINED,0))
 {
     m_pixels->begin();
 }
@@ -152,19 +153,12 @@ void NineLightRemote::pollButtons()
     if (!m_button_timer.check())
         return;
 
-    state button = state::UNDEFINED;
-    pin di_pin = 0;
     for (int i = 0; i < m_button_map.getSize(); i++)
     {
-        m_button_map.getKeyByIndex(i, &button);
-        m_button_map.getValueByIndex(i, &di_pin);
-
-        if (di_pin != 0 && digitalRead(di_pin) == LOW)
+        if (m_button_map.getValueByIndex(i) != 0 && digitalRead(m_button_map.getValueByIndex(i)) == LOW)
         {
-            SerialUSB.print(F("Button with function '"));
-            SerialUSB.print(button);
-            SerialUSB.println(F("' pressed!"));
-            sendStateRequest(button);
+            SerialUSB.println(F("Button on remote pressed!"));
+            sendStateRequest(m_button_map.getKeyByIndex(i));
             m_button_timer.restart();
             return;
         }

@@ -10,7 +10,15 @@ public:
     struct key_value { T_KEY key; T_VALUE value; };
 
     // Constructor for an empty set
-    Map(): m_storage(0), m_items(0) {};
+    Map(T_KEY fallback_key, T_VALUE fallback_value):
+        m_fallback_key(fallback_key),
+        m_fallback_value(fallback_value),
+        m_storage(0),
+        m_items(0)
+    {};
+
+    // Destructor for storage cleanup
+    ~Map() { if (m_storage) free(m_storage); };
 
     // Adds a key-value pair to the set (resizes the allocated memory)
     bool addPair(T_KEY key, T_VALUE value)
@@ -54,14 +62,13 @@ public:
     }
 
     // Fetches the value of an element identified by its key
-    bool getValue(T_KEY key, T_VALUE* target) const
+    T_VALUE getValue(T_KEY key) const
     {
         int index = getIndex(key);
         if (index < 0 || index >= m_items)
-            return false;
+            return m_fallback_value;
 
-        *target = m_storage[index].value;
-        return true;
+        return m_storage[index].value;
     }
 
     // Fetches the numerical index (=array position) of an element identified by its key
@@ -74,23 +81,21 @@ public:
     }
 
     // Fetches the key of an element identified by its index
-    bool getKeyByIndex(int index, T_KEY* target) const
+    T_KEY getKeyByIndex(int index) const
     {
         if (index < 0 || index >= m_items)
-            return false;
+            return m_fallback_key;
 
-        *target = m_storage[index].key;
-        return true;
+        return m_storage[index].key;
     }
 
     // Fetches the value of an element identified by its index
-    bool getValueByIndex(int index, T_VALUE* target) const
+    T_VALUE getValueByIndex(int index) const
     {
         if (index < 0 || index >= m_items)
-            return false;
+            return m_fallback_value;
 
-        *target = m_storage[index].value;
-        return true;
+        return m_storage[index].value;
     }
 
     // Retreives the number of elements currently holded by the map
@@ -100,8 +105,10 @@ public:
     }
 
 private:
-    key_value* m_storage;
-    int m_items;
+    const T_KEY     m_fallback_key;
+    const T_VALUE   m_fallback_value;
+    key_value*      m_storage;
+    int             m_items;
 };
 
 #endif /* _MAP_H_ */
