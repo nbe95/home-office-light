@@ -136,7 +136,7 @@ void NineLightRemote::pollButtons()
     if (!m_button_timer.check())
         return;
 
-    for (int i = 0; i < m_button_map.getSize(); i++)
+    for (int i = 0; i < m_button_map.size(); i++)
     {
         if (m_button_map.getValueByIndex(i) != 0 && digitalRead(m_button_map.getValueByIndex(i)) == LOW)
         {

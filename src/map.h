@@ -43,11 +43,20 @@ public:
     bool removePair(T_KEY key)
     {
         int index = getIndex(key);
-        if (index < 0)
+        if (index < 0 || index >= m_items)
+            return false;
+
+        return removePairByIndex(index);
+    }
+
+    // Removes a specified data set identified by its index from the set (resizes the allocated memory)
+    bool removePairByIndex(int index)
+    {
+        if (index < 0 || index >= m_items)
             return false;
 
         int j = 0;
-        for (int i = 0; i < getSize(); i++)
+        for (int i = 0; i < size(); i++)
             if (i != index)
                 m_storage[j++] = m_storage[i];
 
@@ -74,7 +83,7 @@ public:
     // Fetches the numerical index (=array position) of an element identified by its key
     int getIndex(T_KEY key) const
     {
-        for (int i = 0; i < getSize(); i++)
+        for (int i = 0; i < size(); i++)
             if (m_storage[i].key == key)
                 return i;
         return -1;
@@ -99,7 +108,7 @@ public:
     }
 
     // Retreives the number of elements currently holded by the map
-    int getSize() const
+    int size() const
     {
         return m_items;
     }
@@ -109,12 +118,12 @@ public:
     {
         const size_t key_size = sizeof(T_KEY);
         const size_t value_size = sizeof(T_VALUE);
-        const size_t total_size = getSize() * sizeof(key_value);
+        const size_t total_size = size() * sizeof(key_value);
         char headline[100] = {0};
         sprintf(headline, "Map size: %dB | Key size: %dB | Value size: %dB | Total entries: %d | Allocated at: 0x%x", total_size, key_size, value_size, m_items, m_storage);
         stream.println(headline);
 
-        for (int i = 0; i < getSize(); i++)
+        for (int i = 0; i < size(); i++)
         {
             stream.print(F("["));
             stream.print(i);
