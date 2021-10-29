@@ -104,6 +104,27 @@ public:
         return m_items;
     }
 
+    // Dumps the map's contents to a stream object
+    void dumps(Stream& stream)
+    {
+        const size_t key_size = sizeof(T_KEY);
+        const size_t value_size = sizeof(T_VALUE);
+        const size_t total_size = getSize() * sizeof(key_value);
+        char headline[100] = {0};
+        sprintf(headline, "Map size: %dB | Key size: %dB | Value size: %dB | Total entries: %d | Allocated at: 0x%x", total_size, key_size, value_size, m_items, m_storage);
+        stream.println(headline);
+
+        for (int i = 0; i < getSize(); i++)
+        {
+            stream.print(F("["));
+            stream.print(i);
+            stream.print(F("]  "));
+            stream.print(getKeyByIndex(i));
+            stream.print(F(" -> "));
+            stream.println(getValueByIndex(i));
+        }
+    }
+
 private:
     const T_KEY     m_fallback_key;
     const T_VALUE   m_fallback_value;
