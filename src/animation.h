@@ -9,11 +9,13 @@ class Animation
 {
 public:
     typedef uint32_t color;
-    static color rgb(uint8_t r, uint8_t g, uint8_t b)
-    { return ((color)r << 8 | g) << 8 | b; };
+    static uint8_t Red(const color color) { return (color >> 16) & 0xFF; }
+    static uint8_t Green(const color color) { return (color >> 8) & 0xFF; }
+    static uint8_t Blue(const color color) { return (color >> 0) & 0xFF; }
+    static color RGB(uint8_t r, uint8_t g, uint8_t b) { return ((color)r << 8 | g) << 8 | b; };
 
-    Animation() { start(); };
-    void start() { m_timer.restart(); };
+    Animation(): m_timer(Timer(1000)) { start(); };
+    virtual void start() { m_timer.restart(); };
     virtual color getColor() = 0;
 
 protected:
@@ -26,34 +28,28 @@ class WaveAnimation: public Animation
 {
 public:
     WaveAnimation(): Animation() {}
-    void setBaseColor(const color base_color)
-    { m_base_color = base_color; }
-    void setPeriod(const Timer::ms period)
-    { m_timer.setDuration(period); }
-    void setMinMax(const uint8_t min, const uint8_t max)
-    { m_min = min; m_max = max; }
+    void setBaseColor(const color base_color) { m_base_color = base_color; }
+    void setPeriod(const Timer::ms period) { m_timer.setDuration(period); }
+    void setMinMax(const uint8_t min, const uint8_t max) { m_min = min; m_max = max; }
 
     color getColor()
     {
         float cosine = 0;
         if (m_timer.getDuration() > 0)
             cosine = 0.5 * (cos(TWO_PI * m_timer.getElapsedTime() / m_timer.getDuration()) + 1);
-        float brightness = cosine * (m_max - m_min) + m_min;
+        float scaling = (cosine * (m_max - m_min) + m_min) / 255;
 
-        color current_color = m_base_color;
-        for (byte offset = 0; offset <= 16; offset += 8)
-        {
-            color component = ((current_color >> offset) & 0xFF) * brightness / 255;
-            current_color &= ~((color)0xFF << offset);
-            current_color |= (component << offset);
-        }
-        return current_color;
+        return RGB(
+            Red(m_base_color) * scaling,
+            Green(m_base_color) * scaling,
+            Blue(m_base_color) * scaling
+        );
     };
 
 private:
     color m_base_color;
-    uint8_t m_min;
-    uint8_t m_max;
+    uint8_t m_min = 0;
+    uint8_t m_max = 255;
 };
 
 
@@ -83,8 +79,49 @@ public:
 
 private:
     color m_base_color;
-    Timer::ms m_on_time;
-    Timer::ms m_off_time;
+    Timer::ms m_on_time = 500;
+    Timer::ms m_off_time = 500;
+};
+
+
+// Rainbow animation
+class RainbowAnimation: public Animation
+{
+public:
+    RainbowAnimation(): Animation() {}
+    void setPeriod(const Timer::ms period) { m_timer.setDuration(period / 6); }
+    void start() { Animation::start(); m_phase = 0; }
+
+    color getColor()
+    {
+        if (m_timer.check())
+        {
+            m_timer.restart();
+            if (++m_phase >= 6)
+                m_phase = 0;
+        }
+
+        uint8_t fade_value = m_timer.getElapsedPercentage() * 255;
+        switch (m_phase)
+        {
+            case 0:
+                return RGB(255, fade_value, 0);
+            case 1:
+                return RGB(255 - fade_value, 255, 0);
+            case 2:
+                return RGB(0, 255, fade_value);
+            case 3:
+                return RGB(0, 255 - fade_value, 255);
+            case 4:
+                return RGB(fade_value, 0, 255);
+            case 5:
+                return RGB(255, 0, 255 - fade_value);
+        }
+        return 0;
+    }
+
+private:
+    int m_phase = 0;
 };
 
 #endif /* _ANIMATION_H_ */

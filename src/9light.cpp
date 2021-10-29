@@ -109,9 +109,8 @@ void NineLightRemote::updateLeds()
             }
             case state::COFFEE:
             {
-                OnOffAnimation* ptr = new OnOffAnimation();
-                ptr->setBaseColor(Animation::rgb(0, 255, 0));
-                ptr->setOnOffTime(50, 50);
+                RainbowAnimation* ptr = new RainbowAnimation();
+                ptr->setPeriod(600);
                 m_animation = ptr;
                 break;
             }
