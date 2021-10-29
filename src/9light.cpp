@@ -84,7 +84,7 @@ void NineLightRemote::updateLeds()
             case state::CALL:
             {
                 WaveAnimation* ptr = new WaveAnimation();
-                ptr->setBaseColor(Animation::rgb(255, 150, 0));
+                ptr->setBaseColor(Animation::RGB(255, 150, 0));
                 ptr->setPeriod(2500);
                 ptr->setMinMax(40, 255);
                 m_animation = ptr;
@@ -93,7 +93,7 @@ void NineLightRemote::updateLeds()
             case state::VIDEO:
             {
                 WaveAnimation* ptr = new WaveAnimation();
-                ptr->setBaseColor(Animation::rgb(255, 0, 0));
+                ptr->setBaseColor(Animation::RGB(255, 0, 0));
                 ptr->setPeriod(2500);
                 ptr->setMinMax(40, 255);
                 m_animation = ptr;
@@ -102,7 +102,7 @@ void NineLightRemote::updateLeds()
             case state::REQUEST:
             {
                 OnOffAnimation* ptr = new OnOffAnimation();
-                ptr->setBaseColor(Animation::rgb(0, 200, 255));
+                ptr->setBaseColor(Animation::RGB(0, 200, 255));
                 ptr->setOnOffTime(200, 150);
                 m_animation = ptr;
                 break;
@@ -172,7 +172,7 @@ void NineLightRemote::receiveRemoteRequest()
         SerialUSB.print(F("Incoming HTTP request: "));
         SerialUSB.println(request);
 
-        state result = parseJsonState(request);
+        state result = ParseJsonState(request);
         if (result != state::UNDEFINED)
             setState(result);
     }
@@ -202,7 +202,7 @@ void NineLightRemote::sendStateRequest(const state state_req)
     if (state_req != state::UNDEFINED)
     {
         char state_str[10] = "undefined";
-        stateToCStr(state_req, state_str);
+        StateToCStr(state_req, state_str);
         sprintf(query, "%s:%d%s/set?status=%s&remote", m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
     }
     else
@@ -221,7 +221,7 @@ void NineLightRemote::sendStateRequest(const state state_req)
         SerialUSB.print(F("Got response: "));
         SerialUSB.println(response);
 
-        state result = parseJsonState(response);
+        state result = ParseJsonState(response);
         if (result != state::UNDEFINED)
             setState(result);
     }
@@ -230,7 +230,7 @@ void NineLightRemote::sendStateRequest(const state state_req)
 }
 
 
-bool NineLightRemote::stateToCStr(const state state, char* target)
+bool NineLightRemote::StateToCStr(const state state, char* target)
 {
     switch (state)
     {
@@ -254,7 +254,7 @@ bool NineLightRemote::stateToCStr(const state state, char* target)
 }
 
 
-NineLightRemote::state NineLightRemote::stateFromCStr(const char* buffer)
+NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer)
 {
     const char status_none[]    = "none";
     const char status_call[]    = "call";
@@ -277,7 +277,7 @@ NineLightRemote::state NineLightRemote::stateFromCStr(const char* buffer)
 }
 
 
-NineLightRemote::state NineLightRemote::parseJsonState(const char* buffer)
+NineLightRemote::state NineLightRemote::ParseJsonState(const char* buffer)
 {
     // Look for JSON key
     const char key[] = "\"status\":";
@@ -289,5 +289,5 @@ NineLightRemote::state NineLightRemote::parseJsonState(const char* buffer)
     ptr += strlen(key);
     while (*ptr++ == ' ') ;
 
-    return stateFromCStr(ptr);
+    return StateFromCStr(ptr);
 }

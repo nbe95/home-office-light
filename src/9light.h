@@ -59,9 +59,9 @@ public:
 
 private:
     // Static helper functions
-    static bool         stateToCStr(const state state, char* target);
-    static state        stateFromCStr(const char* buffer);
-    static state        parseJsonState(const char* buffer);
+    static bool         StateToCStr(const state state, char* target);
+    static state        StateFromCStr(const char* buffer);
+    static state        ParseJsonState(const char* buffer);
 
     BridgeServer*       getHttpServer();
     BridgeHttpClient*   getHttpClient();
