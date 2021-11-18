@@ -39,6 +39,7 @@ public:
 
     // Constructor and destructor
     NineLightRemote(const api_config* const api_config, const led_config* const led_config);
+    ~NineLightRemote();
 
     // General methods
     void                setState(const state state) { m_state = state; };
