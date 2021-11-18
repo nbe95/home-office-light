@@ -3,6 +3,7 @@
 
 // Include necessary headers
 #include "timer.h"
+#include "helpers.h"
 
 
 // Debouncer class
@@ -11,12 +12,10 @@ class Debouncer
 {
 public:
     // Constructor
-    Debouncer(Timer::ms threshold = 0):
-        m_timer(threshold)
-    {}
+    Debouncer(Timer::ms threshold = 0): m_timer(threshold) {}
 
     // Updates the internal value and performs the debouncing
-    void update(T value) {
+    void debounce(T value) {
         // Start timer on the first update
         if (!m_timer.isRunning())
             m_timer.start();
@@ -61,6 +60,33 @@ protected:
     bool    m_changed = false;
     bool    m_valid = false;
     Timer   m_timer;
+};
+
+
+// Debounced button auxiliar class
+class DebouncedButton: public Debouncer<bool>
+{
+public:
+    // Constructor
+    DebouncedButton(Timer::ms threshold = 0) : Debouncer(threshold) {}
+
+    // Hardware setup
+    void setPin(const pin input_pin, const bool invert = false, const bool int_pullup = true)
+    {
+        m_pin = input_pin;
+        m_invert = invert;
+        pinMode(input_pin, (int_pullup ? INPUT_PULLUP : INPUT));
+    }
+
+    // Status of button
+    pin getPin() const { return m_pin; }
+    bool readPin() const { return digitalRead(m_pin) == (m_invert ? HIGH : LOW); }
+    void debounce() { Debouncer::debounce(readPin()); }
+    bool isPressed() { return get(); }
+
+protected:
+    pin     m_pin;
+    bool    m_invert;
 };
 
 #endif /* _DEBOUNCER_H_ */
