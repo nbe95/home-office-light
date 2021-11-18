@@ -80,7 +80,7 @@ public:
 
     // Status of button
     pin getPin() const { return m_pin; }
-    bool readPin() const { return digitalRead(m_pin) == (m_invert ? HIGH : LOW); }
+    bool readPin() const { return digitalRead(m_pin) == m_invert ? HIGH : LOW; }
     void debounce() { Debouncer::debounce(readPin()); }
     bool isPressed() const { return get(); }
 

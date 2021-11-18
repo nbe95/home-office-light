@@ -148,7 +148,6 @@ void NineLightRemote::pollButtons()
             {
                 SerialUSB.println(F("Button on remote pressed!"));
                 sendStateRequest(m_button_map.getKeyByIndex(i));
-                return;
             }
         }
     }
