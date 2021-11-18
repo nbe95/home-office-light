@@ -82,7 +82,7 @@ public:
     pin getPin() const { return m_pin; }
     bool readPin() const { return digitalRead(m_pin) == (m_invert ? HIGH : LOW); }
     void debounce() { Debouncer::debounce(readPin()); }
-    bool isPressed() { return get(); }
+    bool isPressed() const { return get(); }
 
 protected:
     pin     m_pin;
