@@ -15,7 +15,7 @@ public:
         m_fallback_value(fallback_value),
         m_storage(0),
         m_items(0)
-    {};
+    {}
 
     // Destructor for storage cleanup
     ~Map() { if (m_storage) free(m_storage); };
@@ -37,7 +37,7 @@ public:
         m_storage[index].value = value;
 
         return true;
-    };
+    }
 
     // Removes a specified key-value pair from the set (resizes the allocated memory)
     bool removePair(T_KEY key)
@@ -113,25 +113,51 @@ public:
         return m_items;
     }
 
+    // Retreives the total storage size of the map content
+    size_t storageSize() const
+    {
+        return m_items * sizeof(key_value);
+    }
+
+    // Checks if a specific key is set
+    bool hasKey(T_KEY key) const
+    {
+        for (int i = 0; i < size(); i++)
+            if (m_storage[i].key == key)
+                return true;
+        return false;
+    }
+
+    // Checks if a specific value is set
+    bool hasValue(T_VALUE value) const
+    {
+        for (int i = 0; i < size(); i++)
+            if (m_storage[i].value == value)
+                return true;
+        return false;
+    }
+
     // Dumps the map's contents to a stream object
     void dumps(Stream& stream)
     {
-        const size_t key_size = sizeof(T_KEY);
-        const size_t value_size = sizeof(T_VALUE);
-        const size_t total_size = size() * sizeof(key_value);
-        char headline[100] = {0};
-        sprintf(headline, "Map size: %dB | Key size: %dB | Value size: %dB | Total entries: %d | Allocated at: 0x%x", total_size, key_size, value_size, m_items, m_storage);
-        stream.println(headline);
-
+        char line[80] = {0};
         for (int i = 0; i < size(); i++)
         {
-            stream.print(F("["));
-            stream.print(i);
-            stream.print(F("]  "));
+            sprintf_P(line, PSTR("[%02d]  "), i);
+            stream.print(line);
             stream.print(getKeyByIndex(i));
             stream.print(F(" -> "));
             stream.println(getValueByIndex(i));
         }
+
+        sprintf_P(line, PSTR("Key/value/total size: %d/%d/%dB, %d entries allocated at %06p"),
+            sizeof(T_KEY),
+            sizeof(T_VALUE),
+            size() * sizeof(key_value),
+            m_items,
+            m_storage
+        );
+        stream.println(line);
     }
 
 private:
