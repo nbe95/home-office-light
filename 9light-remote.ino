@@ -26,11 +26,10 @@ void setup()
     SerialUSB.begin(115200);
 
     // Register remote buttons
-    Remote.registerButton(NineLightRemote::state::CALL,     10);
-    Remote.registerButton(NineLightRemote::state::VIDEO,    11);
-    Remote.registerButton(NineLightRemote::state::COFFEE,   12);
-    Remote.registerButton(NineLightRemote::state::NONE,     13);
-    Remote.setButtonTimeout(500);
+    Remote.registerButton(NineLightRemote::state::CALL,     10,     500);
+    Remote.registerButton(NineLightRemote::state::VIDEO,    11,     500);
+    Remote.registerButton(NineLightRemote::state::COFFEE,   12,     500);
+    Remote.registerButton(NineLightRemote::state::NONE,     13,     500);
 
     // Setup automatic status requests after being idle (keep remote registration status)
     Remote.setupIdleRequest(2UL * 60 * 60 * 1000);

@@ -15,7 +15,7 @@ NineLightRemote::NineLightRemote(const api_config* const api_config, const led_c
     m_api_config(api_config),
     m_led_config(led_config),
     m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
-    m_button_map(Map<state,pin>(state::UNDEFINED,0))
+    m_button_map(Map<state,DebouncedButton*>(state::UNDEFINED,0))
 {
     m_pixels->begin();
 }
@@ -44,21 +44,17 @@ BridgeHttpClient* NineLightRemote::getHttpClient()
 }
 
 
-bool NineLightRemote::registerButton(const state target_state, const pin button_pin, const bool int_pullup)
+bool NineLightRemote::registerButton(const state target_state, const pin button_pin, const Timer::ms debounce_time, const bool int_pullup)
 {
     if (button_pin == 0)
         return false;
 
-    m_button_map.addPair(target_state, button_pin);
-    pinMode(button_pin, (int_pullup ? INPUT_PULLUP : INPUT));
+    DebouncedButton* button = new DebouncedButton();
+    button->setPin(button_pin, false, int_pullup);
+    button->setThreshold(debounce_time);
+    m_button_map.addPair(target_state, button);
 
     return true;
-}
-
-
-void NineLightRemote::setButtonTimeout(const Timer::ms timeout)
-{
-    m_button_timer.setDuration(timeout);
 }
 
 
@@ -132,18 +128,18 @@ void NineLightRemote::updateLeds()
 
 void NineLightRemote::pollButtons()
 {
-    m_button_timer.start();
-    if (!m_button_timer.check())
-        return;
-
     for (int i = 0; i < m_button_map.size(); i++)
     {
-        if (m_button_map.getValueByIndex(i) != 0 && digitalRead(m_button_map.getValueByIndex(i)) == LOW)
+        DebouncedButton* button = m_button_map.getValueByIndex(i);
+        if (button)
         {
-            SerialUSB.println(F("Button on remote pressed!"));
-            sendStateRequest(m_button_map.getKeyByIndex(i));
-            m_button_timer.restart();
-            return;
+            button->debounce();
+            if (button->hasChanged() && button->isPressed())
+            {
+                SerialUSB.println(F("Button on remote pressed!"));
+                sendStateRequest(m_button_map.getKeyByIndex(i));
+                return;
+            }
         }
     }
 }

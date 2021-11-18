@@ -8,6 +8,7 @@
 #include <avr/power.h>
 #include "map.h"
 #include "timer.h"
+#include "debouncer.h"
 #include "animation.h"
 #include "helpers.h"
 
@@ -44,8 +45,7 @@ public:
     state               getState() const { return m_state; };
 
     // Setup
-    bool                registerButton(const state state, const pin pin, const bool int_pullup = true);
-    void                setButtonTimeout(const Timer::ms timeout);
+    bool                registerButton(const state state, const pin pin, const Timer::ms debounce_time, const bool int_pullup = true);
     void                setupIdleRequest(const Timer::ms interval);
 
     // Cylic routines
@@ -68,10 +68,9 @@ private:
 
 
     // Configuration
-    const api_config*   m_api_config;
-    const led_config*   m_led_config;
-    Map<state,pin>      m_button_map;
-    Timer               m_button_timer;
+    const api_config*           m_api_config;
+    const led_config*           m_led_config;
+    Map<state,DebouncedButton*> m_button_map;
 
     // Internal status
     state               m_state = state::UNDEFINED;
