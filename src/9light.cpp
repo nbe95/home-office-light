@@ -59,9 +59,8 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
     if (button_pin == 0)
         return false;
 
-    DebouncedButton* button = new DebouncedButton();
+    DebouncedButton* button = new DebouncedButton(debounce_time);
     button->setPin(button_pin, false, int_pullup);
-    button->setThreshold(debounce_time);
     m_button_map.addPair(target_state, button);
 
     return true;
