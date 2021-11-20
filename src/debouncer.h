@@ -28,14 +28,14 @@ public:
         }
 
         if (m_timer.check())
-            m_valid = true;
+            m_ready = true;
 
         // Fetch value changes
         m_changed = false;
         if (m_timer.check())
         {
-            // Set valid flag once debounced
-            m_valid = true;
+            // Set ready flag once debounced
+            m_ready = true;
             if (m_debounced != m_value)
             {
                 m_debounced = m_value;
@@ -46,9 +46,9 @@ public:
 
     T       get() const { return m_debounced; }             // Retreive the debounced value
     T       getRaw() const { return m_value; }              // Retreive the raw value
-    bool    isValid() const { return m_valid; }             // Check if the value is properly debounced
+    bool    isReady() const { return m_ready; }             // Check if the value is properly debounced
     void    reset()                                         // Reset internal states
-                { m_valid = false; m_changed = false; m_timer.reset(); }
+                { m_ready = false; m_changed = false; m_timer.reset(); }
     bool    hasChanged()                                    // Fetch any edge
                 { if (m_changed) { m_changed = false; return true; } return false; }
     void    setThreshold(Timer::ms threshold)               // Set the debouncing threshold
@@ -58,31 +58,35 @@ protected:
     T       m_value;
     T       m_debounced;
     bool    m_changed = false;
-    bool    m_valid = false;
+    bool    m_ready = false;
     Timer   m_timer;
 };
 
 
-// Debounced button auxiliar class
-class DebouncedButton: public Debouncer<bool>
+// Auxiliar class for buttons, switches and binary sensors
+class DebouncedSwitch: public Debouncer<bool>
 {
 public:
     // Constructor
-    DebouncedButton(Timer::ms threshold = 0) : Debouncer(threshold) {}
+    DebouncedSwitch(Timer::ms threshold = 0) : Debouncer(threshold) {}
 
     // Hardware setup
-    void setPin(const pin input_pin, const bool invert = false, const bool int_pullup = true)
+    void setInputPin(const pin input_pin, const bool invert = false, const bool int_pullup = true)
     {
         m_pin = input_pin;
         m_invert = invert;
         pinMode(input_pin, (int_pullup ? INPUT_PULLUP : INPUT));
     }
+    pin     getInputPin() const { return m_pin; }
+    bool    getInputInvert() const { return m_invert; }
 
-    // Status of button
-    pin getPin() const { return m_pin; }
-    bool readPin() const { return digitalRead(m_pin) == m_invert ? HIGH : LOW; }
-    void debounce() { Debouncer::debounce(readPin()); }
-    bool isPressed() const { return get(); }
+    // Debouncing
+    bool    readStatus() const { if (!m_pin) return false; return (digitalRead(m_pin) == LOW) ^ m_invert; }
+    void    debounce() { if (m_pin) Debouncer::debounce(readStatus()); }
+
+    // Switch status
+    bool    isOpen() const { return get(); }
+    bool    isClosed() const { return get(); }
 
 protected:
     pin     m_pin;

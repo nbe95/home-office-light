@@ -15,7 +15,7 @@ NineLightRemote::NineLightRemote(const api_config* const api_config, const led_c
     m_api_config(api_config),
     m_led_config(led_config),
     m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
-    m_button_map(Map<state,DebouncedButton*>(state::UNDEFINED,0))
+    m_button_map(Map<state,DebouncedSwitch*>(state::UNDEFINED,0))
 {
     m_pixels->begin();
 }
@@ -59,8 +59,8 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
     if (button_pin == 0)
         return false;
 
-    DebouncedButton* button = new DebouncedButton(debounce_time);
-    button->setPin(button_pin, false, int_pullup);
+    DebouncedSwitch* button = new DebouncedSwitch(debounce_time);
+    button->setInputPin(button_pin, false, int_pullup);
     m_button_map.addPair(target_state, button);
 
     return true;
@@ -139,11 +139,11 @@ void NineLightRemote::pollButtons()
 {
     for (int i = 0; i < m_button_map.size(); i++)
     {
-        DebouncedButton* button = m_button_map.getValueByIndex(i);
+        DebouncedSwitch* button = m_button_map.getValueByIndex(i);
         if (button)
         {
             button->debounce();
-            if (button->hasChanged() && button->isPressed())
+            if (button->hasChanged() && button->isClosed())
             {
                 SerialUSB.println(F("Button on remote pressed!"));
                 sendStateRequest(m_button_map.getKeyByIndex(i));

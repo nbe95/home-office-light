@@ -71,7 +71,7 @@ private:
     // Configuration
     const api_config*           m_api_config;
     const led_config*           m_led_config;
-    Map<state,DebouncedButton*> m_button_map;
+    Map<state,DebouncedSwitch*> m_button_map;
 
     // Internal status
     state               m_state = state::UNDEFINED;
