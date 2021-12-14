@@ -1,11 +1,10 @@
-#ifndef _MAP_H_
-#define _MAP_H_
+#ifndef SRC_MAP_H_
+#define SRC_MAP_H_
 
 // Simple map helper class
 template<class T_KEY, class T_VALUE>
-class Map
-{
-public:
+class Map {
+ public:
     // Definition of template data structure
     struct key_value { T_KEY key; T_VALUE value; };
 
@@ -18,14 +17,12 @@ public:
     {}
 
     // Destructor for storage cleanup
-    ~Map() { if (m_storage) free(m_storage); };
+    ~Map() { if (m_storage) free(m_storage); }
 
     // Adds a key-value pair to the set (resizes the allocated memory)
-    bool addPair(T_KEY key, T_VALUE value)
-    {
+    bool addPair(T_KEY key, T_VALUE value) {
         int index = getIndex(key);
-        if (index < 0)
-        {
+        if (index < 0) {
             size_t new_size = (m_items + 1) * sizeof(key_value);
             void* new_pointer = realloc(m_storage, new_size);
             if (!new_pointer)
@@ -40,8 +37,7 @@ public:
     }
 
     // Removes a specified key-value pair from the set (resizes the allocated memory)
-    bool removePair(T_KEY key)
-    {
+    bool removePair(T_KEY key) {
         int index = getIndex(key);
         if (index < 0 || index >= m_items)
             return false;
@@ -50,8 +46,7 @@ public:
     }
 
     // Removes a specified data set identified by its index from the set (resizes the allocated memory)
-    bool removePairByIndex(int index)
-    {
+    bool removePairByIndex(int index) {
         if (index < 0 || index >= m_items)
             return false;
 
@@ -71,8 +66,7 @@ public:
     }
 
     // Fetches the value of an element identified by its key
-    T_VALUE getValue(T_KEY key) const
-    {
+    T_VALUE getValue(T_KEY key) const {
         int index = getIndex(key);
         if (index < 0 || index >= m_items)
             return m_fallback_value;
@@ -81,8 +75,7 @@ public:
     }
 
     // Fetches the numerical index (=array position) of an element identified by its key
-    int getIndex(T_KEY key) const
-    {
+    int getIndex(T_KEY key) const {
         for (int i = 0; i < size(); i++)
             if (m_storage[i].key == key)
                 return i;
@@ -90,8 +83,7 @@ public:
     }
 
     // Fetches the key of an element identified by its index
-    T_KEY getKeyByIndex(int index) const
-    {
+    T_KEY getKeyByIndex(int index) const {
         if (index < 0 || index >= m_items)
             return m_fallback_key;
 
@@ -99,8 +91,7 @@ public:
     }
 
     // Fetches the value of an element identified by its index
-    T_VALUE getValueByIndex(int index) const
-    {
+    T_VALUE getValueByIndex(int index) const {
         if (index < 0 || index >= m_items)
             return m_fallback_value;
 
@@ -108,20 +99,17 @@ public:
     }
 
     // Retreives the number of elements currently holded by the map
-    int size() const
-    {
+    int size() const {
         return m_items;
     }
 
     // Retreives the total storage size of the map content
-    size_t storageSize() const
-    {
+    size_t storageSize() const {
         return m_items * sizeof(key_value);
     }
 
     // Checks if a specific key is set
-    bool hasKey(T_KEY key) const
-    {
+    bool hasKey(T_KEY key) const {
         for (int i = 0; i < size(); i++)
             if (m_storage[i].key == key)
                 return true;
@@ -129,8 +117,7 @@ public:
     }
 
     // Checks if a specific value is set
-    bool hasValue(T_VALUE value) const
-    {
+    bool hasValue(T_VALUE value) const {
         for (int i = 0; i < size(); i++)
             if (m_storage[i].value == value)
                 return true;
@@ -138,16 +125,14 @@ public:
     }
 
     // Dumps the map's contents to a stream object
-    void dumps(Stream& stream)
-    {
+    void dumps(Stream* const stream) {
         char line[80] = {0};
-        for (int i = 0; i < size(); i++)
-        {
+        for (int i = 0; i < size(); i++) {
             sprintf_P(line, PSTR("[%02d]  "), i);
-            stream.print(line);
-            stream.print(getKeyByIndex(i));
-            stream.print(F(" -> "));
-            stream.println(getValueByIndex(i));
+            stream->print(line);
+            stream->print(getKeyByIndex(i));
+            stream->print(F(" -> "));
+            stream->println(getValueByIndex(i));
         }
 
         sprintf_P(line, PSTR("Key/value/total size: %d/%d/%dB, %d entries allocated at %06p"),
@@ -155,16 +140,15 @@ public:
             sizeof(T_VALUE),
             size() * sizeof(key_value),
             m_items,
-            m_storage
-        );
-        stream.println(line);
+            m_storage);
+        stream->println(line);
     }
 
-private:
+ private:
     const T_KEY     m_fallback_key;
     const T_VALUE   m_fallback_value;
     key_value*      m_storage;
     int             m_items;
 };
 
-#endif /* _MAP_H_ */
+#endif  // SRC_MAP_H_

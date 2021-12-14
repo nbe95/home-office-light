@@ -1,6 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-//#include <avr/power.h>
-#include "src/9light.h"
+#include "./src/9light.h"
 
 
 const NineLightRemote::led_config led_config = {

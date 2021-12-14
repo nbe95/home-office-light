@@ -2,27 +2,25 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "9light.h"
-#include "map.h"
-#include "timer.h"
-#include "animation.h"
-#include "helpers.h"
+#include "./9light.h" //NOLINT
+#include "./map.h"
+#include "./timer.h"
+#include "./animation.h"
+#include "./helpers.h"
 
 #define HTTP_READ_TIMEOUT 10
 
 
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
-    m_api_config(api_config),
-    m_led_config(led_config),
-    m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
-    m_button_map(Map<state,DebouncedSwitch*>(state::UNDEFINED,0))
-{
+m_api_config(api_config),
+m_led_config(led_config),
+m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
+m_button_map(Map<state, DebouncedSwitch*>(state::UNDEFINED, 0)) {
     m_pixels->begin();
 }
 
 
-NineLightRemote::~NineLightRemote()
-{
+NineLightRemote::~NineLightRemote() {
     delete m_pixels;
     delete m_http_server;
     delete m_http_client;
@@ -31,10 +29,8 @@ NineLightRemote::~NineLightRemote()
 }
 
 
-BridgeServer* NineLightRemote::getHttpServer()
-{
-    if (!m_http_server)
-    {
+BridgeServer* NineLightRemote::getHttpServer() {
+    if (!m_http_server) {
         m_http_server = new BridgeServer(m_api_config->remote_port);
         m_http_server->noListenOnLocalhost();
         m_http_server->begin();
@@ -43,10 +39,8 @@ BridgeServer* NineLightRemote::getHttpServer()
 }
 
 
-BridgeHttpClient* NineLightRemote::getHttpClient()
-{
-    if (!m_http_client)
-    {
+BridgeHttpClient* NineLightRemote::getHttpClient() {
+    if (!m_http_client) {
         m_http_client = new BridgeHttpClient();
         m_http_client->setTimeout(HTTP_READ_TIMEOUT);
     }
@@ -54,8 +48,7 @@ BridgeHttpClient* NineLightRemote::getHttpClient()
 }
 
 
-bool NineLightRemote::registerButton(const state target_state, const pin button_pin, const Timer::ms debounce_time, const bool int_pullup)
-{
+bool NineLightRemote::registerButton(const state target_state, const pin button_pin, const Timer::ms debounce_time, const bool int_pullup) {
     if (button_pin == 0)
         return false;
 
@@ -67,61 +60,48 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
 }
 
 
-void NineLightRemote::setupIdleRequest(const Timer::ms interval)
-{
+void NineLightRemote::setupIdleRequest(const Timer::ms interval) {
     m_idle_timer.setDuration(interval);
 }
 
 
-void NineLightRemote::updateLeds()
-{
+void NineLightRemote::updateLeds() {
     // LED state machine
-    if (m_leds_state != m_state)
-    {
+    if (m_leds_state != m_state) {
         // Clear old animation
         delete m_animation;
         m_animation = 0;
 
         // Setup new animation object
         m_leds_state = m_state;
-        switch (m_leds_state)
-        {
-            case state::CALL:
-            {
-                WaveAnimation* ptr = new WaveAnimation();
+        switch (m_leds_state) {
+            case state::CALL: {
+                WaveAnimation* ptr = new WaveAnimation(2500);
                 ptr->setBaseColor(Animation::RGB(255, 150, 0));
-                ptr->setPeriod(2500);
                 ptr->setMinMax(40, 255);
                 m_animation = ptr;
                 break;
             }
-            case state::VIDEO:
-            {
-                WaveAnimation* ptr = new WaveAnimation();
+            case state::VIDEO: {
+                WaveAnimation* ptr = new WaveAnimation(2500);
                 ptr->setBaseColor(Animation::RGB(255, 0, 0));
-                ptr->setPeriod(2500);
                 ptr->setMinMax(40, 255);
                 m_animation = ptr;
                 break;
             }
-            case state::REQUEST:
-            {
-                OnOffAnimation* ptr = new OnOffAnimation();
+            case state::REQUEST: {
+                OnOffAnimation* ptr = new OnOffAnimation(200, 150);
                 ptr->setBaseColor(Animation::RGB(0, 200, 255));
-                ptr->setOnOffTime(200, 150);
                 m_animation = ptr;
                 break;
             }
-            case state::COFFEE:
-            {
-                RainbowAnimation* ptr = new RainbowAnimation();
-                ptr->setPeriod(600);
+            case state::COFFEE: {
+                RainbowAnimation* ptr = new RainbowAnimation(600);
                 m_animation = ptr;
                 break;
             }
             case state::NONE:
-            default:
-            {
+            default: {
                 break;
             }
         }
@@ -135,17 +115,13 @@ void NineLightRemote::updateLeds()
 }
 
 
-void NineLightRemote::pollButtons()
-{
-    for (int i = 0; i < m_button_map.size(); i++)
-    {
+void NineLightRemote::pollButtons() {
+    for (int i = 0; i < m_button_map.size(); i++) {
         DebouncedSwitch* button = m_button_map.getValueByIndex(i);
-        if (button)
-        {
+        if (button) {
             button->debounce();
-            if (button->hasChanged() && button->isClosed())
-            {
-                SerialUSB.println(F("Button on remote pressed!"));
+            if (button->hasChanged() && button->isClosed()) {
+                SerialUSB.println(F("Button pressed."));
                 sendStateRequest(m_button_map.getKeyByIndex(i));
             }
         }
@@ -153,17 +129,14 @@ void NineLightRemote::pollButtons()
 }
 
 
-void NineLightRemote::receiveRemoteRequest()
-{
+void NineLightRemote::receiveRemoteRequest() {
     BridgeClient client = getHttpServer()->accept();
-    if (client)
-    {
+    if (client) {
         // Find beginning of JSON payload (i.e. line starting with '{')
         char request[80] = {0};
         size_t bytes;
         client.setTimeout(HTTP_READ_TIMEOUT);
-        do
-        {
+        do {
             memset(request, 0, sizeof(request));
             bytes = client.readBytesUntil('\n', request, sizeof(request));
             if (bytes == 0)
@@ -183,14 +156,12 @@ void NineLightRemote::receiveRemoteRequest()
 }
 
 
-void NineLightRemote::sendRequestIfIdle()
-{
+void NineLightRemote::sendRequestIfIdle() {
     if (!m_idle_timer.isSet())
         return;
 
     m_idle_timer.start();
-    if (m_idle_timer.check())
-    {
+    if (m_idle_timer.check()) {
         SerialUSB.println(F("Time for a cyclic status request in order to keep the remote registration status."));
         sendStateRequest();
         m_idle_timer.restart();
@@ -199,18 +170,14 @@ void NineLightRemote::sendRequestIfIdle()
 
 
 // Will set the 9Light state if state_req is set, otherwise will only get the current state.
-void NineLightRemote::sendStateRequest(const state state_req)
-{
+void NineLightRemote::sendStateRequest(const state state_req) {
     char query[80] = {0};
-    if (state_req != state::UNDEFINED)
-    {
+    if (state_req != state::UNDEFINED) {
         char state_str[10] = "undefined";
         StateToCStr(state_req, state_str);
-        sprintf(query, "%s:%d%s/set?status=%s&remote", m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
-    }
-    else
-    {
-        sprintf(query, "%s:%d%s/get?remote", m_api_config->endpoint, m_api_config->port, m_api_config->url);
+        sprintf_P(query, PSTR("%s:%d%s/set?status=%s&remote"), m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
+    } else {
+        sprintf_P(query, PSTR("%s:%d%s/get?remote"), m_api_config->endpoint, m_api_config->port, m_api_config->url);
     }
     SerialUSB.print(F("Sending HTTP request to: "));
     SerialUSB.println(query);
@@ -218,8 +185,7 @@ void NineLightRemote::sendStateRequest(const state state_req)
     getHttpClient()->get(query);
 
     char response[80] = {0};
-    if (getHttpClient()->available())
-    {
+    if (getHttpClient()->available()) {
         getHttpClient()->readBytesUntil('\n', response, sizeof(response) - 1);
         SerialUSB.print(F("Got response: "));
         SerialUSB.println(response);
@@ -233,32 +199,29 @@ void NineLightRemote::sendStateRequest(const state state_req)
 }
 
 
-bool NineLightRemote::StateToCStr(const state state, char* target)
-{
-    switch (state)
-    {
+bool NineLightRemote::StateToCStr(const state state, char* target) {
+    switch (state) {
         case state::NONE:
-            strcpy(target, "none");
+            sprintf_P(target, PSTR("none"));
             return true;
         case state::CALL:
-            strcpy(target, "call");
+            sprintf_P(target, PSTR("call"));
             return true;
         case state::VIDEO:
-            strcpy(target, "video");
+            sprintf_P(target, PSTR("video"));
             return true;
         case state::REQUEST:
-            strcpy(target, "request");
+            sprintf_P(target, PSTR("request"));
             return true;
         case state::COFFEE:
-            strcpy(target, "coffee");
+            sprintf_P(target, PSTR("coffee"));
             return true;
     }
     return false;
 }
 
 
-NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer)
-{
+NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer) {
     const char status_none[]    = "none";
     const char status_call[]    = "call";
     const char status_video[]   = "video";
@@ -280,8 +243,7 @@ NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer)
 }
 
 
-NineLightRemote::state NineLightRemote::ParseJsonState(const char* buffer)
-{
+NineLightRemote::state NineLightRemote::ParseJsonState(const char* buffer) {
     // Look for JSON key
     const char key[] = "\"status\":";
     char *ptr = strstr(buffer, key);
@@ -290,7 +252,7 @@ NineLightRemote::state NineLightRemote::ParseJsonState(const char* buffer)
 
     // Skip any spaces
     ptr += strlen(key);
-    while (*ptr++ == ' ') ;
+    while (*ptr++ == ' ') {}
 
     return StateFromCStr(ptr);
 }

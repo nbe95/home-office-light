@@ -1,30 +1,21 @@
-#ifndef _9LIGHT_H_
-#define _9LIGHT_H_
+#ifndef SRC_9LIGHT_H_
+#define SRC_9LIGHT_H_
 
 #include <BridgeClient.h>
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include <avr/power.h>
-#include "map.h"
-#include "timer.h"
-#include "debouncer.h"
-#include "animation.h"
-#include "helpers.h"
+#include "./map.h"
+#include "./timer.h"
+#include "./debouncer.h"
+#include "./animation.h"
+#include "./helpers.h"
 
 
-class NineLightRemote
-{
-public:
+class NineLightRemote {
+ public:
     // Type definitions
-    enum state {
-        UNDEFINED,
-        NONE,
-        CALL,
-        VIDEO,
-        REQUEST,
-        COFFEE
-    };
+    enum state { UNDEFINED, NONE, CALL, VIDEO, REQUEST, COFFEE };
     struct api_config {
         const char*     endpoint;
         const char*     url;
@@ -42,8 +33,8 @@ public:
     ~NineLightRemote();
 
     // General methods
-    void                setState(const state state) { m_state = state; };
-    state               getState() const { return m_state; };
+    void                setState(const state state) { m_state = state; }
+    state               getState() const { return m_state; }
 
     // Setup
     bool                registerButton(const state state, const pin pin, const Timer::ms debounce_time, const bool int_pullup = true);
@@ -58,7 +49,7 @@ public:
     // 9Light interface methods
     void                sendStateRequest(const state state = state::UNDEFINED);
 
-private:
+ private:
     // Static helper functions
     static bool         StateToCStr(const state state, char* target);
     static state        StateFromCStr(const char* buffer);
@@ -69,9 +60,9 @@ private:
 
 
     // Configuration
-    const api_config*           m_api_config;
-    const led_config*           m_led_config;
-    Map<state,DebouncedSwitch*> m_button_map;
+    const api_config*   m_api_config;
+    const led_config*   m_led_config;
+    Map<state, DebouncedSwitch*> m_button_map;
 
     // Internal status
     state               m_state = state::UNDEFINED;
@@ -87,4 +78,4 @@ private:
     BridgeServer*       m_http_server;
 };
 
-#endif /* _9LIGHT_H_ */
+#endif  // SRC_9LIGHT_H_
