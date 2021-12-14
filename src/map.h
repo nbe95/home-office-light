@@ -10,14 +10,17 @@ class Map {
 
     // Constructor for an empty set
     Map(T_KEY fallback_key, T_VALUE fallback_value):
-        m_fallback_key(fallback_key),
-        m_fallback_value(fallback_value),
-        m_storage(0),
-        m_items(0)
+    m_fallback_key(fallback_key),
+    m_fallback_value(fallback_value),
+    m_storage(0),
+    m_items(0)
     {}
 
     // Destructor for storage cleanup
-    ~Map() { if (m_storage) free(m_storage); }
+    ~Map() {
+        if (m_storage)
+            free(m_storage);
+    }
 
     // Adds a key-value pair to the set (resizes the allocated memory)
     bool addPair(T_KEY key, T_VALUE value) {

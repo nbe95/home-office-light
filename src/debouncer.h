@@ -11,7 +11,8 @@ template<class T>
 class Debouncer {
  public:
     // Constructor
-    explicit Debouncer(Timer::ms threshold = 0): m_timer(threshold) {}
+    explicit Debouncer(Timer::ms threshold = 0):
+    m_timer(threshold) {}
 
     // Updates the internal value and performs the debouncing
     void debounce(T value) {
@@ -40,15 +41,29 @@ class Debouncer {
         }
     }
 
-    T       get() const { return m_debounced; }             // Retreive the debounced value
-    T       getRaw() const { return m_value; }              // Retreive the raw value
-    bool    isReady() const { return m_ready; }             // Check if the value is properly debounced
-    void    reset()                                         // Reset internal states
-                { m_ready = false; m_changed = false; m_timer.reset(); } //NOLINT
-    bool    hasChanged()                                    // Fetch any edge
-                { if (m_changed) { m_changed = false; return true; } return false; } //NOLINT
-    void    setThreshold(Timer::ms threshold)               // Set the debouncing threshold
-                { m_timer.setDuration(threshold); }
+    // Retreive the debounced or raw value
+    T get() const { return m_debounced; }
+    T getRaw() const { return m_value; }
+    bool isReady() const { return m_ready; }
+
+    // Set the debouncing threshold
+    void setThreshold(Timer::ms threshold) { m_timer.setDuration(threshold); }
+
+    // Reset internal states
+    void reset() {
+        m_ready = false;
+        m_changed = false;
+        m_timer.reset();
+    }
+
+    // Fetch any signal edge
+    bool hasChanged() {
+        if (m_changed) {
+            m_changed = false;
+            return true;
+        }
+        return false;
+    }
 
  protected:
     T       m_value;
@@ -63,7 +78,8 @@ class Debouncer {
 class DebouncedSwitch: public Debouncer<bool> {
  public:
     // Constructor
-    explicit DebouncedSwitch(Timer::ms threshold = 0) : Debouncer(threshold) {}
+    explicit DebouncedSwitch(Timer::ms threshold = 0):
+    Debouncer(threshold) {}
 
     // Hardware setup
     void setInputPin(const pin input_pin, const bool invert = false, const bool int_pullup = true) {
@@ -71,16 +87,16 @@ class DebouncedSwitch: public Debouncer<bool> {
         m_invert = invert;
         pinMode(input_pin, (int_pullup ? INPUT_PULLUP : INPUT));
     }
-    pin     getInputPin() const { return m_pin; }
-    bool    getInputInvert() const { return m_invert; }
+    pin getInputPin() const { return m_pin; }
+    bool getInputInvert() const { return m_invert; }
 
     // Debouncing
-    bool    readStatus() const { return m_pin ? (digitalRead(m_pin) == LOW) ^ m_invert : false; }
-    void    debounce() { if (m_pin) Debouncer::debounce(readStatus()); }
+    bool readStatus() const { return m_pin ? (digitalRead(m_pin) == LOW) ^ m_invert : false; }
+    void debounce() { if (m_pin) Debouncer::debounce(readStatus()); }
 
     // Switch status
-    bool    isOpen() const { return get(); }
-    bool    isClosed() const { return get(); }
+    bool isOpen() const { return get(); }
+    bool isClosed() const { return get(); }
 
  protected:
     pin     m_pin;
