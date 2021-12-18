@@ -3,7 +3,7 @@
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
 #include "./9light.h" //NOLINT
-#include "./map.h"
+#include "./lookup-table.h"
 #include "./timer.h"
 #include "./animation.h"
 #include "./helpers.h"
@@ -14,8 +14,7 @@
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
 m_api_config(api_config),
 m_led_config(led_config),
-m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)),
-m_button_map(Map<state, DebouncedSwitch*>(state::UNDEFINED, 0)) {
+m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)) {
     m_pixels->begin();
 }
 
@@ -24,7 +23,7 @@ NineLightRemote::~NineLightRemote() {
     delete m_pixels;
     delete m_http_server;
     delete m_http_client;
-    for (int i = 0; i < m_button_map.size(); i++)
+    for (int i = 0; i < m_button_map.items(); i++)
         delete m_button_map.getValueByIndex(i);
 }
 
@@ -54,7 +53,7 @@ bool NineLightRemote::registerButton(const state target_state, const pin button_
 
     DebouncedSwitch* button = new DebouncedSwitch(debounce_time);
     button->setInputPin(button_pin, false, int_pullup);
-    m_button_map.addPair(target_state, button);
+    m_button_map.set(target_state, button);
 
     return true;
 }
@@ -116,7 +115,7 @@ void NineLightRemote::updateLeds() {
 
 
 void NineLightRemote::pollButtons() {
-    for (int i = 0; i < m_button_map.size(); i++) {
+    for (int i = 0; i < m_button_map.items(); i++) {
         DebouncedSwitch* button = m_button_map.getValueByIndex(i);
         if (button) {
             button->debounce();

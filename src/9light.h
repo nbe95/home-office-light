@@ -5,7 +5,7 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "./map.h"
+#include "./lookup-table.h"
 #include "./timer.h"
 #include "./debouncer.h"
 #include "./animation.h"
@@ -62,7 +62,10 @@ class NineLightRemote {
     // Configuration
     const api_config*   m_api_config;
     const led_config*   m_led_config;
-    Map<state, DebouncedSwitch*> m_button_map;
+
+    // Hardware buttons
+    using ButtonMap = LookupTable<state, DebouncedSwitch*, 4>;
+    ButtonMap           m_button_map;
 
     // Internal status
     state               m_state = state::UNDEFINED;
