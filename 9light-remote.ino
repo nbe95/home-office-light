@@ -18,8 +18,7 @@ const NineLightRemote::api_config api_config = {
 NineLightRemote Remote(&api_config, &led_config);
 
 
-void setup()
-{
+void setup() {
     // Setup bridge and serial interface
     Bridge.begin();
     SerialUSB.begin(115200);
@@ -38,8 +37,7 @@ void setup()
 }
 
 
-void loop()
-{
+void loop() {
     // Call cyclic processes
     Remote.receiveRemoteRequest();
     Remote.sendRequestIfIdle();
