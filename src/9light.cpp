@@ -23,8 +23,11 @@ NineLightRemote::~NineLightRemote() {
     delete m_pixels;
     delete m_http_server;
     delete m_http_client;
-    for (int i = 0; i < m_button_map.items(); i++)
-        delete m_button_map.getValueByIndex(i);
+    for (int i = 0; i < m_button_map.items(); i++) {
+        DebouncedSwitch* button = m_button_map.getValueByIndex(i);
+        if (button)
+            delete button;
+    }
 }
 
 
