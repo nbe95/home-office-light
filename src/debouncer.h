@@ -11,33 +11,29 @@ template<class T>
 class Debouncer {
  public:
     // Constructor
-    explicit Debouncer(Timer::ms threshold = 0):
+    explicit Debouncer(Timer::ms threshold = 0) :
+    m_value(),
+    m_debounced(),
     m_timer(threshold) {}
 
     // Updates the internal value and performs the debouncing
     void debounce(T value) {
-        // Start timer on the first update
-        if (!m_timer.isRunning())
-            m_timer.start();
-
         // Reset timer upon value change
+        m_timer.start();
         if (value != m_value) {
             m_timer.restart();
             m_value = value;
         }
 
-        if (m_timer.check())
-            m_ready = true;
-
         // Fetch value changes
         m_changed = false;
         if (m_timer.check()) {
-            // Set ready flag once debounced
-            m_ready = true;
+            // Set ready flag once we have a stable value
             if (m_debounced != m_value) {
                 m_debounced = m_value;
-                m_changed = true;
+                m_changed |= m_ready;
             }
+            m_ready = true;
         }
     }
 
@@ -78,7 +74,7 @@ class Debouncer {
 class DebouncedSwitch: public Debouncer<bool> {
  public:
     // Constructor
-    explicit DebouncedSwitch(Timer::ms threshold = 0):
+    explicit DebouncedSwitch(Timer::ms threshold = 0) :
     Debouncer(threshold) {}
 
     // Hardware setup
@@ -95,12 +91,12 @@ class DebouncedSwitch: public Debouncer<bool> {
     void debounce() { if (m_pin) Debouncer::debounce(readStatus()); }
 
     // Switch status
-    bool isOpen() const { return get(); }
+    bool isOpen() const { return !get(); }
     bool isClosed() const { return get(); }
 
  protected:
-    pin     m_pin;
-    bool    m_invert;
+    pin     m_pin = 0;
+    bool    m_invert = false;
 };
 
 #endif  // SRC_DEBOUNCER_H_

@@ -7,8 +7,8 @@ class Timer {
  public:
     typedef     uint32_t ms;                        // Type definition for internal use of milliseconds (unsigned long)
 
-    explicit    Timer(const ms duration = 0):       // Constructor for a timer with or without specific duration
-                   m_start_time(0), m_running(false) { setDuration(duration); }
+    explicit    Timer(const ms duration = 0)        // Constructor for a timer with or without specific duration
+                   { setDuration(duration); }
 
     void        setDuration(const ms duration)      // Sets the timer duration
                     { m_duration = duration; }
@@ -38,9 +38,9 @@ class Timer {
                     { if (!getDuration()) return 0; float p = (float)getElapsedTime() / getDuration(); return max(0, min(p, 1)); } //NOLINT
 
  private:
-    bool        m_running;          // Flag indicating that the timer is running
-    ms          m_start_time;       // Start time captured when the timer was started
-    ms          m_duration;         // Duration of the timer
+    bool        m_running = false;      // Flag indicating that the timer is running
+    ms          m_start_time = 0;       // Start time captured when the timer was started
+    ms          m_duration = 0;         // Duration of the timer
 };
 
 #endif  // SRC_TIMER_H_

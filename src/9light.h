@@ -5,7 +5,7 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "./lookup-table.h"
+#include "./map.h"
 #include "./timer.h"
 #include "./debouncer.h"
 #include "./animation.h"
@@ -64,7 +64,7 @@ class NineLightRemote {
     const led_config*   m_led_config;
 
     // Hardware buttons
-    using ButtonMap = LookupTable<state, DebouncedSwitch*, 4>;
+    using ButtonMap = StaticMap<state, DebouncedSwitch*, 4>;
     ButtonMap           m_button_map;
 
     // Internal status

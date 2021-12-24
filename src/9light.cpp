@@ -3,7 +3,7 @@
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
 #include "./9light.h" //NOLINT
-#include "./lookup-table.h"
+#include "./map.h"
 #include "./timer.h"
 #include "./animation.h"
 #include "./helpers.h"
