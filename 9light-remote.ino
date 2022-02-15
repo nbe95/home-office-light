@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Niklas Bettgen
 
 #include <Adafruit_NeoPixel.h>
-#include "./src/9light.h"
+#include "./src/9light-remote.h"
 
 
 const NineLightRemote::led_config led_config = {

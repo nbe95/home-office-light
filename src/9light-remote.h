@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Niklas Bettgen
 
-#ifndef SRC_9LIGHT_H_
-#define SRC_9LIGHT_H_
+#ifndef SRC_9LIGHT_REMOTE_H_
+#define SRC_9LIGHT_REMOTE_H_
 
 #include <BridgeClient.h>
 #include <BridgeHttpClient.h>
@@ -17,7 +17,7 @@
 class NineLightRemote {
  public:
     // Type definitions
-    enum state { UNDEFINED, NONE, CALL, VIDEO, REQUEST, COFFEE };
+    enum state { UNDEFINED = 0, NONE, CALL, VIDEO, REQUEST, COFFEE };
     struct api_config {
         const char*     endpoint;
         const char*     url;
@@ -83,4 +83,4 @@ class NineLightRemote {
     BridgeServer*       m_http_server;
 };
 
-#endif  // SRC_9LIGHT_H_
+#endif  // SRC_9LIGHT_REMOTE_H_

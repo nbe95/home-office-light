@@ -4,7 +4,7 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "./9light.h" //NOLINT
+#include "./9light-remote.h" //NOLINT
 #include "./map.h"
 #include "./timer.h"
 #include "./animation.h"
