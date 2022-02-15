@@ -1,12 +1,14 @@
+// Copyright (c) 2022 Niklas Bettgen
+
 #ifndef SRC_DEBOUNCER_H_
 #define SRC_DEBOUNCER_H_
 
-// Include necessary headers
+#include "Arduino.h"
+#include "./pin.h"
 #include "./timer.h"
-#include "./helpers.h"
 
 
-// Debouncer class
+// Debouncer class for any kind of data type
 template<class T>
 class Debouncer {
  public:
@@ -38,12 +40,13 @@ class Debouncer {
     }
 
     // Retreive the debounced or raw value
-    T get() const { return m_debounced; }
-    T getRaw() const { return m_value; }
-    bool isReady() const { return m_ready; }
+    bool isReady() const    { return m_ready; }
+    T getDebounced() const  { return m_debounced; }
+    T getRaw() const        { return m_value; }
 
-    // Set the debouncing threshold
-    void setThreshold(Timer::ms threshold) { m_timer.setDuration(threshold); }
+    // Get/set the debouncing threshold
+    void setThreshold(Timer::ms threshold)  { m_timer.setDuration(threshold); }
+    Timer::ms getThreshold()                { return m_timer.getDuration(); }
 
     // Reset internal states
     void reset() {
@@ -70,33 +73,28 @@ class Debouncer {
 };
 
 
-// Auxiliar class for buttons, switches and binary sensors
-class DebouncedSwitch: public Debouncer<bool> {
+// Class for buttons, switches and any type of binary sensors
+class DebouncedSwitch : public Debouncer<bool> {
  public:
     // Constructor
-    explicit DebouncedSwitch(Timer::ms threshold = 0) :
-    Debouncer(threshold) {}
+    explicit DebouncedSwitch(const Pin pin = Pin(), Timer::ms threshold = 0) :
+    Debouncer(threshold),
+    m_pin(pin) {}
 
     // Hardware setup
-    void setInputPin(const pin input_pin, const bool invert = false, const bool int_pullup = true) {
-        m_pin = input_pin;
-        m_invert = invert;
-        pinMode(input_pin, (int_pullup ? INPUT_PULLUP : INPUT));
-    }
-    pin getInputPin() const { return m_pin; }
-    bool getInputInvert() const { return m_invert; }
+    void            setPin(const Pin pin)   { m_pin = pin; }
+    Pin             getPin() const          { return m_pin; }
 
     // Debouncing
-    bool readStatus() const { return m_pin ? (digitalRead(m_pin) == LOW) ^ m_invert : false; }
-    void debounce() { if (m_pin) Debouncer::debounce(readStatus()); }
+    virtual bool    readStatus() const      { return m_pin.isSet() && m_pin.isLow(); }
+    virtual void    debounce()              { if (m_pin.isSet()) Debouncer::debounce(readStatus()); }
 
     // Switch status
-    bool isOpen() const { return !get(); }
-    bool isClosed() const { return get(); }
+    virtual bool    isOpen() const          { return !getDebounced(); }
+    virtual bool    isClosed() const        { return getDebounced(); }
 
  protected:
-    pin     m_pin = 0;
-    bool    m_invert = false;
+    Pin             m_pin;
 };
 
 #endif  // SRC_DEBOUNCER_H_

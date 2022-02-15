@@ -14,7 +14,7 @@
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
 m_api_config(api_config),
 m_led_config(led_config),
-m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin, led_config->options)) {
+m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin.getPin(), led_config->options)) {
     m_pixels->begin();
 }
 
@@ -49,12 +49,11 @@ BridgeHttpClient* NineLightRemote::getHttpClient() {
 }
 
 
-bool NineLightRemote::registerButton(const state target_state, const pin button_pin, const Timer::ms debounce_time, const bool int_pullup) {
-    if (button_pin == 0)
+bool NineLightRemote::registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time) {
+    if (!button_pin.isSet())
         return false;
 
-    DebouncedSwitch* button = new DebouncedSwitch(debounce_time);
-    button->setInputPin(button_pin, false, int_pullup);
+    DebouncedSwitch* button = new DebouncedSwitch(button_pin, debounce_time);
     m_button_map.set(target_state, button);
 
     return true;

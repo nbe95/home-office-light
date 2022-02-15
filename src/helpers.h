@@ -5,11 +5,6 @@
 #include "./timer.h"
 
 
-// Static type definitions
-typedef uint16_t    knx_addr;   // KNX addresses
-typedef uint8_t     pin;        // Hardware pins
-typedef uint32_t    ptr;        // Pointer
-
 // Dynamic array length calculation
 #define array_len(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 

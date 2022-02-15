@@ -23,7 +23,7 @@ class NineLightRemote {
         unsigned int    remote_port;
     };
     struct led_config {
-        pin         do_pin;
+        Pin         do_pin;
         uint16_t    num_leds;
         uint16_t    options;
     };
@@ -37,7 +37,7 @@ class NineLightRemote {
     state               getState() const { return m_state; }
 
     // Setup
-    bool                registerButton(const state state, const pin pin, const Timer::ms debounce_time, const bool int_pullup = true);
+    bool                registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time);
     void                setupIdleRequest(const Timer::ms interval);
 
     // Cylic routines
