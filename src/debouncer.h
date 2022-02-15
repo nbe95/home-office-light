@@ -79,22 +79,22 @@ class DebouncedSwitch : public Debouncer<bool> {
     // Constructor
     explicit DebouncedSwitch(const Pin pin = Pin(), Timer::ms threshold = 0) :
     Debouncer(threshold),
-    m_pin(pin) {}
+    m_Pin(pin) {}
 
     // Hardware setup
-    void            setPin(const Pin pin)   { m_pin = pin; }
-    Pin             getPin() const          { return m_pin; }
+    void            setPin(const Pin pin)   { m_Pin = pin; }
+    Pin             getPin() const          { return m_Pin; }
 
     // Debouncing
-    virtual bool    readStatus() const      { return m_pin.isSet() && m_pin.isLow(); }
-    virtual void    debounce()              { if (m_pin.isSet()) Debouncer::debounce(readStatus()); }
+    virtual bool    readStatus() const      { return m_Pin.isSet() && m_Pin.isLow(); }
+    virtual void    debounce()              { if (m_Pin.isSet()) Debouncer::debounce(readStatus()); }
 
     // Switch status
     virtual bool    isOpen() const          { return !getDebounced(); }
     virtual bool    isClosed() const        { return getDebounced(); }
 
  protected:
-    Pin             m_pin;
+    Pin             m_Pin;
 };
 
 #endif  // SRC_DEBOUNCER_H_
