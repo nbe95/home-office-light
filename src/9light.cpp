@@ -55,6 +55,7 @@ bool NineLightRemote::registerButton(const state target_state, const Pin button_
     if (!button_pin.isSet())
         return false;
 
+    button_pin.setup();
     DebouncedSwitch* button = new DebouncedSwitch(button_pin, debounce_time);
     m_button_map.set(target_state, button);
 
