@@ -9,7 +9,7 @@ const NineLightRemote::led_config led_config = {
 };
 
 const NineLightRemote::api_config api_config = {
-    .endpoint       = "http://srv-rpi3.m5a.bettgen.de",
+    .endpoint       = "http://192.168.1.20",
     .url            = "/9light",
     .port           = 9000,
     .remote_port    = 9001
