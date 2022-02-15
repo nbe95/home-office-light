@@ -16,7 +16,8 @@
 NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
 m_api_config(api_config),
 m_led_config(led_config),
-m_pixels(new Adafruit_NeoPixel(led_config->num_leds, (uint16_t)led_config->do_pin.getPin(), led_config->options)) {
+m_pixels(new Adafruit_NeoPixel(led_config->num_leds, led_config->do_pin.getPin(), led_config->options)),
+m_button_map(NineLightRemote::state::UNDEFINED, nullptr) {
     m_pixels->begin();
 }
 
