@@ -23,10 +23,9 @@ NineLightRemote::~NineLightRemote() {
     delete m_pixels;
     delete m_http_server;
     delete m_http_client;
-    for (int i = 0; i < m_button_map.items(); i++) {
-        DebouncedSwitch* button = m_button_map.getValueByIndex(i);
-        if (button)
-            delete button;
+    for (ButtonMap::iter it = m_button_map.begin(); it < m_button_map.end(); it++) {
+        if (it->value != nullptr)
+            delete it->value;
     }
 }
 
@@ -118,13 +117,13 @@ void NineLightRemote::updateLeds() {
 
 
 void NineLightRemote::pollButtons() {
-    for (int i = 0; i < m_button_map.items(); i++) {
-        DebouncedSwitch* button = m_button_map.getValueByIndex(i);
-        if (button) {
+    for (ButtonMap::iter it = m_button_map.begin(); it < m_button_map.end(); it++) {
+        DebouncedSwitch* button = it->value;
+        if (button != nullptr) {
             button->debounce();
             if (button->hasChanged() && button->isClosed()) {
                 SerialUSB.println(F("Button pressed."));
-                sendStateRequest(m_button_map.getKeyByIndex(i));
+                sendStateRequest(it->key);
             }
         }
     }
