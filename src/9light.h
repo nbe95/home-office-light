@@ -1,3 +1,5 @@
+// Copyright (c) 2022 Niklas Bettgen
+
 #ifndef SRC_9LIGHT_H_
 #define SRC_9LIGHT_H_
 

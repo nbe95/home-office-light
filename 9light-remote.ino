@@ -1,3 +1,5 @@
+// Copyright (c) 2022 Niklas Bettgen
+
 #include <Adafruit_NeoPixel.h>
 #include "./src/9light.h"
 

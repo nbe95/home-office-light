@@ -1,3 +1,5 @@
+// Copyright (c) 2022 Niklas Bettgen
+
 #include <BridgeClient.h>
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>

@@ -1,3 +1,5 @@
+// Copyright (c) 2022 Niklas Bettgen
+
 #ifndef SRC_HELPERS_H_
 #define SRC_HELPERS_H_
 
