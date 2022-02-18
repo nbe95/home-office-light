@@ -63,7 +63,7 @@ class StableButton():
     def getDebouncedState(self):
         return self.debounced
 
-    def trigger(self, channel):
+    def trigger(self, _):
         if self.check_thread is not None and self.check_thread.is_alive():
             self.check_abort = True
             self.check_thread.join()
@@ -270,11 +270,12 @@ class NineLight:
 
         def lightThread(self):
             self.clearAllPixels()
+
             if self.parent.state == self.parent.States.NONE:
-                while (self.light_thread_terminate != True):
+                while (not self.light_thread_terminate):
                     if self.parent.bell.stable_button.getDebouncedState():
                         green = (0, 255, 0)
-                        self.setAllPixels(green)
+                        self.setAllPixels(green, True, True)
                     else:
                         self.clearAllPixels()
                     sleep(0.05)
@@ -291,13 +292,13 @@ class NineLight:
                 blue = (0, 200, 255)
                 self.setAllPixels(blue, top = True)
                 self.light_wave = PulseWave(0.8, 30, 255)
-                while (self.light_thread_terminate != True):
+                while (not self.light_thread_terminate):
                     self.setBrightness(self.light_wave.getInt())
                     sleep(0.02)
 
             elif self.parent.state == self.parent.States.COFFEE:
                 pos = True
-                while (self.light_thread_terminate != True):
+                while (not self.light_thread_terminate):
                     col = self.getRandomColor()
                     self.clearAllPixels()
                     self.setAllPixels(col, top = pos, bottom = not(pos))
@@ -310,7 +311,7 @@ class NineLight:
                 col.append(int(randint(0, 10) * 255 / 10))
             return col
 
-nl = NineLight(18, 23, 24)
+nl = NineLight(9000, 9001, 18, 23, 24)
 api = flask.Flask(__name__)
 
 @api.route('/')
