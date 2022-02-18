@@ -267,12 +267,20 @@ class NineLight:
             self.clearAllPixels()
 
             if self.parent.state == self.parent.States.NONE:
+                is_on = False
+                is_ready = False
                 while (not self.light_thread_terminate):
                     if self.parent.bell.stable_button.getDebouncedState():
-                        green = (0, 255, 0)
-                        self.setAllPixels(green, True, True)
+                        if is_ready:
+                            #TODO(Niklas): Make a fancy animation :-)
+                            green = (0, 255, 0)
+                            self.setAllPixels(green, True, True)
+                            is_on = True
                     else:
-                        self.clearAllPixels()
+                        is_ready = True
+                        if is_on:
+                            self.clearAllPixels()
+                            is_on = False
                     sleep(0.05)
 
             elif self.parent.state == self.parent.States.CALL:
