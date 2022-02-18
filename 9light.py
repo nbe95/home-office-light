@@ -101,6 +101,7 @@ class NineLight:
         self.remotes_expiration_s   = 60 * 60 * 3
         self.remotes_skip_once      = None
         self.timeout_request_s      = 30
+        self.led.setupLightThread()
 
     def getStatus(self):
         self.updateRemotes()
