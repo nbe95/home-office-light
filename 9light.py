@@ -85,17 +85,16 @@ class StableButton():
         return True
 
 class NineLight:
-    local_http_port = 9000
-    remotes_http_port = 9001
-    remotes_expiration_s = 60 * 60 * 3
-    remotes_skip_once = None
-    timeout_request_s = 30
-
-    def __init__(self, led_pin, button_pin, buzzer_pin):
-        self.timer = None
-        self.remotes = []
-        self.bell = self.Bell(self, button_pin, buzzer_pin)
-        self.led = self.Led(self, led_pin)
+    def __init__(self, local_port, remotes_port, led_pin, button_pin, buzzer_pin):
+        self.timer                  = None
+        self.remotes                = []
+        self.bell                   = self.Bell(self, button_pin, buzzer_pin)
+        self.led                    = self.Led(self, led_pin)
+        self.local_http_port        = local_port
+        self.remotes_http_port      = remotes_port
+        self.remotes_expiration_s   = 60 * 60 * 3
+        self.remotes_skip_once      = None
+        self.timeout_request_s      = 30
 
     def getStatus(self):
         self.updateRemotes()
