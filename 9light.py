@@ -155,14 +155,17 @@ class NineLight:
         self.sendToRemotes()
 
     def on_exit_VIDEO(self):
-        self.timer.canceled = True
+        if self.timer is not None:
+            self.timer.canceled = True
 
     def on_enter_REQUEST(self):
         self.bell.ring()
-        self.timer = Timeout(self.video, self.timeout_request_s)
+        if self.timer is not None:
+            self.timer = Timeout(self.video, self.timeout_request_s)
 
     def on_exit_REQUEST(self):
-        self.timer.canceled = True
+        if self.timer is not None:
+            self.timer.canceled = True
 
     def cleanup(self):
         self.bell.cleanup()
@@ -186,7 +189,7 @@ class NineLight:
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.button, GPIO.IN)
             GPIO.setup(self.buzzer, GPIO.OUT)
-            self.stable_button.setCallbackPress(self.press)
+            self.stable_button.setCallbackPressed(self.press)
             GPIO.add_event_detect(self.button, GPIO.BOTH, callback = self.stable_button.trigger)
 
         def readButton(self):
