@@ -2,6 +2,7 @@
 
 import enum
 from threading import Thread
+from urllib import request
 from transitions import Machine
 from rpi_ws281x import *
 import RPi.GPIO as GPIO
@@ -153,11 +154,7 @@ class NineLight:
         self.led.setupLightThread()
         self.sendToRemotes()
 
-    def on_enter_VIDEO(self):
-        self.timer = Timeout(self.bell.enable, 2)
-
     def on_exit_VIDEO(self):
-        self.bell.disable()
         self.timer.canceled = True
 
     def on_enter_REQUEST(self):
@@ -179,7 +176,6 @@ class NineLight:
 
     class Bell:
         def __init__(self, parent, button, buzzer):
-            self.enabled = False
             self.parent = parent
             self.button = button
             self.buzzer = buzzer
@@ -190,21 +186,14 @@ class NineLight:
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.button, GPIO.IN)
             GPIO.setup(self.buzzer, GPIO.OUT)
-            self.stable_button.setCallbackPressed(self.press)
+            self.stable_button.setCallbackPress(self.press)
             GPIO.add_event_detect(self.button, GPIO.BOTH, callback = self.stable_button.trigger)
 
         def readButton(self):
             return GPIO.input(self.button)
 
-        def disable(self):
-            self.enabled = False
-
-        def enable(self):
-            self.enabled = True
-
         def press(self):
-            if self.enabled:
-                self.parent.request()
+            self.parent.request()
 
         def ring(self):
             self.ring_thread = Thread(target = self.ringThread, daemon = True)
@@ -349,6 +338,7 @@ def main():
         { 'trigger': 'call',    'source': '*',              'dest': nl.States.CALL },
         { 'trigger': 'video',   'source': '*',              'dest': nl.States.VIDEO },
         { 'trigger': 'request', 'source': nl.States.VIDEO,  'dest': nl.States.REQUEST },
+        { 'trigger': 'request', 'source': nl.States.COFFEE, 'dest': nl.States.NONE },
         { 'trigger': 'coffee',  'source': nl.States.NONE,   'dest': nl.States.COFFEE }
     ]
     ma = Machine(nl, states = nl.States, transitions = transitions, initial = nl.States.NONE, after_state_change = nl.onStateChange)
