@@ -52,12 +52,16 @@ class StableButton():
         self.cb_released    = None
         self.check_thread   = None
         self.check_abort    = False
+        self.debounced      = False
 
     def setCallbackPressed(self, cb):
         self.cb_pressed = cb
 
     def setCallbackReleased(self, cb):
         self.cb_released = cb
+
+    def getDebouncedState(self):
+        return self.debounced
 
     def trigger(self, channel):
         if self.check_thread is not None and self.check_thread.is_alive():
@@ -76,6 +80,7 @@ class StableButton():
                 return False
             sleep(0.001)
 
+        self.debounced = state
         if state:
             if self.cb_pressed is not None:
                 self.cb_pressed()
@@ -265,7 +270,16 @@ class NineLight:
 
         def lightThread(self):
             self.clearAllPixels()
-            if self.parent.state == self.parent.States.CALL:
+            if self.parent.state == self.parent.States.NONE:
+                while (self.light_thread_terminate != True):
+                    if self.parent.bell.stable_button.getDebouncedState():
+                        green = (0, 255, 0)
+                        self.setAllPixels(green)
+                    else:
+                        self.clearAllPixels()
+                    sleep(0.05)
+
+            elif self.parent.state == self.parent.States.CALL:
                 yellow = (255, 150, 0)
                 self.setAllPixels(yellow, bottom = True)
 
