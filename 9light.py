@@ -46,12 +46,12 @@ class Timeout(Thread):
 
 class StableButton():
     def __init__(self, cb_read_state, threshold_ms):
-        self.threshold_ms = threshold_ms
-        self.cb_read_state = cb_read_state
-        self.cb_pressed = None
-        self.cb_released = None
-        self.check_thread = None
-        self.check_abort = False
+        self.threshold_ms   = threshold_ms
+        self.cb_read_state  = cb_read_state
+        self.cb_pressed     = None
+        self.cb_released    = None
+        self.check_thread   = None
+        self.check_abort    = False
 
     def setCallbackPressed(self, cb):
         self.cb_pressed = cb
@@ -66,7 +66,7 @@ class StableButton():
 
         state = self.cb_read_state()
         self.check_abort = False
-        self.check_thread = Thread(target=self.checkThread, args=(state,), daemon=True)
+        self.check_thread = Thread(target = self.checkThread, args = (state,), daemon = True)
         self.check_thread.start()
 
     def checkThread(self, state):
@@ -166,11 +166,11 @@ class NineLight:
         self.bell.cleanup()
 
     class States(enum.Enum):
-        NONE = 0
-        CALL = 1
-        VIDEO = 2
+        NONE    = 0
+        CALL    = 1
+        VIDEO   = 2
         REQUEST = 3
-        COFFEE = 99
+        COFFEE  = 99
 
     class Bell:
         def __init__(self, parent, button, buzzer):
@@ -186,7 +186,7 @@ class NineLight:
             GPIO.setup(self.button, GPIO.IN)
             GPIO.setup(self.buzzer, GPIO.OUT)
             self.stable_button.setCallbackPressed(self.press)
-            GPIO.add_event_detect(self.button, GPIO.BOTH, callback=self.stable_button.trigger)
+            GPIO.add_event_detect(self.button, GPIO.BOTH, callback = self.stable_button.trigger)
 
         def readButton(self):
             return GPIO.input(self.button)
@@ -202,7 +202,7 @@ class NineLight:
                 self.parent.request()
 
         def ring(self):
-            self.ring_thread = Thread(target=self.ringThread, daemon=True)
+            self.ring_thread = Thread(target = self.ringThread, daemon = True)
             self.ring_thread.start()
 
         def ringThread(self):
@@ -237,7 +237,7 @@ class NineLight:
             self.light_thread = None
             self.light_thread_terminate = False
 
-        def setAllPixels(self, color_rgb, top=False, bottom=False):
+        def setAllPixels(self, color_rgb, top = False, bottom = False):
             if top:
                 for p in range(0, 6):
                     self.strip.setPixelColorRGB(p, *color_rgb)
@@ -251,7 +251,7 @@ class NineLight:
             self.strip.show()
 
         def clearAllPixels(self):
-            self.setAllPixels((0, 0, 0), top=True, bottom=True)
+            self.setAllPixels((0, 0, 0), top = True, bottom = True)
             self.setBrightness(255)
 
         def setupLightThread(self):
@@ -260,22 +260,22 @@ class NineLight:
                 self.light_thread.join()
 
             self.light_thread_terminate = False
-            self.light_thread = Thread(target=self.lightThread, daemon=True)
+            self.light_thread = Thread(target = self.lightThread, daemon = True)
             self.light_thread.start()
 
         def lightThread(self):
             self.clearAllPixels()
             if self.parent.state == self.parent.States.CALL:
                 yellow = (255, 150, 0)
-                self.setAllPixels(yellow, bottom=True)
+                self.setAllPixels(yellow, bottom = True)
 
             elif self.parent.state == self.parent.States.VIDEO:
                 red = (255, 0, 0)
-                self.setAllPixels(red, top=True)
+                self.setAllPixels(red, top = True)
 
             elif self.parent.state == self.parent.States.REQUEST:
                 blue = (0, 200, 255)
-                self.setAllPixels(blue, top=True)
+                self.setAllPixels(blue, top = True)
                 self.light_wave = PulseWave(0.8, 30, 255)
                 while (self.light_thread_terminate != True):
                     self.setBrightness(self.light_wave.getInt())
@@ -286,7 +286,7 @@ class NineLight:
                 while (self.light_thread_terminate != True):
                     col = self.getRandomColor()
                     self.clearAllPixels()
-                    self.setAllPixels(col, top=pos, bottom=not(pos))
+                    self.setAllPixels(col, top = pos, bottom = not(pos))
                     sleep(0.05)
                     pos = not(pos)
 
@@ -330,15 +330,15 @@ def api_get():
 
 def main():
     transitions = [
-        { 'trigger': 'none', 'source': '*', 'dest': nl.States.NONE },
-        { 'trigger': 'call', 'source': '*', 'dest': nl.States.CALL },
-        { 'trigger': 'video', 'source': '*', 'dest': nl.States.VIDEO },
-        { 'trigger': 'request', 'source': nl.States.VIDEO, 'dest': nl.States.REQUEST },
-        { 'trigger': 'coffee', 'source': nl.States.NONE, 'dest': nl.States.COFFEE }
+        { 'trigger': 'none',    'source': '*',              'dest': nl.States.NONE },
+        { 'trigger': 'call',    'source': '*',              'dest': nl.States.CALL },
+        { 'trigger': 'video',   'source': '*',              'dest': nl.States.VIDEO },
+        { 'trigger': 'request', 'source': nl.States.VIDEO,  'dest': nl.States.REQUEST },
+        { 'trigger': 'coffee',  'source': nl.States.NONE,   'dest': nl.States.COFFEE }
     ]
-    ma = Machine(nl, states=nl.States, transitions=transitions, initial=nl.States.NONE, after_state_change=nl.onStateChange)
+    ma = Machine(nl, states = nl.States, transitions = transitions, initial = nl.States.NONE, after_state_change = nl.onStateChange)
 
-    serve(api, host='0.0.0.0', port=NineLight.local_http_port)
+    serve(api, host='0.0.0.0', port = nl.local_http_port)
     atexit.register(nl.cleanup)
 
 if __name__ == "__main__":
