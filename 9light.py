@@ -239,7 +239,7 @@ class NineLight:
 
             self.light_thread = None
             self.light_thread_terminate = False
-            self.light_show = self.LightShow(self.strip, 0.03, 3)
+            self.light_show = self.LightShow(self.strip, 0.05, 2)
 
         def setAllPixels(self, color_rgb, top = False, bottom = False):
             if top:
@@ -299,17 +299,29 @@ class NineLight:
             elif self.parent.state == self.parent.States.COFFEE:
                 pos = True
                 while (not self.light_thread_terminate):
-                    col = self.getRandomColor()
+                    col = NineLight.Led.getRandomColor()
                     self.clearAllPixels()
                     self.setAllPixels(col, top = pos, bottom = not(pos))
                     sleep(0.05)
                     pos = not(pos)
 
-        def getRandomColor(self):
+        def getRandomColor():
             col = []
             for i in range(3):
                 col.append(int(randint(0, 10) * 255 / 10))
-            return col
+            return tuple(col)
+
+        def getRainbowColor(pos):
+            # See lightshow.py
+            # in = 0..255, out = magic
+            if pos < 85:
+                return (pos * 3, 255 - pos * 3, 0)
+            elif pos < 170:
+                pos -= 85
+                return (255 - pos * 3, 0, pos * 3)
+            else:
+                pos -= 170
+            return (0, pos * 3, 255 - pos * 3)
 
         class LightShow:
             def __init__(self, strip, period_s, spare_leds):
@@ -339,7 +351,7 @@ class NineLight:
                 if self.spare_count > self.spare_leds or not self.isRunning():
                     self.spare_count = 0
                     if continue_pixels:
-                        new_pixel = (0, 255, 0)
+                        new_pixel = NineLight.Led.getRainbowColor(int(time() / self.period_s * 1000) % 255)
 
                 # Shift pixels forward
                 running_before = self.isRunning()
