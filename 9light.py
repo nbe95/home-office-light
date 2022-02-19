@@ -239,7 +239,7 @@ class NineLight:
 
             self.light_thread = None
             self.light_thread_terminate = False
-            self.light_show = self.LightShow(self.strip, 0.5, 3)
+            self.light_show = self.LightShow(self.strip, 0.03, 3)
 
         def setAllPixels(self, color_rgb, top = False, bottom = False):
             if top:
@@ -274,13 +274,11 @@ class NineLight:
                 is_ready = False
                 while (not self.light_thread_terminate):
                     button_pressed = self.parent.bell.stable_button.getDebouncedState()
-                    if button_pressed:
-                        if is_ready:
-                            self.light_show.process(button_pressed)
-                    else:
+                    if is_ready:
+                        self.light_show.process(button_pressed)
+                    elif not button_pressed:
                         is_ready = True
-
-                    sleep(0.05)
+                    sleep(0.01)
 
             elif self.parent.state == self.parent.States.CALL:
                 yellow = (255, 150, 0)
@@ -318,25 +316,27 @@ class NineLight:
                 self.total_leds = 12
                 self.strip = strip
                 self.period_s = period_s
+                self.spare_leds = spare_leds
                 self.reset()
 
             def reset(self):
                 self.spare_count = 0
                 self.last_call = 0
-                self.leds = [(0, 0, 0) * self.total_leds]
+                self.leds = [(0, 0, 0)] * self.total_leds
 
             def isRunning(self):
-                return any(col.any() for col in self.leds)
+                return any([any(col) for col in self.leds])
 
             def process(self, continue_pixels):
-                if time() < self.last_call + self.period_s:
+                # Check interval from last call
+                if self.last_call + self.period_s > time():
                     return
                 self.last_call = time()
 
                 # Prepare new pixel
                 new_pixel = (0, 0, 0)
                 self.spare_count += 1
-                if self.spare_count >= self.spare_leds:
+                if self.spare_count > self.spare_leds or not self.isRunning():
                     self.spare_count = 0
                     if continue_pixels:
                         new_pixel = (0, 255, 0)
@@ -351,13 +351,10 @@ class NineLight:
                     return
 
                 # Apply pixels to LED strip
+                pixel_id_per_led = (*range(0, 6), *range(7, 13))
                 i = 0
-                for col in self.leds[0:6]:      # top
-                    self.strip.setPixelColorRGB(i, *col)
-                    i += 1
-                i = 0
-                for col in self.leds[7:13]:     # bottom
-                    self.strip.setPixelColorRGB(i, *col)
+                for col in self.leds: 
+                    self.strip.setPixelColorRGB(pixel_id_per_led[i], *col)
                     i += 1
                 self.strip.show()
 
