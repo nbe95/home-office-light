@@ -157,6 +157,9 @@ class NineLight:
         self.led.setupLightThread()
         self.sendToRemotes()
 
+    def on_exit_NONE(self):
+        self.led.light_show.reset()
+
     def on_exit_VIDEO(self):
         if self.timer is not None:
             self.timer.canceled = True
@@ -236,6 +239,7 @@ class NineLight:
 
             self.light_thread = None
             self.light_thread_terminate = False
+            self.light_show = self.LightShow(self.strip, 0.5, 3)
 
         def setAllPixels(self, color_rgb, top = False, bottom = False):
             if top:
@@ -267,20 +271,15 @@ class NineLight:
             self.clearAllPixels()
 
             if self.parent.state == self.parent.States.NONE:
-                is_on = False
                 is_ready = False
                 while (not self.light_thread_terminate):
-                    if self.parent.bell.stable_button.getDebouncedState():
+                    button_pressed = self.parent.bell.stable_button.getDebouncedState()
+                    if button_pressed:
                         if is_ready:
-                            #TODO(Niklas): Make a fancy animation :-)
-                            green = (0, 255, 0)
-                            self.setAllPixels(green, True, True)
-                            is_on = True
+                            self.light_show.process(button_pressed)
                     else:
                         is_ready = True
-                        if is_on:
-                            self.clearAllPixels()
-                            is_on = False
+
                     sleep(0.05)
 
             elif self.parent.state == self.parent.States.CALL:
@@ -313,6 +312,55 @@ class NineLight:
             for i in range(3):
                 col.append(int(randint(0, 10) * 255 / 10))
             return col
+
+        class LightShow:
+            def __init__(self, strip, period_s, spare_leds):
+                self.total_leds = 12
+                self.strip = strip
+                self.period_s = period_s
+                self.reset()
+
+            def reset(self):
+                self.spare_count = 0
+                self.last_call = 0
+                self.leds = [(0, 0, 0) * self.total_leds]
+
+            def isRunning(self):
+                return any(col.any() for col in self.leds)
+
+            def process(self, continue_pixels):
+                if time() < self.last_call + self.period_s:
+                    return
+                self.last_call = time()
+
+                # Prepare new pixel
+                new_pixel = (0, 0, 0)
+                self.spare_count += 1
+                if self.spare_count >= self.spare_leds:
+                    self.spare_count = 0
+                    if continue_pixels:
+                        new_pixel = (0, 255, 0)
+
+                # Shift pixels forward
+                running_before = self.isRunning()
+                self.leds.pop()
+                self.leds.insert(0, new_pixel)
+
+                # Check if we have something to do
+                if not running_before and not self.isRunning():
+                    return
+
+                # Apply pixels to LED strip
+                i = 0
+                for col in self.leds[0:6]:      # top
+                    self.strip.setPixelColorRGB(i, *col)
+                    i += 1
+                i = 0
+                for col in self.leds[7:13]:     # bottom
+                    self.strip.setPixelColorRGB(i, *col)
+                    i += 1
+                self.strip.show()
+
 
 nl = NineLight(9000, 9001, 18, 23, 24)
 api = flask.Flask(__name__)
