@@ -166,8 +166,7 @@ class NineLight:
 
     def on_enter_REQUEST(self):
         self.bell.ring()
-        if self.timer is not None:
-            self.timer = Timeout(self.video, self.timeout_request_s)
+        self.timer = Timeout(self.video, self.timeout_request_s)
 
     def on_exit_REQUEST(self):
         if self.timer is not None:
