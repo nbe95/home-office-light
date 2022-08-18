@@ -2,11 +2,17 @@
 <html>
     <head>
         <title>{{ main_title }} Frontend</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='layout.css') }}" />
     </head>
     <body>
         <h1>{{ main_title }} Frontend</h1>
 
         <h2>Current State</h2>
+        <div id="preview" class="{{ current_state }}">
+            <div class="top">Video</div>
+            <div class="middle">&#x2B24;</div>
+            <div class="bottom">Anruf</div>
+        </div>
         <form action="/" method="post">
             <p>
                 Current state: <strong>{{ current_state|upper }}</strong>

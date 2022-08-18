@@ -1,0 +1,40 @@
+* {
+    font-family: Arial;
+    color: black;
+}
+
+h2 {
+    clear: both;
+}
+
+#preview {
+    float: left;
+    margin: 0px 20px 30px 0px;
+}
+
+#preview div.top,
+#preview div.bottom {
+    width: 130px;
+    height: 80px;
+    line-height: 80px;
+    font-size: 35px;
+    font-family: "Arial Narrow", Arial;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    border: 1px solid black;
+    background: #f0f0f0;
+    text-align: center;
+    font-weight: bold;
+}
+
+#preview div.middle {
+    width: 130px;
+    height: 25px;
+    line-height: 25px;
+    font-size: 25px;
+    font-family: Arial;
+    color: #333300;
+    border: 1px solid black;
+    background: sandybrown;
+    text-align: center;
+}
