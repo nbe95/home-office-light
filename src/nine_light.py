@@ -13,6 +13,7 @@ from timeout import Timeout
 from constants import BELL_REQUEST_TIMEOUT
 
 
+@no_type_check
 class NineLight:
     """Business logic class and state machine for our 9Light."""
 
@@ -70,7 +71,7 @@ class NineLight:
     def update_remotes(self) -> None:
         """Remove expired remotes."""
         new_list = filter(lambda x: not x.is_expired(), self.remotes)
-        self.remotes = new_list
+        self.remotes = list(new_list)
 
     def send_update_to_remotes(self) -> None:
         """Send current status to all registered remotes."""

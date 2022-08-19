@@ -17,16 +17,17 @@ from constants import (
 
 class Frontend:
     """Container for the frontend flask application."""
+    nl_instance: NineLight
 
     def __init__(self, nl_instance: NineLight, template_folder: str,
                  static_folder: str) -> None:
-        Frontend.nl_instance: NineLight = nl_instance
+        Frontend.nl_instance = nl_instance
         self.app: Flask = Flask(
             __name__,
             template_folder=abspath(template_folder),
             static_folder=abspath(static_folder)
         )
-        self.app.secret_key: str = uuid4().hex
+        self.app.secret_key = uuid4().hex
 
         @self.app.route("/", methods=["GET", "POST"])
         def _route_index():
@@ -47,7 +48,7 @@ class Frontend:
                 if result:
                     groups = result.groups()
                     ip: str = groups[0]
-                    port: int = groups[1] or PORT_REMOTE
+                    port: int = int(groups[1]) or PORT_REMOTE
                     Frontend.nl_instance.add_remote(NineLightRemote(ip, port))
 
             if "del-remote" in request.form:

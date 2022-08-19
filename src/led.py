@@ -3,6 +3,7 @@
 """Helper module for handling of a WS281x LED strip."""
 
 from rpi_ws281x import Adafruit_NeoPixel
+from datetime import timedelta
 from time import sleep
 from threading import Thread
 from random import randint
@@ -24,6 +25,7 @@ class LedStrip:
                  leds_bottom: Tuple[int, int]):
         self._leds_top: range = range(leds_top[0], leds_top[1] + 1)
         self._leds_bottom: range = range(leds_bottom[0], leds_bottom[1] + 1)
+        self._light_wave: PulseWave
         self._strip = Adafruit_NeoPixel(*(
             leds_total,     # Number of LED pixels
             led_pin,        # GPIO pin connected to the pixels (18 uses PWM!)
@@ -35,28 +37,28 @@ class LedStrip:
         ))
         self._strip.begin()
 
-        self.clear_all_pixels()
+        self.clear()
 
         self._light_thread: Optional[Thread] = None
         self._light_thread_terminate: bool = False
 
     def set_top(self, color: rgb) -> None:
         for pixel in self._leds_top:
-            self.strip.setPixelColorRGB(pixel, *color)
-        self.strip.show()
+            self._strip.setPixelColorRGB(pixel, *color)
+        self._strip.show()
 
     def set_bottom(self, color: rgb) -> None:
         for pixel in self._leds_bottom:
-            self.strip.setPixelColorRGB(pixel, *color)
-        self.strip.show()
+            self._strip.setPixelColorRGB(pixel, *color)
+        self._strip.show()
 
     def set_all(self, color: rgb) -> None:
         self.set_top(color)
         self.set_bottom(color)
 
     def set_brightness(self, brightness: int) -> None:
-        self.strip.setBrightness(brightness)
-        self.strip.show()
+        self._strip.setBrightness(brightness)
+        self._strip.show()
 
     def clear(self) -> None:
         self.set_all((0, 0, 0))
@@ -89,14 +91,14 @@ class LedStrip:
         elif state == NineLight.States.REQUEST:
             blue: rgb = (0, 200, 255)
             self.set_top(blue)
-            self.light_wave = PulseWave(0.8, 30, 255)
-            while (not self.light_thread_terminate):
-                self.setBrightness(self.light_wave.getInt())
+            self._light_wave = PulseWave(timedelta(milliseconds=800), (30, 255))
+            while (not self._light_thread_terminate):
+                self.set_brightness(self._light_wave.get_scaled())
                 sleep(0.02)
 
         elif state == NineLight.States.COFFEE:
             top: bool = False
-            while (not self.light_thread_terminate):
+            while (not self._light_thread_terminate):
                 color: rgb = LedStrip.get_random_color()
                 self.clear()
                 if top:

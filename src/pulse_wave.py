@@ -9,9 +9,9 @@ from typing import Tuple
 
 class PulseWave:
     def __init__(self,
-                 period_s: timedelta,
+                 period: timedelta,
                  scale: Tuple[int, int] = (0, 100)):
-        self.period_s: timedelta = period_s
+        self.period: timedelta = period
         self.scale: Tuple[int, int] = scale
         self.reset()
 
@@ -20,10 +20,10 @@ class PulseWave:
 
     def get(self) -> float:
         """Returns the current cosine value as float between 0 and 1."""
-        t: timedelta = datetime.now() - self.start_time
-        cosine: float = 0.5 * (cos(2 * pi * t / self.period_s) + 1)
-        return cosine
+        t: float = (datetime.now() - self.start_time).total_seconds()
+        cosine: float = cos(2 * pi * t / self.period.total_seconds())
+        return 0.5 * (cosine + 1)
 
     def get_scaled(self) -> int:
         """Returns the current cosine value as scaled integer."""
-        return self.get() * (self.scale[1] - self.scale[0]) + self.scale[0]
+        return int(self.get()) * (self.scale[1] - self.scale[0]) + self.scale[0]

@@ -15,7 +15,11 @@ class StableButton():
                  threshold: timedelta):
         self.threshold: timedelta = threshold
         self._read_state_function: Callable[[], bool] = read_state_function
-        self._check_thread: Optional[Thread] = None
+        self._check_thread: Thread = Thread(
+            target=self._run_check_thread,
+            args=(self._read_state_function(),),
+            daemon=True
+        )
         self._check_abort: bool = False
         self._cb_pressed: Optional[Callable[[], None]] = None
         self._cb_released: Optional[Callable[[], None]] = None
@@ -31,21 +35,17 @@ class StableButton():
         return self._debounced_state
 
     def trigger(self, _) -> None:
-        if self._check_thread and self._check_thread.is_alive():
+        if self._check_thread.is_alive():
             self._check_abort = True
             self._check_thread.join()
 
         self._check_abort = False
-        self._check_thread = Thread(
-            target=self._check_thread,
-            args=(self._read_state_function(),),
-            daemon=True)
         self._check_thread.start()
 
-    def _check_thread(self, state: bool) -> None:
-        end: datetime = datetime(datetime.now() + self.threshold)
+    def _run_check_thread(self, state: bool) -> None:
+        end: datetime = datetime.now() + self.threshold
         while datetime.now() < end:
-            if self._check_abort or self.read_state_function() != state:
+            if self._check_abort or self._read_state_function() != state:
                 return
             sleep(0.001)
 

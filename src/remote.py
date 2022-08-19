@@ -16,6 +16,7 @@ class NineLightRemote:
                  expiration: Optional[datetime] = None):
         self.ip: str = ip
         self.port: int = port
+        self.skip_once: bool = False
         self.set_expiration(expiration)
 
     def send_update(self, state: str, remotes: List[str]) -> None:
@@ -28,11 +29,8 @@ class NineLightRemote:
 
         # cmd: str = f"curl -fs -X GET \"http://{self.ip}:{self.port}/remote\" -d '{payload}' > /dev/null"
         # subprocess.Popen(shlex.split(cmd))
-        request(
-            "GET",
-            f"http://{self.ip}:{self.port}/remote",
-            headers={"state": state, "remotes": remotes},
-        )
+        request("GET", f"http://{self.ip}:{self.port}/remote",
+                data={"state": state, "remotes": remotes})
 
     def set_expiration(self, expiration: Optional[datetime] = None) -> None:
         """Set the timestamp when this remote's registration will expire."""

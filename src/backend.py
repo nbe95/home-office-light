@@ -3,7 +3,7 @@
 """9light backend python module."""
 
 from uuid import uuid4
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from typing import Optional
 
 from nine_light import NineLight
@@ -15,11 +15,12 @@ from constants import (
 
 class Backend:
     """Container for the backend flask application."""
+    nl_instance: NineLight
 
     def __init__(self, nl_instance: NineLight) -> None:
-        Backend.nl_instance: NineLight = nl_instance
+        Backend.nl_instance = nl_instance
         self.app: Flask = Flask(__name__)
-        self.app.secret_key: str = uuid4().hex
+        self.app.secret_key = uuid4().hex
 
         @self.app.route("/status/get", methods=["GET"])
         def _status_get():
@@ -30,13 +31,13 @@ class Backend:
             return Backend.status()
 
     @staticmethod
-    def status() -> str:
+    def status() -> Response:
         """Gets the bare status of the system and - if provided - updates a
         remote registration."""
 
         if "remote" in request.args:
             Backend.nl_instance.add_remote(NineLightRemote(
-                request.remote_addr,
+                str(request.remote_addr),
                 PORT_REMOTE
             ))
 

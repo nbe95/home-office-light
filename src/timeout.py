@@ -13,14 +13,14 @@ class Timeout(Thread):
 
     def __init__(self, func: Callable[[], None], timeout: timedelta):
         super(Timeout, self).__init__()
-        self.func: Callable[None, Any] = func
+        self.func: Callable[[], Any] = func
         self.timeout: timedelta = timeout
         self._canceled: bool = False
         self.start()
 
     def run(self) -> None:
         """Start the timeout and when elapsed, run the registered function."""
-        sleep(self.timeout)
+        sleep(self.timeout.total_seconds())
         if not self._canceled:
             self.func()
 
