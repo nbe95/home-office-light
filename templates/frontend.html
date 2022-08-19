@@ -8,23 +8,32 @@
         <h1>{{ main_title }} Frontend</h1>
 
         <h2>Current State</h2>
-        <div id="preview" class="{{ current_state }}">
-            <div class="top">Video</div>
-            <div class="middle">&#x2B24;</div>
-            <div class="bottom">Anruf</div>
-        </div>
-        <form action="/" method="post">
+        <form action="/" method="post" name="form1">
+            <div id="preview" class="{{ current_state }}">
+                <div class="top">Video</div>
+                <div class="middle">
+                    <script type="text/javascript">
+                        function pressBell() {
+                            document.forms.form1["bell-button"].value = "1";
+                            document.forms.form1.submit();
+                        }
+                    </script>
+                    <input type="hidden" name="bell-button" value="">
+                    <a href="#" onclick="pressBell();">&#x2B24;</a>
+                </div>
+                <div class="bottom">Anruf</div>
+            </div>
             <p>
                 Current state: <strong>{{ current_state|upper }}</strong>
             </p>
             <p>
                 Set new state:
                 <select name="new-state">
-                    <option name="none">None</option>
-                    <option name="call">Call</option>
-                    <option name="video">Video</option>
-                    <option name="request">Request</option>
-                    <option name="coffee">I need a coffee&hellip;</option>
+                    <option value="none">None</option>
+                    <option value="call">Call</option>
+                    <option value="video">Video</option>
+                    <option value="request">Request</option>
+                    <option value="coffee">I need a coffee&hellip;</option>
                 </select>
                 <button name="set-state">Set</button>
             </p>

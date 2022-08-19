@@ -2,10 +2,12 @@
 
 """Python module which handles the main 9light interfaces and functions."""
 
-from transitions import Machine
 from enum import Enum
+from transitions import Machine
 from typing import List
+
 from remote import NineLightRemote
+from timeout import Timeout
 from constants import (
     REMOTE_EXP_TIMEOUT_S,
     BELL_TIMEOUT_S
@@ -47,7 +49,7 @@ class NineLight:
     def set_state(self, target: str) -> bool:
         """Try to apply a new state."""
         try:
-            self.trigger(target)
+            self.trigger(target.lower())
         except:
             return False
         return True
@@ -69,12 +71,20 @@ class NineLight:
         self.remotes = new_list
 
     def send_to_remotes(self, ignore: List[NineLightRemote]) -> None:
+        """Send current status to all registered remotes."""
         payload: str = json.dumps({
             "state": parent.get_state(),
             "remotes": list(r.ip for r in parent.remotes)
         })
         for remote in filter(lambda x: x not in ignore, self.remotes):
             remote.send_update(payload)
+
+    def on_bell_button(self) -> None:
+        """Trigger correct action when someone pushed the button."""
+        if self.state == NineLight.States.VIDEO:
+            self.request()
+        elif self.state == NineLight.States.COFFEE:
+            self.none()
 
     def on_state_changed(self) -> None:
         # self.leds.set_mode(self.state)

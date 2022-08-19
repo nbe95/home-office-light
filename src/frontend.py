@@ -36,11 +36,13 @@ class Frontend:
     @staticmethod
     def index() -> str:
         """Returns the index page of the web application."""
+
+        # Trigger actions if requested
         if request.method == "POST":
             if "set-state" in request.form:
                 Frontend.nl_instance.set_state(request.form["new-state"])
 
-            elif "add-remote" in request.form:
+            if "add-remote" in request.form:
                 result = match("^((?:\d{1,3}\.){3}\d{1,3})(?:\:(\d+))?$", request.form["new-remote"])
                 if result:
                     groups = result.groups()
@@ -48,9 +50,12 @@ class Frontend:
                     port: int = groups[1] or PORT_REMOTE
                     Frontend.nl_instance.add_remote(NineLightRemote(ip, port))
 
-            elif "del-remote" in request.form:
+            if "del-remote" in request.form:
                 Frontend.nl_instance.delete_remote(NineLightRemote(request.form["del-remote"], 0))
 
+            if "bell-button" in request.form:
+                if request.form["bell-button"] == "1":
+                    Frontend.nl_instance.on_bell_button()
 
         return render_template("frontend.html",
             main_title=MAIN_TITLE,
