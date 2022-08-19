@@ -17,8 +17,7 @@ from constants import (
     FRONTEND_TEMPLATE_DIR,
     FRONTEND_STATIC_DIR,
     PORT_FRONTEND,
-    PORT_BACKEND,
-    PORT_REMOTE
+    PORT_BACKEND
 )
 
 
@@ -37,7 +36,8 @@ def main():
     backend_thread.start()
 
     # Set up frontend thread
-    frontend: Frontend = Frontend(nl, FRONTEND_TEMPLATE_DIR, FRONTEND_STATIC_DIR)
+    frontend: Frontend = Frontend(nl, FRONTEND_TEMPLATE_DIR,
+                                  FRONTEND_STATIC_DIR)
     frontend_thread: Thread = Thread(
         target=frontend.run,
         args=(PORT_FRONTEND,),

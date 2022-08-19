@@ -2,12 +2,21 @@
 
 """Helper module for handling of a WS281x LED strip."""
 
-from rpi_ws281x import *
+from rpi_ws281x import Adafruit_NeoPixel
+from time import sleep
+from threading import Thread
+from random import randint
+from typing import List, Tuple, Optional
+
+from pulse_wave import PulseWave
+from nine_light import NineLight
+
+
+# Type alias
+rgb = Tuple[int, int, int]
 
 
 class LedStrip:
-    rgb = Tuple[int, int, int]
-
     def __init__(self,
                  led_pin: int,
                  leds_total: int,
@@ -20,9 +29,9 @@ class LedStrip:
             led_pin,        # GPIO pin connected to the pixels (18 uses PWM!)
             800000,         # LED signal frequency in hertz (usually 800khz)
             10,             # DMA channel to use for generating signal (try 10)
-            False,          # True to invert the signal (when using NPN transistor level shift)
+            False,          # True to invert the signal (when using NPN transistor level shift)             # noqa: E501
             255,            # Set to 0 for darkest and 255 for brightest
-            1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53
+            1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
         ))
         self._strip.begin()
 
@@ -33,12 +42,12 @@ class LedStrip:
 
     def set_top(self, color: rgb) -> None:
         for pixel in self._leds_top:
-            self.strip.setPixelColorRGB(pixel, *rgb)
+            self.strip.setPixelColorRGB(pixel, *color)
         self.strip.show()
 
     def set_bottom(self, color: rgb) -> None:
         for pixel in self._leds_bottom:
-            self.strip.setPixelColorRGB(pixel, *rgb)
+            self.strip.setPixelColorRGB(pixel, *color)
         self.strip.show()
 
     def set_all(self, color: rgb) -> None:
@@ -88,7 +97,7 @@ class LedStrip:
         elif state == NineLight.States.COFFEE:
             top: bool = False
             while (not self.light_thread_terminate):
-                color: rgb = get_random_color()
+                color: rgb = LedStrip.get_random_color()
                 self.clear()
                 if top:
                     self.set_top(color)

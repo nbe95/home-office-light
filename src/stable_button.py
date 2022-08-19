@@ -3,27 +3,28 @@
 """ Helper module for handling hardware button debouncing and managing the
 corresponding callbacks."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from threading import Thread
+from time import sleep
 from typing import Optional, Callable
 
 
 class StableButton():
     def __init__(self,
-                 read_state_function: Callable[None, bool],
-                 thresholds: timedelta):
+                 read_state_function: Callable[[], bool],
+                 threshold: timedelta):
         self.threshold: timedelta = threshold
-        self._read_state_function: Callable[None, bool] = cb_read_state
+        self._read_state_function: Callable[[], bool] = read_state_function
         self._check_thread: Optional[Thread] = None
         self._check_abort: bool = False
-        self._cb_pressed: Optional[Callable] = None
-        self._cb_released: Optional[Callable] = None
+        self._cb_pressed: Optional[Callable[[], None]] = None
+        self._cb_released: Optional[Callable[[], None]] = None
         self._debounced_state: bool = False
 
-    def set_callback_pressed(self, callback: Callable[None, bool]) -> None:
+    def set_callback_pressed(self, callback: Callable[[], None]) -> None:
         self._cb_pressed = callback
 
-    def set_callback_released(self, callback: Callable[None, bool]) -> None:
+    def set_callback_released(self, callback: Callable[[], None]) -> None:
         self._cb_released = callback
 
     def get_debounced_state(self) -> bool:
@@ -36,9 +37,9 @@ class StableButton():
 
         self._check_abort = False
         self._check_thread = Thread(
-            target = self._check_thread,
-            args = (self._read_state_function(),),
-            daemon = True)
+            target=self._check_thread,
+            args=(self._read_state_function(),),
+            daemon=True)
         self._check_thread.start()
 
     def _check_thread(self, state: bool) -> None:

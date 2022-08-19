@@ -3,8 +3,10 @@
 """Helper module for handling a button and a hardware buzzer acting as a classic
 door bell."""
 
-from time import sleep, time
+from time import sleep
 import RPi.GPIO as GPIO
+from typing import Optional, Callable
+from threading import Thread
 
 from stable_button import StableButton
 from constants import (
@@ -44,8 +46,8 @@ class Bell:
 
     def ring(self) -> None:
         self.ring_thread = Thread(
-            target = self._run_ring_thread,
-            daemon = True
+            target=self._run_ring_thread,
+            daemon=True
         )
         self._ring_thread.start()
 

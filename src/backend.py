@@ -2,16 +2,13 @@
 
 """9light backend python module."""
 
-from os.path import abspath
-from re import match
 from uuid import uuid4
-from flask import Flask, render_template, request, Response
+from flask import Flask, request, jsonify
 from typing import Optional
 
 from nine_light import NineLight
 from remote import NineLightRemote
 from constants import (
-    MAIN_TITLE,
     PORT_REMOTE
 )
 
@@ -45,11 +42,11 @@ class Backend:
 
         new_state: Optional[str] = request.args.get("status")
         if new_state:
-            nl_instance.set_state(new_state)
+            Backend.nl_instance.set_state(new_state)
 
         return jsonify({
-            "state": state,
-            "remotes": remotes
+            "state": Backend.nl_instance.get_state(),
+            "remotes": [r.ip for r in Backend.nl_instance.remotes]
         })
 
     def run(self, port, host: str = "0.0.0.0") -> None:

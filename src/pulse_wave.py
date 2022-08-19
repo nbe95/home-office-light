@@ -2,7 +2,10 @@
 
 """Helper module for generating pulse waves flawlessly."""
 
+from math import cos, pi
+from datetime import datetime, timedelta
 from typing import Tuple
+
 
 class PulseWave:
     def __init__(self,

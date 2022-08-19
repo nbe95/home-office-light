@@ -4,47 +4,45 @@
 
 from enum import Enum
 from transitions import Machine
-from typing import List
+from typing import List, Optional
 
-#from bell import Bell
-#from led import LedStrip
+# from bell import Bell
+# from led import LedStrip
 from remote import NineLightRemote
 from timeout import Timeout
-from constants import (
-    REMOTE_EXP_TIMEOUT,
-    BELL_REQUEST_TIMEOUT
-)
+from constants import BELL_REQUEST_TIMEOUT
 
 
 class NineLight:
     """Business logic class and state machine for our 9Light."""
 
     class States(Enum):
-        """Enumeration of all available states with corresponding numerical ID."""
-        NONE    = 0,
-        CALL    = 1,
-        VIDEO   = 2,
+        """Enumeration of all states with corresponding numerical ID."""
+        NONE = 0,
+        CALL = 1,
+        VIDEO = 2,
         REQUEST = 3,
-        COFFEE  = 99
+        COFFEE = 99
 
     def __init__(self):
         self.remotes: List[NineLightRemote] = []
-        #self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP, LEDS_BOTTOM)
-        #self._bell: Bell = Bell(PIN_BUTTON, PIN_BUZZER)
+        # self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP,
+        #                                 LEDS_BOTTOM)
+        # self._bell: Bell = Bell(PIN_BUTTON, PIN_BUZZER)
         self._bell_timeout: Optional[Timeout] = None
 
         Machine(self,
-            states=self.States,
-            transitions=[
-                { "trigger": "none",    "source": "*",                  "dest": self.States.NONE },
-                { "trigger": "call",    "source": "*",                  "dest": self.States.CALL },
-                { "trigger": "video",   "source": "*",                  "dest": self.States.VIDEO },
-                { "trigger": "request", "source": self.States.VIDEO,    "dest": self.States.REQUEST },
-                { "trigger": "request", "source": self.States.COFFEE,   "dest": self.States.NONE },
-                { "trigger": "coffee",  "source": self.States.NONE,     "dest": self.States.COFFEE }
-            ],
-            initial=self.States.NONE,
-            after_state_change=self.on_state_changed)
+                states=self.States,
+                transitions=[
+                    {"trigger": "none",    "source": "*",                  "dest": self.States.NONE},       # noqa: E501
+                    {"trigger": "call",    "source": "*",                  "dest": self.States.CALL},       # noqa: E501
+                    {"trigger": "video",   "source": "*",                  "dest": self.States.VIDEO},      # noqa: E501
+                    {"trigger": "request", "source": self.States.VIDEO,    "dest": self.States.REQUEST},    # noqa: E501
+                    {"trigger": "request", "source": self.States.COFFEE,   "dest": self.States.NONE},       # noqa: E501
+                    {"trigger": "coffee",  "source": self.States.NONE,     "dest": self.States.COFFEE}      # noqa: E501
+                ],
+                initial=self.States.NONE,
+                after_state_change=self.on_state_changed)
 
     def get_state(self) -> str:
         """Get the current state as a lowercase string."""
@@ -54,7 +52,7 @@ class NineLight:
         """Try to apply a new state."""
         try:
             self.trigger(target.lower())
-        except:
+        except KeyboardInterrupt:
             return False
         return True
 
