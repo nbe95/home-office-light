@@ -3,14 +3,16 @@
 """9light backend python module."""
 
 from uuid import uuid4
-from flask import Flask, request, jsonify, Response
 from typing import Optional
+from flask import Flask, request, jsonify, Response
 
 from nine_light import NineLight
 from remote import NineLightRemote
 from constants import (
     PORT_REMOTE
 )
+
+# pylint: disable=E1101
 
 
 class Backend:
@@ -47,7 +49,7 @@ class Backend:
 
         return jsonify({
             "state": Backend.nl_instance.get_state(),
-            "remotes": [r.ip for r in Backend.nl_instance.remotes]
+            "remotes": [r.ip_addr for r in Backend.nl_instance.remotes]
         })
 
     def run(self, port, host: str = "0.0.0.0") -> None:

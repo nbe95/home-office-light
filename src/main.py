@@ -24,10 +24,10 @@ from constants import (
 def main():
     """Execute the main app task."""
     # Create 9light object
-    nl = NineLight()
+    light = NineLight()
 
     # Set up backend thread
-    backend: Backend = Backend(nl)
+    backend: Backend = Backend(light)
     backend_thread: Thread = Thread(
         target=backend.run,
         args=(PORT_BACKEND,),
@@ -36,7 +36,7 @@ def main():
     backend_thread.start()
 
     # Set up frontend thread
-    frontend: Frontend = Frontend(nl, FRONTEND_TEMPLATE_DIR,
+    frontend: Frontend = Frontend(light, FRONTEND_TEMPLATE_DIR,
                                   FRONTEND_STATIC_DIR)
     frontend_thread: Thread = Thread(
         target=frontend.run,
@@ -46,7 +46,7 @@ def main():
     frontend_thread.start()
 
     # Register cleanup callback for GPIOs
-    atexit.register(nl.cleanup)
+    atexit.register(light.cleanup)
 
     # Run until interrupted...
     try:

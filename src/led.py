@@ -2,22 +2,25 @@
 
 """Helper module for handling of a WS281x LED strip."""
 
-from rpi_ws281x import Adafruit_NeoPixel
 from datetime import timedelta
 from time import sleep
 from threading import Thread
 from random import randint
 from typing import List, Tuple, Optional
+from rpi_ws281x import Adafruit_NeoPixel
 
 from pulse_wave import PulseWave
 from nine_light import NineLight
 
 
 # Type alias
+# pylint: disable=C0103
 rgb = Tuple[int, int, int]
 
 
 class LedStrip:
+    """Helper class for managing the two LED fields of our 9light using a WS281x
+    LED strip."""
     def __init__(self,
                  led_pin: int,
                  leds_total: int,
@@ -27,6 +30,7 @@ class LedStrip:
         self._leds_bottom: range = range(leds_bottom[0], leds_bottom[1] + 1)
         self._light_wave: PulseWave
         self._strip = Adafruit_NeoPixel(*(
+            # pylint: disable=C0301
             leds_total,     # Number of LED pixels
             led_pin,        # GPIO pin connected to the pixels (18 uses PWM!)
             800000,         # LED signal frequency in hertz (usually 800khz)
@@ -36,35 +40,39 @@ class LedStrip:
             1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
         ))
         self._strip.begin()
-
-        self.clear()
-
         self._light_thread: Optional[Thread] = None
         self._light_thread_terminate: bool = False
+        self.clear()
 
     def set_top(self, color: rgb) -> None:
+        """Set the LED color of the top glass field."""
         for pixel in self._leds_top:
             self._strip.setPixelColorRGB(pixel, *color)
         self._strip.show()
 
     def set_bottom(self, color: rgb) -> None:
+        """Set the LED color of the bottom glass field."""
         for pixel in self._leds_bottom:
             self._strip.setPixelColorRGB(pixel, *color)
         self._strip.show()
 
     def set_all(self, color: rgb) -> None:
+        """Set the LED color of both glass fields."""
         self.set_top(color)
         self.set_bottom(color)
 
     def set_brightness(self, brightness: int) -> None:
+        """Set the brightness of all LEDs on the strip."""
         self._strip.setBrightness(brightness)
         self._strip.show()
 
     def clear(self) -> None:
+        """Turn off any LEDs."""
         self.set_all((0, 0, 0))
         self.set_brightness(255)
 
     def on_state_changed(self, state: NineLight.States) -> None:
+        """Callback to be triggered on any 9light state change."""
         if self._light_thread:
             self._light_thread_terminate = True
             self._light_thread.join()
@@ -78,6 +86,8 @@ class LedStrip:
         self._light_thread.start()
 
     def _run_light_thread(self, state: NineLight.States) -> None:
+        """Internal method which controls the 9light LED lightning according to
+        the provided status information."""
         self.clear()
 
         if state == NineLight.States.CALL:
@@ -92,13 +102,13 @@ class LedStrip:
             blue: rgb = (0, 200, 255)
             self.set_top(blue)
             self._light_wave = PulseWave(timedelta(milliseconds=800), (30, 255))
-            while (not self._light_thread_terminate):
+            while not self._light_thread_terminate:
                 self.set_brightness(self._light_wave.get_scaled())
                 sleep(0.02)
 
         elif state == NineLight.States.COFFEE:
             top: bool = False
-            while (not self._light_thread_terminate):
+            while not self._light_thread_terminate:
                 color: rgb = LedStrip.get_random_color()
                 self.clear()
                 if top:
@@ -106,10 +116,11 @@ class LedStrip:
                 else:
                     self.set_bottom(color)
                 sleep(0.05)
-                top = not(top)
+                top = not top
 
     @staticmethod
     def get_random_color() -> rgb:
+        """Provides a random RGB color."""
         color: List[int] = []
         for _ in range(3):
             color.append(int(randint(0, 10) * 255 / 10))

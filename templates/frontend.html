@@ -56,10 +56,10 @@
                 {% for no, remote in remotes %}
                 <tr>
                     <td>{{ no + 1 }}</td>
-                    <td>{{ remote.ip }}:{{ remote.port }}</td>
+                    <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
                     <td>{{ remote.expiration }}</td>
                     <td>
-                        <button name="del-remote" value="{{ remote.ip }}">Remove</button>
+                        <button name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
                     </td>
                 </tr>
                 {% else %}

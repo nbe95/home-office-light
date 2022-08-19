@@ -12,7 +12,7 @@ class Timeout(Thread):
     """Timeout helper class, which will run a specific task as a thread."""
 
     def __init__(self, func: Callable[[], None], timeout: timedelta):
-        super(Timeout, self).__init__()
+        super().__init__()
         self.func: Callable[[], Any] = func
         self.timeout: timedelta = timeout
         self._canceled: bool = False

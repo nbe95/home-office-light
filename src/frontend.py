@@ -14,6 +14,8 @@ from constants import (
     PORT_REMOTE
 )
 
+# pylint: disable=E1101
+
 
 class Frontend:
     """Container for the frontend flask application."""
@@ -47,9 +49,11 @@ class Frontend:
                                request.form["new-remote"])
                 if result:
                     groups = result.groups()
-                    ip: str = groups[0]
-                    port: int = int(groups[1]) or PORT_REMOTE
-                    Frontend.nl_instance.add_remote(NineLightRemote(ip, port))
+                    ip_addr: str = groups[0]
+                    port: Union[str, int] = groups[1] or PORT_REMOTE
+                    Frontend.nl_instance.add_remote(
+                        NineLightRemote(ip_addr, int(port))
+                    )
 
             if "del-remote" in request.form:
                 Frontend.nl_instance.delete_remote(
