@@ -6,16 +6,18 @@ from enum import Enum
 from transitions import Machine
 from typing import List
 
+#from bell import Bell
+#from led import LedStrip
 from remote import NineLightRemote
 from timeout import Timeout
 from constants import (
-    REMOTE_EXP_TIMEOUT_S,
-    BELL_TIMEOUT_S
+    REMOTE_EXP_TIMEOUT,
+    BELL_REQUEST_TIMEOUT
 )
 
 
 class NineLight:
-    """Business logic class for our 9Light."""
+    """Business logic class and state machine for our 9Light."""
 
     class States(Enum):
         """Enumeration of all available states with corresponding numerical ID."""
@@ -27,7 +29,9 @@ class NineLight:
 
     def __init__(self):
         self.remotes: List[NineLightRemote] = []
-        self.bell_timeout: Optional[Timeout] = None
+        #self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP, LEDS_BOTTOM)
+        #self._bell: Bell = Bell(PIN_BUTTON, PIN_BUZZER)
+        self._bell_timeout: Optional[Timeout] = None
 
         Machine(self,
             states=self.States,
@@ -70,14 +74,13 @@ class NineLight:
         new_list = filter(lambda x: not x.is_expired(), self.remotes)
         self.remotes = new_list
 
-    def send_to_remotes(self, ignore: List[NineLightRemote]) -> None:
+    def send_update_to_remotes(self) -> None:
         """Send current status to all registered remotes."""
-        payload: str = json.dumps({
-            "state": parent.get_state(),
-            "remotes": list(r.ip for r in parent.remotes)
-        })
-        for remote in filter(lambda x: x not in ignore, self.remotes):
-            remote.send_update(payload)
+        for remote in self.remotes:
+            remote.send_update(
+                self.get_state(),
+                [r.ip for r in self.remotes]
+            )
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""
@@ -87,12 +90,15 @@ class NineLight:
             self.none()
 
     def on_state_changed(self) -> None:
-        # self.leds.set_mode(self.state)
+        self._leds.on_state_changed(self.state)
 
         # Cancel bell timeout if leaving e.g. request state
-        if self.bell_timeout:
-            self.bell_timeout.canceled = True
+        if self._bell_timeout:
+            self._bell_timeout.cancel()
 
     def on_enter_REQUEST(self) -> None:
-        #self.bell.ring()
-        self.bell_timeout = Timeout(self.video, BELL_TIMEOUT_S)
+        self._bell.ring()
+        self._bell_timeout = Timeout(self.video, BELL_REQUEST_TIMEOUT)
+
+    def cleanup(self) -> None:
+        self._bell.cleanup()

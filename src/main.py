@@ -7,7 +7,11 @@ functionalities. It sets up a backend server for API access as well as a simple
 web frontend for webbrowser based control.
 """
 
+import atexit
+from threading import Thread
+
 from nine_light import NineLight
+from backend import Backend
 from frontend import Frontend
 from constants import (
     FRONTEND_TEMPLATE_DIR,
@@ -23,13 +27,33 @@ def main():
     # Create 9light object
     nl = NineLight()
 
-    # Set up backend API
-    # backend: Backend = Backend(nl, )
-    # backend.run(PORT_BACKEND)
+    # Set up backend thread
+    backend: Backend = Backend(nl)
+    backend_thread: Thread = Thread(
+        target=backend.run,
+        args=(PORT_BACKEND,),
+        daemon=True
+    )
+    backend_thread.start()
 
-    # Set up web frontend
+    # Set up frontend thread
     frontend: Frontend = Frontend(nl, FRONTEND_TEMPLATE_DIR, FRONTEND_STATIC_DIR)
-    frontend.run(PORT_FRONTEND)
+    frontend_thread: Thread = Thread(
+        target=frontend.run,
+        args=(PORT_FRONTEND,),
+        daemon=True
+    )
+    frontend_thread.start()
+
+    # Register cleanup callback for GPIOs
+    atexit.register(nl.cleanup)
+
+    # Run until interrupted...
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
