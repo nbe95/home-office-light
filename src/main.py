@@ -46,7 +46,7 @@ def main():
     frontend_thread.start()
 
     # Register cleanup callback for GPIOs
-    atexit.register(light.cleanup)
+    atexit.register(light.gpio_cleanup)
 
     # Run until interrupted...
     try:

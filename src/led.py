@@ -6,14 +6,13 @@ from datetime import timedelta
 from time import sleep
 from threading import Thread
 from random import randint
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Callable
 from rpi_ws281x import Adafruit_NeoPixel
 
 from pulse_wave import PulseWave
-from nine_light import NineLight
+from states import States
 
 
-# Type alias
 # pylint: disable=C0103
 rgb = Tuple[int, int, int]
 
@@ -24,11 +23,11 @@ class LedStrip:
     def __init__(self,
                  led_pin: int,
                  leds_total: int,
-                 leds_top: Tuple[int, int],
-                 leds_bottom: Tuple[int, int]):
-        self._leds_top: range = range(leds_top[0], leds_top[1] + 1)
-        self._leds_bottom: range = range(leds_bottom[0], leds_bottom[1] + 1)
-        self._light_wave: PulseWave
+                 leds_top: List[int],
+                 leds_bottom: List[int],
+                 get_state_function: Callable[[], States] = None):
+        self._leds_top: List[int] = leds_top
+        self._leds_bottom: List[int] = leds_bottom
         self._strip = Adafruit_NeoPixel(*(
             # pylint: disable=C0301
             leds_total,     # Number of LED pixels
@@ -40,6 +39,7 @@ class LedStrip:
             1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
         ))
         self._strip.begin()
+        self.state: States = States.NONE
         self._light_thread: Optional[Thread] = None
         self._light_thread_terminate: bool = False
         self.clear()
@@ -71,7 +71,7 @@ class LedStrip:
         self.set_all((0, 0, 0))
         self.set_brightness(255)
 
-    def on_state_changed(self, state: NineLight.States) -> None:
+    def on_state_changed(self, state: States) -> None:
         """Callback to be triggered on any 9light state change."""
         if self._light_thread:
             self._light_thread_terminate = True
@@ -85,28 +85,28 @@ class LedStrip:
         )
         self._light_thread.start()
 
-    def _run_light_thread(self, state: NineLight.States) -> None:
+    def _run_light_thread(self, state: States) -> None:
         """Internal method which controls the 9light LED lightning according to
         the provided status information."""
         self.clear()
 
-        if state == NineLight.States.CALL:
+        if state == States.CALL:
             yellow: rgb = (255, 150, 0)
             self.set_bottom(yellow)
 
-        elif state == NineLight.States.VIDEO:
+        elif state == States.VIDEO:
             red: rgb = (255, 0, 0)
             self.set_top(red)
 
-        elif state == NineLight.States.REQUEST:
+        elif state == States.REQUEST:
             blue: rgb = (0, 200, 255)
             self.set_top(blue)
-            self._light_wave = PulseWave(timedelta(milliseconds=800), (30, 255))
+            wave: PulseWave = PulseWave(timedelta(milliseconds=800), (30, 255))
             while not self._light_thread_terminate:
-                self.set_brightness(self._light_wave.get_scaled())
+                self.set_brightness(wave.get_scaled())
                 sleep(0.02)
 
-        elif state == NineLight.States.COFFEE:
+        elif state == States.COFFEE:
             top: bool = False
             while not self._light_thread_terminate:
                 color: rgb = LedStrip.get_random_color()

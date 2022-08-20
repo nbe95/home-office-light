@@ -4,47 +4,64 @@
 
 from enum import Enum
 from typing import List, Optional
-from transitions import Machine
+from transitions import Machine, MachineError
+from RPi import GPIO
 
-# from bell import Bell
-# from led import LedStrip
+from button import Button
+from buzzer import Buzzer
+from led import LedStrip
 from remote import NineLightRemote
+from states import States
 from timeout import Timeout
-from constants import BELL_REQUEST_TIMEOUT
-
-# pylint: disable=E1101
+from constants import (
+    BELL_REQUEST_TIMEOUT,
+    PIN_LEDS,
+    PIN_BUTTON,
+    PIN_BUZZER,
+    LEDS_TOTAL,
+    LEDS_TOP,
+    LEDS_BOTTOM
+)
 
 class NineLight:
     """Business logic class and state machine for our 9Light."""
-
-    class States(Enum):
-        """Enumeration of all states with corresponding numerical ID."""
-        NONE = 0
-        CALL = 1
-        VIDEO = 2
-        REQUEST = 3
-        COFFEE = 99
+    # pylint: disable=E1101
 
     def __init__(self):
+        Machine(
+            self,
+            states=States,
+            transitions=[
+                # pylint: disable=C0301
+                {"trigger": "none",    "source": "*",           "dest": States.NONE},       # noqa: E501
+                {"trigger": "call",    "source": "*",           "dest": States.CALL},       # noqa: E501
+                {"trigger": "video",   "source": "*",           "dest": States.VIDEO},      # noqa: E501
+                {"trigger": "request", "source": States.VIDEO,  "dest": States.REQUEST},    # noqa: E501
+                {"trigger": "request", "source": States.COFFEE, "dest": States.NONE},       # noqa: E501
+                {"trigger": "coffee",  "source": States.NONE,   "dest": States.COFFEE}      # noqa: E501
+            ],
+            initial=States.NONE,
+            after_state_change=self.on_state_changed
+        )
         self.remotes: List[NineLightRemote] = []
+
+        self.gpio_setup()
+        self._buzzer: Buzzer = Buzzer(PIN_BUZZER, GPIO)
+        self._button: Button = Button(PIN_BUTTON, GPIO,
+                                      callback_pressed=self.on_bell_button)
         self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP,
-                                        LEDS_BOTTOM)
-        self._bell: Bell = Bell(PIN_BUTTON, PIN_BUZZER)
+                                        LEDS_BOTTOM,
+                                        get_state_function=self.get_state)
+
         self._bell_timeout: Optional[Timeout] = None
 
-        Machine(self,
-                states=self.States,
-                transitions=[
-                    # pylint: disable=C0301
-                    {"trigger": "none",    "source": "*",                  "dest": self.States.NONE},       # noqa: E501
-                    {"trigger": "call",    "source": "*",                  "dest": self.States.CALL},       # noqa: E501
-                    {"trigger": "video",   "source": "*",                  "dest": self.States.VIDEO},      # noqa: E501
-                    {"trigger": "request", "source": self.States.VIDEO,    "dest": self.States.REQUEST},    # noqa: E501
-                    {"trigger": "request", "source": self.States.COFFEE,   "dest": self.States.NONE},       # noqa: E501
-                    {"trigger": "coffee",  "source": self.States.NONE,     "dest": self.States.COFFEE}      # noqa: E501
-                ],
-                initial=self.States.NONE,
-                after_state_change=self.on_state_changed)
+    @staticmethod
+    def gpio_setup() -> None:
+        GPIO.setmode(GPIO.BCM)
+
+    @staticmethod
+    def gpio_cleanup() -> None:
+        GPIO.cleanup()
 
     def get_state(self) -> str:
         """Get the current state as a lowercase string."""
@@ -54,7 +71,7 @@ class NineLight:
         """Try to apply a new state."""
         try:
             self.trigger(target.lower())
-        except KeyboardInterrupt:
+        except MachineError:
             return False
         return True
 
@@ -84,26 +101,20 @@ class NineLight:
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""
-        if self.state == NineLight.States.VIDEO:
+        if self.state == States.VIDEO:
             self.request()
-        elif self.state == NineLight.States.COFFEE:
+        elif self.state == States.COFFEE:
             self.none()
 
     def on_state_changed(self) -> None:
         """Auto-called function triggered after any transition of the state
         machine."""
         self._leds.on_state_changed(self.state)
-
-        # Cancel bell timeout if leaving e.g. request state
-        if self._bell_timeout:
+        if self._bell_timeout and self.state != States.REQUEST:
             self._bell_timeout.cancel()
 
     def on_enter_REQUEST(self) -> None:
         """Auto-called function triggered when entering the request state."""
-        # pylint: disable=C0103
-        self._bell.ring()
+        self._buzzer.ring()
         self._bell_timeout = Timeout(self.video, BELL_REQUEST_TIMEOUT)
-
-    def cleanup(self) -> None:
-        """Cleanup function for GPIO handling."""
-        self._bell.cleanup()
+        self._bell_timeout.start()
