@@ -2,7 +2,6 @@
 
 """Python module which handles the main 9light interfaces and functions."""
 
-from enum import Enum
 from typing import List, Optional
 from transitions import Machine, MachineError
 from RPi import GPIO
@@ -22,6 +21,7 @@ from constants import (
     LEDS_TOP,
     LEDS_BOTTOM
 )
+
 
 class NineLight:
     """Business logic class and state machine for our 9Light."""
@@ -50,17 +50,17 @@ class NineLight:
         self._button: Button = Button(PIN_BUTTON, GPIO,
                                       callback_pressed=self.on_bell_button)
         self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP,
-                                        LEDS_BOTTOM,
-                                        get_state_function=self.get_state)
-
+                                        LEDS_BOTTOM)
         self._bell_timeout: Optional[Timeout] = None
 
     @staticmethod
     def gpio_setup() -> None:
+        """Call GPIO setup routines."""
         GPIO.setmode(GPIO.BCM)
 
     @staticmethod
     def gpio_cleanup() -> None:
+        """Call GPIO cleanup routines."""
         GPIO.cleanup()
 
     def get_state(self) -> str:
@@ -115,6 +115,7 @@ class NineLight:
 
     def on_enter_REQUEST(self) -> None:
         """Auto-called function triggered when entering the request state."""
+        # pylint: disable=C0103
         self._buzzer.ring()
         self._bell_timeout = Timeout(self.video, BELL_REQUEST_TIMEOUT)
         self._bell_timeout.start()

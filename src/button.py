@@ -20,7 +20,7 @@ class Button:
                  callback_released: Optional[Callable[[], None]] = None,
                  threshold: timedelta = BELL_DEBOUNCE_TIME):
         self.pin: int = pin
-        self.threshold: timedelta = BELL_DEBOUNCE_TIME
+        self.threshold: timedelta = threshold
         self._cb_pressed: Optional[Callable[[], None]] = callback_pressed
         self._cb_released: Optional[Callable[[], None]] = callback_released
         self._gpio_setup(gpio)
@@ -59,7 +59,7 @@ class Button:
         end: datetime = datetime.now() + self.threshold
         while datetime.now() < end:
             if self._debounce_thread_terminate \
-            or self.get_button_state() != state:
+               or self.get_button_state() != state:
                 return
             sleep(0.001)
 

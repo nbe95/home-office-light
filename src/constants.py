@@ -3,7 +3,7 @@
 """Python module to configure various constants."""
 
 from datetime import timedelta as td
-from typing import List, Tuple
+from typing import List
 
 
 # Flask

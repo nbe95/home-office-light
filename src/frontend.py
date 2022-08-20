@@ -5,6 +5,7 @@
 from os.path import abspath
 from re import match
 from uuid import uuid4
+from typing import Union
 from flask import Flask, render_template, request
 
 from nine_light import NineLight

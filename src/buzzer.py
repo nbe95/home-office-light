@@ -3,7 +3,7 @@
 """Helper module for handling a buzzer acting as a classic door bell."""
 
 from time import sleep
-from typing import Optional, Callable
+from typing import Optional
 from threading import Thread
 from RPi import GPIO
 

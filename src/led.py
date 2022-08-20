@@ -6,7 +6,7 @@ from datetime import timedelta
 from time import sleep
 from threading import Thread
 from random import randint
-from typing import List, Tuple, Optional, Callable
+from typing import List, Tuple, Optional
 from rpi_ws281x import Adafruit_NeoPixel
 
 from pulse_wave import PulseWave
@@ -24,8 +24,7 @@ class LedStrip:
                  led_pin: int,
                  leds_total: int,
                  leds_top: List[int],
-                 leds_bottom: List[int],
-                 get_state_function: Callable[[], States] = None):
+                 leds_bottom: List[int]):
         self._leds_top: List[int] = leds_top
         self._leds_bottom: List[int] = leds_bottom
         self._strip = Adafruit_NeoPixel(*(
