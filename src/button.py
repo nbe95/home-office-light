@@ -15,7 +15,6 @@ class Button:
     """Helper class for handling and debouncing the button."""
     def __init__(self,
                  pin: int,
-                 gpio: GPIO,
                  callback_pressed: Optional[Callable[[], None]] = None,
                  callback_released: Optional[Callable[[], None]] = None,
                  threshold: timedelta = BELL_DEBOUNCE_TIME):
@@ -23,21 +22,21 @@ class Button:
         self.threshold: timedelta = threshold
         self._cb_pressed: Optional[Callable[[], None]] = callback_pressed
         self._cb_released: Optional[Callable[[], None]] = callback_released
-        self._gpio_setup(gpio)
+        self._gpio_setup()
         self._debounce_thread: Optional[Thread] = None
         self._debounce_thread_terminate: bool = False
         self.debounced: bool = False
 
-    def _gpio_setup(self, gpio: GPIO) -> None:
+    def _gpio_setup(self) -> None:
         """Manages the internal GPIO setup."""
-        self._gpio: GPIO = gpio
-        self._gpio.setup(self.pin, GPIO.IN)
-        self._gpio.add_event_detect(self.pin, GPIO.BOTH,
-                                    callback=self.on_gpio_edge)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.pin, GPIO.IN)
+        GPIO.add_event_detect(self.pin, GPIO.BOTH,
+                              callback=self.on_gpio_edge)
 
     def get_button_state(self) -> bool:
         """Fetches the current button state as a boolean value."""
-        return self._gpio.input(self.pin)
+        return GPIO.input(self.pin)
 
     def on_gpio_edge(self, _) -> None:
         """Internal method which must be called upon ANY detected edge of the

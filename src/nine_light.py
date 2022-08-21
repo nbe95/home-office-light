@@ -45,21 +45,15 @@ class NineLight:
         )
         self.remotes: List[NineLightRemote] = []
 
-        self.gpio_setup()
-        self._buzzer: Buzzer = Buzzer(PIN_BUZZER, GPIO)
-        self._button: Button = Button(PIN_BUTTON, GPIO,
+        self._buzzer: Buzzer = Buzzer(PIN_BUZZER)
+        self._button: Button = Button(PIN_BUTTON,
                                       callback_pressed=self.on_bell_button)
         self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP,
                                         LEDS_BOTTOM)
         self._bell_timeout: Optional[Timeout] = None
 
     @staticmethod
-    def gpio_setup() -> None:
-        """Call GPIO setup routines."""
-        GPIO.setmode(GPIO.BCM)
-
-    @staticmethod
-    def gpio_cleanup() -> None:
+    def cleanup() -> None:
         """Call GPIO cleanup routines."""
         GPIO.cleanup()
 

@@ -14,16 +14,16 @@ from constants import (
 
 class Buzzer:
     """Helper class handling the buzzer hardware."""
-    def __init__(self, pin: int, gpio: GPIO):
+    def __init__(self, pin: int):
         self.pin: int = pin
-        self._gpio_setup(gpio)
+        self._gpio_setup()
         self._ring_thread: Optional[Thread] = None
 
-    def _gpio_setup(self, gpio: GPIO) -> None:
+    def _gpio_setup(self) -> None:
         """Manages the internal GPIO setup."""
-        self._gpio = gpio
-        self._gpio.setup(self.pin, GPIO.OUT)
-        self._gpio.output(self.pin, 0)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, 0)
 
     def ring(self) -> None:
         """Start an internal thread for the ring functionality of the bell."""
@@ -37,7 +37,7 @@ class Buzzer:
         """Run the internal functions to trigger the buzzer once."""
         state: bool = True
         for timeout_ms in BELL_BUZZER_SEQUENCE:
-            self._gpio.output(self.pin, 1 if state else 0)
+            GPIO.output(self.pin, 1 if state else 0)
             state = not state
             sleep(timeout_ms / 1000)
-        self._gpio.output(self.pin, 0)
+        GPIO.output(self.pin, 0)
