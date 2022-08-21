@@ -34,6 +34,11 @@ class Button:
         GPIO.setup(self.pin, GPIO.IN)
         GPIO.add_event_detect(self.pin, GPIO.BOTH, callback=self.on_gpio_edge)
 
+    def cleanup(self) -> None:
+        """Reset any GPIOs used in this module."""
+        self._debounce_thread_terminate = True
+        GPIO.cleanup()
+
     def get_button_state(self) -> bool:
         """Fetches the current button state as a boolean value."""
         return GPIO.input(self.pin)     # type: ignore

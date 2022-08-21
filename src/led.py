@@ -43,6 +43,11 @@ class LedStrip:
         self._light_thread_terminate: bool = False
         self.clear()
 
+    def cleanup(self) -> None:
+        """Reset any GPIOs used in this module."""
+        self._light_thread_terminate = True
+        self.clear()
+
     def set_top(self, color: rgb) -> None:
         """Set the LED color of the top glass field."""
         for pixel in self._leds_top:
