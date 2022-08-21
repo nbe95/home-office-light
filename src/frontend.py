@@ -20,11 +20,10 @@ from constants import (
 
 class Frontend:
     """Container for the frontend flask application."""
-    nl_instance: NineLight
 
     def __init__(self, nl_instance: NineLight, template_folder: str,
                  static_folder: str) -> None:
-        Frontend.nl_instance = nl_instance
+        self.nl_instance: NineLight = nl_instance
         self.app: Flask = Flask(
             __name__,
             template_folder=abspath(template_folder),
@@ -34,16 +33,15 @@ class Frontend:
 
         @self.app.route("/", methods=["GET", "POST"])
         def _route_index():
-            return Frontend.index()
+            return self.index()
 
-    @staticmethod
-    def index() -> str:
+    def index(self) -> str:
         """Returns the index page of the web application."""
 
         # Trigger actions if requested
         if request.method == "POST":
             if "set-state" in request.form:
-                Frontend.nl_instance.set_state(request.form["new-state"])
+                self.nl_instance.set_state(request.form["new-state"])
 
             if "add-remote" in request.form:
                 result = match(r"^((?:\d{1,3}\.){3}\d{1,3})(?:\:(\d+))?$",
@@ -52,25 +50,25 @@ class Frontend:
                     groups = result.groups()
                     ip_addr: str = groups[0]
                     port: Union[str, int] = groups[1] or PORT_REMOTE
-                    Frontend.nl_instance.add_remote(
+                    self.nl_instance.add_remote(
                         NineLightRemote(ip_addr, int(port))
                     )
 
             if "del-remote" in request.form:
-                Frontend.nl_instance.delete_remote(
+                self.nl_instance.delete_remote(
                     NineLightRemote(request.form["del-remote"], 0)
                 )
 
             if "bell-button" in request.form:
                 if request.form["bell-button"] == "1":
-                    Frontend.nl_instance.on_bell_button()
+                    self.nl_instance.on_bell_button()
 
         return render_template(
             "frontend.html",
             main_title=MAIN_TITLE,
             client_ip=request.remote_addr,
-            current_state=Frontend.nl_instance.get_state(),
-            remotes=enumerate(Frontend.nl_instance.remotes)
+            current_state=self.nl_instance.get_state(),
+            remotes=enumerate(self.nl_instance.remotes)
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
