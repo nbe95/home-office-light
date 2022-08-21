@@ -120,7 +120,7 @@ class LedStrip:
     @staticmethod
     def get_random_color() -> rgb:
         """Provides a random RGB color."""
-        color: List[int] = []
-        for _ in range(3):
-            color.append(int(randint(0, 10) * 255 / 10))
-        return tuple(color)
+        r: int = randint(0, 10) * 255 // 10
+        g: int = randint(0, 10) * 255 // 10
+        b: int = randint(0, 10) * 255 // 10
+        return (r, g, b)

@@ -59,7 +59,7 @@ class NineLight:
 
     def get_state(self) -> str:
         """Get the current state as a lowercase string."""
-        return self.state.name.lower()
+        return str(self.state.name).lower()
 
     def set_state(self, target: str) -> bool:
         """Try to apply a new state."""

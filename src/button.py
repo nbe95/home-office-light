@@ -32,12 +32,11 @@ class Button:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.IN)
-        GPIO.add_event_detect(self.pin, GPIO.BOTH,
-                              callback=self.on_gpio_edge)
+        GPIO.add_event_detect(self.pin, GPIO.BOTH, callback=self.on_gpio_edge)
 
     def get_button_state(self) -> bool:
         """Fetches the current button state as a boolean value."""
-        return GPIO.input(self.pin)
+        return GPIO.input(self.pin)     # type: ignore
 
     def on_gpio_edge(self, _) -> None:
         """Internal method which must be called upon ANY detected edge of the
