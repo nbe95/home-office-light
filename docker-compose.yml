@@ -1,0 +1,11 @@
+version: "3.6"
+services:
+  9light:
+    restart: always
+    build: .
+    ports:
+      - 9000:9000
+      - 9080:9080
+    devices:
+      - /dev/gpiomem
+    privileged: true
