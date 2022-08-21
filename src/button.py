@@ -29,6 +29,7 @@ class Button:
 
     def _gpio_setup(self) -> None:
         """Manages the internal GPIO setup."""
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.IN)
         GPIO.add_event_detect(self.pin, GPIO.BOTH,

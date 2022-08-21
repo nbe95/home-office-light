@@ -21,6 +21,7 @@ class Buzzer:
 
     def _gpio_setup(self) -> None:
         """Manages the internal GPIO setup."""
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
         GPIO.output(self.pin, 0)
