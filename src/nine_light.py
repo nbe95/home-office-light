@@ -2,9 +2,9 @@
 
 """Python module which handles the main 9light interfaces and functions."""
 
+from types import FrameType
 from typing import List, Optional
 from transitions import Machine, MachineError
-from RPi import GPIO
 
 from button import Button
 from buzzer import Buzzer
@@ -52,14 +52,15 @@ class NineLight:
                                         LEDS_BOTTOM)
         self._bell_timeout: Optional[Timeout] = None
 
-    @staticmethod
-    def cleanup() -> None:
+    def on_exit(self, _sig: int, _frame: FrameType) -> None:
         """Call GPIO cleanup routines."""
-        GPIO.cleanup()
+        self._button.cleanup()
+        self._buzzer.cleanup()
+        self._leds.cleanup()
 
     def get_state(self) -> str:
         """Get the current state as a lowercase string."""
-        return self.state.name.lower()
+        return str(self.state.name).lower()
 
     def set_state(self, target: str) -> bool:
         """Try to apply a new state."""

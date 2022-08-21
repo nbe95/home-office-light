@@ -7,7 +7,7 @@ functionalities. It sets up a backend server for API access as well as a simple
 web frontend for webbrowser based control.
 """
 
-import atexit
+import signal
 from threading import Thread
 
 from nine_light import NineLight
@@ -45,15 +45,12 @@ def main():
     )
     frontend_thread.start()
 
-    # Register cleanup callback for GPIOs
-    atexit.register(light.cleanup)
-
     # Run until interrupted...
+    signal.signal(signal.SIGTERM, light.on_exit)
     try:
-        while True:
-            pass
+        signal.pause()
     except KeyboardInterrupt:
-        pass
+        light.on_exit()
 
 
 if __name__ == "__main__":

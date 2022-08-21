@@ -26,6 +26,10 @@ class Buzzer:
         GPIO.setup(self.pin, GPIO.OUT)
         GPIO.output(self.pin, 0)
 
+    def cleanup(self) -> None:
+        """Reset any GPIOs used in this module."""
+        GPIO.cleanup()
+
     def ring(self) -> None:
         """Start an internal thread for the ring functionality of the bell."""
         if self._ring_thread and self._ring_thread.is_alive():
