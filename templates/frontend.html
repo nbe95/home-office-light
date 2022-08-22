@@ -32,14 +32,14 @@
             </p>
             <p>
                 Set new state:
-                <select name="new-state">
+                <select name="new-state" size="5">
                     <option value="none">None</option>
                     <option value="call">Call</option>
                     <option value="video">Video</option>
                     <option value="request">Request</option>
                     <option value="coffee">I need a coffee&hellip;</option>
                 </select>
-                <button name="set-state">Set</button>
+                <button type="submit" name="set-state">Set</button>
             </p>
         </form>
 
@@ -48,8 +48,9 @@
             <p>
                 Add or update remote endpoint:
                 <input type="text" name="new-remote" value="{{ client_ip }}">
-                <button name="add-remote" value="1">Add</button>
+                <button type="submit" name="add-remote" value="1">Add</button>
             </p>
+            {% if remotes|length %}
             <table>
                 <tr>
                     <th>No.</th>
@@ -63,15 +64,14 @@
                     <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
                     <td>{{ remote.expiration }}</td>
                     <td>
-                        <button name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
+                        <button type="submit" name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
                     </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4">No remotes registered.</td>
                 </tr>
                 {% endfor %}
             </table>
+            {% else %}
+                <p class="error">No remotes currently registered.</p>
+            {% endif %}
         </form>
 
     </body>

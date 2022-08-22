@@ -68,7 +68,7 @@ class Frontend:
             main_title=MAIN_TITLE,
             client_ip=request.remote_addr,
             current_state=self.nl_instance.get_state(),
-            remotes=enumerate(self.nl_instance.remotes)
+            remotes=list(enumerate(self.nl_instance.remotes))
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

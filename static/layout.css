@@ -3,6 +3,10 @@
     color: black;
 }
 
+.error {
+    color: red;
+}
+
 h2 {
     clear: both;
 }
