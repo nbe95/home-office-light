@@ -1,0 +1,5 @@
+flask
+requests
+transitions
+RPi.GPIO
+rpi_ws281x
