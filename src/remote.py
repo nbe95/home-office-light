@@ -2,9 +2,10 @@
 
 """Python module which handles 9light remotes."""
 
+from json import dumps
 from datetime import datetime
 from typing import Optional, List
-from requests import request
+from socket import socket, timeout, AF_INET, SOCK_STREAM
 
 from constants import PORT_REMOTE, REMOTE_EXP_TIMEOUT
 
@@ -27,8 +28,21 @@ class NineLightRemote:
             self.skip_once = False
             return
 
-        request("GET", f"http://{self.ip_addr}:{self.port}/remote",
-                data={"state": state, "remotes": remotes})
+        # The payload must be sent as one-line JSON string (with trailing \n)
+        payload: str = dumps({"state": state, "remotes": remotes}, indent=None)
+        http_request: str = (f"GET /remote HTTP/1.1\n"
+                             f"Host: {self.ip_addr}\n"
+                             "\n"
+                             f"{payload}\n")
+        sock: socket = socket(AF_INET, SOCK_STREAM)
+        sock.settimeout(1)
+        try:
+            sock.connect((self.ip_addr, self.port))
+            sock.sendall(http_request.encode("ascii"))
+        except timeout:
+            pass
+        finally:
+            sock.close()
 
     def set_expiration(self, expiration: Optional[datetime] = None) -> None:
         """Set the timestamp when this remote's registration will expire."""

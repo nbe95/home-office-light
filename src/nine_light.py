@@ -105,9 +105,15 @@ class NineLight:
     def on_state_changed(self) -> None:
         """Auto-called function triggered after any transition of the state
         machine."""
+        # Control LED strip
         self._leds.on_state_changed(self.state)
+
+        # Trigger bell
         if self._bell_timeout and self.state != States.REQUEST:
             self._bell_timeout.cancel()
+
+        # Update remotes
+        self.send_update_to_remotes()
 
     def on_enter_REQUEST(self) -> None:
         """Auto-called function triggered when entering the request state."""

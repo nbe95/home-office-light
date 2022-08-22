@@ -1,4 +1,5 @@
 flask
+json
 requests
 transitions
 RPi.GPIO
