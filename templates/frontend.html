@@ -3,6 +3,16 @@
     <head>
         <title>{{ main_title }} Frontend</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='layout.css') }}" />
+        <script type="text/javascript">
+            function autoRefresh() {
+                document.location.href = "/";
+            }
+            function pressBell() {
+                document.forms.form1["bell-button"].value = "1";
+                document.forms.form1.submit();
+            }
+            window.setTimeout(autoRefresh, 15 * 1000);
+        </script>
     </head>
     <body>
         <h1>{{ main_title }} Frontend</h1>
@@ -12,12 +22,6 @@
             <div id="preview" class="{{ current_state }}">
                 <div class="top">Video</div>
                 <div class="middle">
-                    <script type="text/javascript">
-                        function pressBell() {
-                            document.forms.form1["bell-button"].value = "1";
-                            document.forms.form1.submit();
-                        }
-                    </script>
                     <input type="hidden" name="bell-button" value="">
                     <a href="#" onclick="pressBell();">&#x2B24;</a>
                 </div>
@@ -46,7 +50,7 @@
                 <input type="text" name="new-remote" value="{{ client_ip }}">
                 <button name="add-remote" value="1">Add</button>
             </p>
-            <table border="1">
+            <table>
                 <tr>
                     <th>No.</th>
                     <th>IP endpoint</th>
