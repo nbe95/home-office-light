@@ -52,7 +52,8 @@ class NineLight:
                                         LEDS_BOTTOM)
         self._bell_timeout: Optional[Timeout] = None
 
-    def on_exit(self, _sig: int, _frame: FrameType) -> None:
+    def on_exit(self, _sig: Optional[int] = None,
+                _frame: Optional[FrameType] = None) -> None:
         """Call GPIO cleanup routines."""
         self._button.cleanup()
         self._buzzer.cleanup()
