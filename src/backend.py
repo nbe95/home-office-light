@@ -41,6 +41,13 @@ class Backend:
                 PORT_REMOTE
             ))
 
+            sender: Optional[NineLightRemote] = next(filter(
+                lambda x: x.ip_addr == request.remote_addr,
+                self.nl_instance.remotes
+            ), None)
+            if sender:
+                sender.skip_once = True
+
         new_state: Optional[str] = request.args.get("state")
         if new_state:
             self.nl_instance.set_state(new_state)
