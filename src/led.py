@@ -4,11 +4,11 @@
 
 from datetime import timedelta
 from time import sleep
-from threading import Thread
 from random import randint
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 from rpi_ws281x import Adafruit_NeoPixel
 
+from bg_task import BgTask
 from pulse_wave import PulseWave
 from states import States
 
@@ -39,13 +39,12 @@ class LedStrip:
         ))
         self._strip.begin()
         self.state: States = States.NONE
-        self._light_thread: Optional[Thread] = None
-        self._light_thread_terminate: bool = False
+        self._light_task: BgTask = BgTask(self._run_light_task, (States.NONE,))
         self.clear()
 
     def cleanup(self) -> None:
         """Reset any GPIOs used in this module."""
-        self._light_thread_terminate = True
+        self._light_task.cancel()
         self.clear()
 
     def set_top(self, color: rgb) -> None:
@@ -77,19 +76,9 @@ class LedStrip:
 
     def on_state_changed(self, state: States) -> None:
         """Callback to be triggered on any 9light state change."""
-        if self._light_thread:
-            self._light_thread_terminate = True
-            self._light_thread.join()
+        self._light_task.restart((state,))
 
-        self._light_thread_terminate = False
-        self._light_thread = Thread(
-            target=self._run_light_thread,
-            args=(state,),
-            daemon=True
-        )
-        self._light_thread.start()
-
-    def _run_light_thread(self, state: States) -> None:
+    def _run_light_task(self, state: States) -> None:
         """Internal method which controls the 9light LED lightning according to
         the provided status information."""
         self.clear()
@@ -106,13 +95,13 @@ class LedStrip:
             blue: rgb = (0, 200, 255)
             self.set_top(blue)
             wave: PulseWave = PulseWave(timedelta(milliseconds=800), (30, 255))
-            while not self._light_thread_terminate:
+            while not self._light_task.is_canceled():
                 self.set_brightness(wave.get_scaled())
                 sleep(0.02)
 
         elif state == States.COFFEE:
             top: bool = False
-            while not self._light_thread_terminate:
+            while not self._light_task.is_canceled():
                 color: rgb = LedStrip.get_random_color()
                 self.clear()
                 if top:

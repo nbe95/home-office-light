@@ -3,10 +3,9 @@
 """Helper module for handling a buzzer acting as a classic door bell."""
 
 from time import sleep
-from typing import Optional
-from threading import Thread
 from RPi import GPIO
 
+from bg_task import BgTask
 from constants import (
     BELL_BUZZER_SEQUENCE
 )
@@ -17,7 +16,7 @@ class Buzzer:
     def __init__(self, pin: int):
         self.pin: int = pin
         self._gpio_setup()
-        self._ring_thread: Optional[Thread] = None
+        self._ring_task: BgTask = BgTask(self._run_ring_task)
 
     def _gpio_setup(self) -> None:
         """Manages the internal GPIO setup."""
@@ -32,16 +31,15 @@ class Buzzer:
 
     def ring(self) -> None:
         """Start an internal thread for the ring functionality of the bell."""
-        if self._ring_thread and self._ring_thread.is_alive():
-            return
+        if not self._ring_task.is_running():
+            self._ring_task.restart()
 
-        self._ring_thread = Thread(target=self._run_ring_thread, daemon=True)
-        self._ring_thread.start()
-
-    def _run_ring_thread(self) -> None:
+    def _run_ring_task(self) -> None:
         """Run the internal functions to trigger the buzzer once."""
         state: bool = True
         for timeout_ms in BELL_BUZZER_SEQUENCE:
+            if self._ring_task.is_canceled():
+                break
             GPIO.output(self.pin, 1 if state else 0)
             state = not state
             sleep(timeout_ms / 1000)

@@ -5,9 +5,9 @@
 from datetime import datetime, timedelta
 from time import sleep
 from typing import Optional, Callable
-from threading import Thread
 from RPi import GPIO
 
+from bg_task import BgTask
 from constants import BELL_DEBOUNCE_TIME
 
 
@@ -23,8 +23,7 @@ class Button:
         self._cb_pressed: Optional[Callable[[], None]] = callback_pressed
         self._cb_released: Optional[Callable[[], None]] = callback_released
         self._gpio_setup()
-        self._debounce_thread: Optional[Thread] = None
-        self._debounce_thread_terminate: bool = False
+        self._debounce_task: BgTask = BgTask(self._run_debounce_task, (False,))
         self.debounced: bool = False
 
     def _gpio_setup(self) -> None:
@@ -36,7 +35,7 @@ class Button:
 
     def cleanup(self) -> None:
         """Reset any GPIOs used in this module."""
-        self._debounce_thread_terminate = True
+        self._debounce_task.cancel()
         GPIO.cleanup()
 
     def get_button_state(self) -> bool:
@@ -46,23 +45,13 @@ class Button:
     def on_gpio_edge(self, _) -> None:
         """Internal method which must be called upon ANY detected edge of the
         button (i.e. by the bare GPIO functionalities)."""
-        if self._debounce_thread:
-            self._debounce_thread_terminate = True
-            self._debounce_thread.join()
+        self._debounce_task.restart((self.get_button_state(),))
 
-        self._debounce_thread_terminate = False
-        self._debounce_thread = Thread(
-            target=self._run_debounce_thread,
-            args=(self.get_button_state(),),
-            daemon=True
-        )
-        self._debounce_thread.start()
-
-    def _run_debounce_thread(self, state: bool) -> None:
+    def _run_debounce_task(self, state: bool) -> None:
         """Perform internally debouncing operations."""
         end: datetime = datetime.now() + self.threshold
         while datetime.now() < end:
-            if self._debounce_thread_terminate \
+            if self._debounce_task.is_canceled() \
                or self.get_button_state() != state:
                 return
             sleep(0.001)
