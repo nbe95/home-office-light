@@ -7,7 +7,7 @@ from time import sleep
 from typing import Optional, Callable
 from RPi import GPIO
 
-from bg_task import BgTask
+from aux.bg_task import BgTask
 from constants import BELL_DEBOUNCE_TIME
 
 

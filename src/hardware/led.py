@@ -8,8 +8,8 @@ from random import randint
 from typing import List, Tuple
 from rpi_ws281x import Adafruit_NeoPixel
 
-from bg_task import BgTask
-from pulse_wave import PulseWave
+from aux.bg_task import BgTask
+from aux.pulse_wave import PulseWave
 from states import States
 
 

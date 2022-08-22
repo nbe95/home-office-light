@@ -6,12 +6,12 @@ from types import FrameType
 from typing import List, Optional
 from transitions import Machine, MachineError
 
-from button import Button
-from buzzer import Buzzer
-from led import LedStrip
+from aux.timeout import Timeout
+from hardware.button import Button
+from hardware.buzzer import Buzzer
+from hardware.led import LedStrip
 from remote import NineLightRemote
 from states import States
-from timeout import Timeout
 from constants import (
     BELL_REQUEST_TIMEOUT,
     PIN_LEDS,

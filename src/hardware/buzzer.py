@@ -5,7 +5,7 @@
 from time import sleep
 from RPi import GPIO
 
-from bg_task import BgTask
+from aux.bg_task import BgTask
 from constants import (
     BELL_BUZZER_SEQUENCE
 )
