@@ -1,23 +1,15 @@
 // Copyright (c) 2022 Niklas Bettgen
 
-#include <BridgeClient.h>
-#include <BridgeHttpClient.h>
-#include <BridgeServer.h>
-#include <Adafruit_NeoPixel.h>
-#include "./9light-remote.h" //NOLINT
-#include "./map.h"
-#include "./timer.h"
-#include "./animation.h"
-#include "./helpers.h"
+#include "9light-remote.h"
 
 #define HTTP_READ_TIMEOUT 10
 
 
-NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config):
+NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config) :
 m_api_config(api_config),
 m_led_config(led_config),
 m_pixels(new Adafruit_NeoPixel(led_config->num_leds, led_config->do_pin.getPin(), led_config->options)),
-m_button_map(NineLightRemote::state::UNDEFINED, nullptr) {
+m_button_map(4, NineLightRemote::state::UNDEFINED, nullptr) {
     m_pixels->begin();
 }
 
@@ -53,7 +45,7 @@ BridgeHttpClient* NineLightRemote::getHttpClient() {
 
 
 bool NineLightRemote::registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time) {
-    if (!button_pin.isSet())
+    if (!button_pin.isValid())
         return false;
 
     button_pin.setup();
@@ -74,7 +66,7 @@ void NineLightRemote::updateLeds() {
     if (m_leds_state != m_state) {
         // Clear old animation
         delete m_animation;
-        m_animation = 0;
+        m_animation = nullptr;
 
         // Setup new animation object
         m_leds_state = m_state;
@@ -164,10 +156,9 @@ void NineLightRemote::sendRequestIfIdle() {
         return;
 
     m_idle_timer.start();
-    if (m_idle_timer.check()) {
-        SerialUSB.println(F("Time for a cyclic status request in order to keep the remote registration status."));
+    if (m_idle_timer.checkAndRestart()) {
+        SerialUSB.println(F("Time for a cyclic state request in order to keep the remote registration state."));
         sendStateRequest();
-        m_idle_timer.restart();
     }
 }
 
@@ -202,7 +193,7 @@ void NineLightRemote::sendStateRequest(const state state_req) {
 }
 
 
-bool NineLightRemote::StateToCStr(const state state, char* target) {
+bool NineLightRemote::StateToCStr(const state state, char* const target) {
     switch (state) {
         case state::NONE:
             sprintf_P(target, PSTR("none"));
@@ -224,7 +215,7 @@ bool NineLightRemote::StateToCStr(const state state, char* target) {
 }
 
 
-NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer) {
+NineLightRemote::state NineLightRemote::StateFromCStr(const char* const buffer) {
     const char status_none[]    = "none";
     const char status_call[]    = "call";
     const char status_video[]   = "video";
@@ -246,11 +237,11 @@ NineLightRemote::state NineLightRemote::StateFromCStr(const char* buffer) {
 }
 
 
-NineLightRemote::state NineLightRemote::ParseJsonState(const char* buffer) {
+NineLightRemote::state NineLightRemote::ParseJsonState(const char* const buffer) {
     // Look for JSON key
-    const char key[] = "\"status\":";
+    const char key[] = "\"state\":";
     char *ptr = strstr(buffer, key);
-    if (ptr == 0)
+    if (ptr == nullptr)
         return state::UNDEFINED;
 
     // Skip any spaces

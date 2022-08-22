@@ -7,11 +7,11 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "./map.h"
-#include "./timer.h"
-#include "./debouncer.h"
-#include "./animation.h"
-#include "./helpers.h"
+#include "container/map.h"
+#include "hardware/debouncer.h"
+#include "animation.h"
+#include "macros.h"
+#include "timer.h"
 
 
 class NineLightRemote {
@@ -54,9 +54,9 @@ class NineLightRemote {
 
  private:
     // Static helper functions
-    static bool         StateToCStr(const state state, char* target);
-    static state        StateFromCStr(const char* buffer);
-    static state        ParseJsonState(const char* buffer);
+    static bool         StateToCStr(const state state, char* const target);
+    static state        StateFromCStr(const char* const buffer);
+    static state        ParseJsonState(const char* const buffer);
 
     BridgeServer*       getHttpServer();
     BridgeHttpClient*   getHttpClient();
@@ -67,14 +67,14 @@ class NineLightRemote {
     const led_config*   m_led_config;
 
     // Hardware buttons
-    using ButtonMap = StaticMap<state, DebouncedSwitch*, 4>;
+    using ButtonMap = StaticMap<state, DebouncedSwitch*>;
     ButtonMap           m_button_map;
 
-    // Internal status
+    // Internal state
     state               m_state = state::UNDEFINED;
     Timer               m_idle_timer;
 
-    // LED status
+    // LED state
     Adafruit_NeoPixel*  m_pixels;
     state               m_leds_state = state::UNDEFINED;
     Animation*          m_animation;

@@ -1,75 +1,91 @@
 // Copyright (c) 2022 Niklas Bettgen
 
-#include "./timer.h" //NOLINT
+#include "timer.h"
 
 // Constructor for a timer with or without specific duration
 Timer::Timer(const Timer::ms duration) {
     setDuration(duration);
 }
 
-// Sets the timer duration
+// Set the timer duration
 void Timer::setDuration(const Timer::ms duration) {
-    m_duration = duration;
+    // Only overwrite if necessary (may be called each cycle!)
+    if (duration != m_duration)
+        m_duration = duration;
 }
 
-// Resets the timer
+// Reset the timer
 void Timer::reset() {
     m_start_time = 0;
     m_running = false;
 }
 
-// Starts the timer if not done yet
+// Start the timer if not done yet
 bool Timer::start(const Timer::ms duration) {
-    if (duration > 0)
+    if (duration > InvalidDuration)
         setDuration(duration);
 
     if (isRunning())
         return false;
-    m_start_time = millis();
+    m_start_time = getCurrentTime();
     m_running = true;
     return true;
 }
 
-// Resets and, if provided, restarts the timer with a new duration
+// Reset and, if provided, restart the timer with a new duration
 bool Timer::restart(const Timer::ms duration) {
     reset();
     return start(duration);
 }
 
-// Gets the configured timer duration
+// Get the configured timer duration
 Timer::ms Timer::getDuration() const {
     return m_duration;
 }
 
-// Checks wheter the specified duration is already expired
+// Check wheter the specified duration is already expired
 bool Timer::check() const {
-    return (isRunning() ? getElapsedTime() > getDuration() : false);
+    return isRunning() ? getElapsedTime() > getDuration() : false;
 }
 
-// Checks if the timer is currently running
+// Perform a check and immediately restarts the timer - useful for cyclic tasks
+bool Timer::checkAndRestart() {
+    if (check()) {
+        restart();
+        return true;
+    }
+    return false;
+}
+
+// Check if the timer is currently running
 bool Timer::isRunning() const {
     return m_running;
 }
 
-// Checks if a valid duration has been set
+// Check if a valid duration has been set
 bool Timer::isSet() const {
-    return getDuration() != 0;
+    return getDuration() != InvalidDuration;
 }
 
-// Returns the time when the timer was started
+// Return the time when the timer was started
 Timer::ms Timer::getStartTime() const {
-    return (isRunning() ? m_start_time : 0);
+    return isRunning() ? m_start_time : 0;
 }
 
-// Returns the amount of elapsed milliseconds
+// Return the amount of elapsed milliseconds
 Timer::ms Timer::getElapsedTime() const {
-    return (isRunning() ? millis() - getStartTime() : 0);
+    return isRunning() ? getCurrentTime() - getStartTime() : 0;
 }
 
-// Returns the amount of elapsed time as a float value between 0 and 1
-float Timer::getElapsedPercentage() const {
+// Return the amount of relative elapsed time as a float value between 0 and 1
+float Timer::getElapsedTimeRel() const {
     if (!getDuration())
         return 0;
     float p = (float)getElapsedTime() / getDuration();
-    return max(0, min(p, 1)); //NOLINT
+    return max((float)0, min(p, (float)1));   //NOLINT
+}
+
+// Internal function to retreive the current µC time
+Timer::ms Timer::getCurrentTime() const {
+    return millis();
 }
