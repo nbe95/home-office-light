@@ -88,7 +88,7 @@ class NineLight:
         self.remotes = list(new_list)
 
     def send_update_to_remotes(self) -> None:
-        """Send current status to all registered remotes."""
+        """Send current state to all registered remotes."""
         for remote in self.remotes:
             remote.send_update(
                 self.get_state(),

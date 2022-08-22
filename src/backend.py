@@ -23,16 +23,16 @@ class Backend:
         self.app: Flask = Flask(__name__)
         self.app.secret_key = uuid4().hex
 
-        @self.app.route("/status/get", methods=["GET"])
-        def _status_get():
-            return self.status()
+        @self.app.route("/state/get", methods=["GET"])
+        def _state_get():
+            return self.state()
 
-        @self.app.route("/status/set", methods=["GET"])
-        def _status_set():
-            return self.status()
+        @self.app.route("/state/set", methods=["GET"])
+        def _state_set():
+            return self.state()
 
-    def status(self) -> Response:
-        """Gets the bare status of the system and - if provided - updates a
+    def state(self) -> Response:
+        """Gets the bare state of the system and - if provided - updates a
         remote registration."""
 
         if "remote" in request.args:
@@ -41,7 +41,7 @@ class Backend:
                 PORT_REMOTE
             ))
 
-        new_state: Optional[str] = request.args.get("status")
+        new_state: Optional[str] = request.args.get("state")
         if new_state:
             self.nl_instance.set_state(new_state)
 

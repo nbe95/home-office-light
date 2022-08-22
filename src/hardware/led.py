@@ -80,7 +80,7 @@ class LedStrip:
 
     def _run_light_task(self, state: States) -> None:
         """Internal method which controls the 9light LED lightning according to
-        the provided status information."""
+        the provided state information."""
         self.clear()
 
         if state == States.CALL:
