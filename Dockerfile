@@ -10,9 +10,9 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY src/ /app/
-COPY templates/ /app/
-COPY static/ /app/
+COPY src/ /app/src/
+COPY static/ /app/static/
+COPY templates/ /app/templates/
 
 COPY requirements.txt /app/
 RUN pip install --upgrade -r requirements.txt
