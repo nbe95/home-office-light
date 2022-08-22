@@ -4,7 +4,8 @@
 
 from uuid import uuid4
 from typing import Optional
-from flask import Flask, request, jsonify, Response
+from json import dumps
+from flask import Flask, request
 
 from nine_light import NineLight
 from remote import NineLightRemote
@@ -31,7 +32,7 @@ class Backend:
         def _state_set():
             return self.state()
 
-    def state(self) -> Response:
+    def state(self) -> str:
         """Gets the bare state of the system and - if provided - updates a
         remote registration."""
 
@@ -41,21 +42,18 @@ class Backend:
                 PORT_REMOTE
             ))
 
-            sender: Optional[NineLightRemote] = next(filter(
-                lambda x: x.ip_addr == request.remote_addr,
-                self.nl_instance.remotes
-            ), None)
-            if sender:
-                sender.skip_once = True
+            for remote in self.nl_instance.remotes:
+                if remote.ip_addr == str(request.remote_addr):
+                    remote.skip_once = True
 
         new_state: Optional[str] = request.args.get("state")
         if new_state:
             self.nl_instance.set_state(new_state)
 
-        return jsonify({
+        return dumps({
             "state": self.nl_instance.get_state(),
             "remotes": [r.ip_addr for r in self.nl_instance.remotes]
-        })
+        }, indent=None)
 
     def run(self, port, host: str = "0.0.0.0") -> None:
         """Trigger the inner run method of the flask application."""
