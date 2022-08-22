@@ -27,6 +27,7 @@ class Buzzer:
 
     def cleanup(self) -> None:
         """Reset any GPIOs used in this module."""
+        self._ring_task.cancel()
         GPIO.cleanup()
 
     def ring(self) -> None:

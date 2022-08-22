@@ -27,7 +27,7 @@ class LedStrip:
                  leds_bottom: List[int]):
         self._leds_top: List[int] = leds_top
         self._leds_bottom: List[int] = leds_bottom
-        self._strip = Adafruit_NeoPixel(*(
+        self._strip = Adafruit_NeoPixel(
             # pylint: disable=C0301
             leds_total,     # Number of LED pixels
             led_pin,        # GPIO pin connected to the pixels (18 uses PWM!)
@@ -36,7 +36,7 @@ class LedStrip:
             False,          # True to invert the signal (when using NPN transistor level shift)             # noqa: E501
             255,            # Set to 0 for darkest and 255 for brightest
             1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
-        ))
+        )
         self._strip.begin()
         self.state: States = States.NONE
         self._light_task: BgTask = BgTask(self._run_light_task, (States.NONE,))
