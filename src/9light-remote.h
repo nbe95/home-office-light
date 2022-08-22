@@ -20,7 +20,8 @@ class NineLightRemote {
     enum state { UNDEFINED = 0, NONE, CALL, VIDEO, REQUEST, COFFEE };
     struct api_config {
         const char*     endpoint;
-        const char*     url;
+        const char*     uri_get;
+        const char*     uri_set;
         unsigned int    port;
         unsigned int    remote_port;
     };

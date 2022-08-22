@@ -137,14 +137,13 @@ void NineLightRemote::receiveRemoteRequest() {
     BridgeClient client = getHttpServer()->accept();
     if (client) {
         // Find beginning of JSON payload (i.e. line starting with '{')
-        char request[80] = {0};
+        // Note: The entire JSON content must be sent as one-line string!
+        char request[80];
         size_t bytes;
         client.setTimeout(HTTP_READ_TIMEOUT);
         do {
             memset(request, 0, sizeof(request));
             bytes = client.readBytesUntil('\n', request, sizeof(request));
-            if (bytes == 0)
-                break;
         } while (request[0] != '{');
         client.flush();
         client.print(F("HTTP/1.1 200 OK\n"));
@@ -179,9 +178,9 @@ void NineLightRemote::sendStateRequest(const state state_req) {
     if (state_req != state::UNDEFINED) {
         char state_str[10] = "undefined";
         StateToCStr(state_req, state_str);
-        sprintf_P(query, PSTR("%s:%d%s/set?status=%s&remote"), m_api_config->endpoint, m_api_config->port, m_api_config->url, state_str);
+        sprintf_P(query, PSTR("%s:%d%s?state=%s&remote"), m_api_config->endpoint, m_api_config->port, m_api_config->uri_set, state_str);
     } else {
-        sprintf_P(query, PSTR("%s:%d%s/get?remote"), m_api_config->endpoint, m_api_config->port, m_api_config->url);
+        sprintf_P(query, PSTR("%s:%d%s?remote"), m_api_config->endpoint, m_api_config->port, m_api_config->uri_get);
     }
     SerialUSB.print(F("Sending HTTP request to: "));
     SerialUSB.println(query);
@@ -190,7 +189,7 @@ void NineLightRemote::sendStateRequest(const state state_req) {
 
     char response[80] = {0};
     if (getHttpClient()->available()) {
-        getHttpClient()->readBytesUntil('\n', response, sizeof(response) - 1);
+        getHttpClient()->readBytesUntil('\n', response, sizeof(response));
         SerialUSB.print(F("Got response: "));
         SerialUSB.println(response);
 
