@@ -99,13 +99,14 @@ class NineLight:
         logger.info("Remote with endpoint %s:%d removed.", remote.ip_addr,
                     remote.port)
 
-    def update_remotes(self) -> None: #TODO(Niklas): This is never called...
+    def update_remotes(self) -> None:
         """Remove expired remotes."""
         new_list = filter(lambda x: not x.is_expired(), self.remotes)
         self.remotes = list(new_list)
 
     def send_update_to_remotes(self) -> None:
-        """Send current state to all registered remotes."""
+        """Update registered remotes and send current state to all of them."""
+        self.update_remotes()
         for remote in self.remotes:
             remote.send_update(
                 self.get_state(),
