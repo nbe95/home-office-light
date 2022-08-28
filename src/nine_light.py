@@ -2,6 +2,7 @@
 
 """Python module which handles the main 9light interfaces and functions."""
 
+import logging
 from types import FrameType
 from typing import List, Optional
 from transitions import Machine, MachineError
@@ -13,6 +14,7 @@ from hardware.led import LedStrip
 from remote import NineLightRemote
 from states import States
 from constants import (
+    LOG_LEVEL,
     BELL_REQUEST_TIMEOUT,
     PIN_LEDS,
     PIN_BUTTON,
@@ -22,12 +24,16 @@ from constants import (
     LEDS_BOTTOM
 )
 
+logger = logging.getLogger(__name__)
+logger.setLevel(LOG_LEVEL)
+
 
 class NineLight:
     """Business logic class and state machine for our 9Light."""
     # pylint: disable=E1101
 
     def __init__(self):
+        logger.debug("Initializing state machine.")
         Machine(
             self,
             states=States,
@@ -43,6 +49,7 @@ class NineLight:
             initial=States.NONE,
             after_state_change=self.on_state_changed
         )
+
         self.remotes: List[NineLightRemote] = []
 
         self._buzzer: Buzzer = Buzzer(PIN_BUZZER)
@@ -52,9 +59,13 @@ class NineLight:
                                         LEDS_BOTTOM)
         self._bell_timeout: Optional[Timeout] = None
 
+        logger.debug("9light instance initialized.")
+
     def on_exit(self, _sig: Optional[int] = None,
                 _frame: Optional[FrameType] = None) -> None:
         """Call GPIO cleanup routines."""
+        logger.info("Running cleanup routine.")
+
         self._button.cleanup()
         self._buzzer.cleanup()
         self._leds.cleanup()
@@ -76,13 +87,19 @@ class NineLight:
         self.delete_remote(remote)
         self.remotes.append(remote)
 
+        logger.info("Remote with endpoint %s:%d registered.", remote.ip_addr,
+                    remote.port)
+
     def delete_remote(self, remote: NineLightRemote) -> None:
         """Remove an existing remote from the registration list by IP."""
         new_list = list(filter(lambda x: x.ip_addr != remote.ip_addr,
                                self.remotes))
         self.remotes = new_list
 
-    def update_remotes(self) -> None:
+        logger.info("Remote with endpoint %s:%d removed.", remote.ip_addr,
+                    remote.port)
+
+    def update_remotes(self) -> None: #TODO(Niklas): This is never called...
         """Remove expired remotes."""
         new_list = filter(lambda x: not x.is_expired(), self.remotes)
         self.remotes = list(new_list)
@@ -94,9 +111,13 @@ class NineLight:
                 self.get_state(),
                 [r.ip_addr for r in self.remotes]
             )
+            logger.info("State update sent to remote with IP %s.",
+                        remote.ip_addr)
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""
+        logger.info("Bell button triggered.")
+
         if self.state == States.VIDEO:
             self.request()
         elif self.state == States.COFFEE:
@@ -105,6 +126,8 @@ class NineLight:
     def on_state_changed(self) -> None:
         """Auto-called function triggered after any transition of the state
         machine."""
+        logger.info("9light state changed to %s.", self.get_state())
+
         # Control LED strip
         self._leds.on_state_changed(self.state)
 

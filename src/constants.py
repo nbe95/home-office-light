@@ -2,9 +2,22 @@
 
 """Python module to configure various constants."""
 
+import logging
+from os import environ as env
 from datetime import timedelta as td
-from typing import List
+from typing import List, Dict
 
+
+# General
+_log_mapping: Dict[str, int] = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL
+}
+LOG_LEVEL: int = _log_mapping[env["LOG_LEVEL"]] \
+                 if env["LOG_LEVEL"] in _log_mapping else logging.INFO
 
 # Flask
 MAIN_TITLE: str = "9light API"

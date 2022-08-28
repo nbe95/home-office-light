@@ -5,6 +5,8 @@ services:
     build: .
     container_name: 9light
     restart: always
+    environment:
+      - LOG_LEVEL=DEBUG
     ports:
       - 9000:9000
       - 9080:9080

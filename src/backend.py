@@ -13,8 +13,6 @@ from constants import (
     PORT_REMOTE
 )
 
-# pylint: disable=E1101
-
 
 class Backend:
     """Container for the backend flask application."""
