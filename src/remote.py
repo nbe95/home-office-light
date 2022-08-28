@@ -39,7 +39,7 @@ class NineLightRemote:
         try:
             sock.connect((self.ip_addr, self.port))
             sock.sendall(http_request.encode("ascii"))
-        except timeout:
+        except timeout, ConnectionRefusedError:
             pass
         finally:
             sock.close()
