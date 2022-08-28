@@ -91,16 +91,20 @@ class NineLight:
 
     def delete_remote(self, remote: NineLightRemote) -> None:
         """Remove an existing remote from the registration list by IP."""
-        new_list = list(filter(lambda x: x.ip_addr != remote.ip_addr,
-                               self.remotes))
+        new_list: List[NineLightRemote] = list(filter(
+            lambda x: x.ip_addr != remote.ip_addr,
+            self.remotes
+        ))
         self.remotes = new_list
 
         logger.info("Remote with endpoint %s removed.", remote.ip_addr)
 
     def update_remotes(self) -> None:
         """Remove expired remotes."""
-        new_list = filter(lambda x: not x.is_expired(), self.remotes)
-        self.remotes = list(new_list)
+        logger.info("Auto-removing expired remote registrations.")
+        for remote in self.remotes:
+            if remote.is_expired():
+                self.delete_remote(remote)
 
     def send_update_to_remotes(self) -> None:
         """Update registered remotes and send current state to all of them."""

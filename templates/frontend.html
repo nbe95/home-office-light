@@ -48,7 +48,11 @@
             <p>
                 Add or update remote endpoint:
                 <input type="text" name="new-remote" value="{{ client_ip }}">
-                <button type="submit" name="add-remote" value="1">Add</button>
+                <button type="submit" name="add-remote">Add</button>
+            </p>
+            <p>
+                Remove expired registrations:
+                <button type="submit" name="update-remotes" value="1">Clean up</button>
             </p>
             {% if remotes|length %}
             <table>

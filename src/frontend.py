@@ -54,6 +54,9 @@ class Frontend:
                         NineLightRemote(ip_addr, int(port))
                     )
 
+            if "update-remotes" in request.form:
+                self.nl_instance.update_remotes()
+
             if "del-remote" in request.form:
                 self.nl_instance.delete_remote(
                     NineLightRemote(request.form["del-remote"], 0)
