@@ -2,20 +2,18 @@
 
 """Python module which handles 9light remotes."""
 
-import logging
 from json import dumps
 from datetime import datetime
 from typing import Optional, List
 from socket import socket, timeout, AF_INET, SOCK_STREAM
 
+from logger import get_logger
 from constants import (
-    LOG_LEVEL,
     PORT_REMOTE,
     REMOTE_EXP_TIMEOUT
 )
 
-logger = logging.getLogger(__name__)
-logger.setLevel(LOG_LEVEL)
+logger = get_logger(__name__)
 
 
 class NineLightRemote:
@@ -52,8 +50,8 @@ class NineLightRemote:
             sock.connect((self.ip_addr, self.port))
             sock.sendall(http_request.encode("ascii"))
         except (timeout, ConnectionRefusedError) as err:
-            logging.error("Could not send status update to remote %s: %s",
-                          self.ip_addr, err)
+            logger.error("Could not send status update to remote %s: %s",
+                         self.ip_addr, err)
         finally:
             sock.close()
 
@@ -67,4 +65,4 @@ class NineLightRemote:
 
     def is_expired(self) -> bool:
         """Check if this remote's registration is already expired."""
-        return self.expiration >= datetime.now()
+        return self.expiration <= datetime.now()

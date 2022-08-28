@@ -9,21 +9,19 @@ web frontend for webbrowser based control.
 
 import signal
 from threading import Thread
-import logging
 
-from nine_light import NineLight
 from backend import Backend
 from frontend import Frontend
+from logger import get_logger
+from nine_light import NineLight
 from constants import (
-    LOG_LEVEL,
     FRONTEND_TEMPLATE_DIR,
     FRONTEND_STATIC_DIR,
     PORT_FRONTEND,
     PORT_BACKEND
 )
 
-logger = logging.getLogger(__name__)
-logger.setLevel(LOG_LEVEL)
+logger = get_logger(__name__)
 
 
 def main():

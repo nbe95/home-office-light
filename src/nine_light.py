@@ -2,7 +2,6 @@
 
 """Python module which handles the main 9light interfaces and functions."""
 
-import logging
 from types import FrameType
 from typing import List, Optional
 from transitions import Machine, MachineError
@@ -11,10 +10,10 @@ from aux.timeout import Timeout
 from hardware.button import Button
 from hardware.buzzer import Buzzer
 from hardware.led import LedStrip
+from logger import get_logger
 from remote import NineLightRemote
 from states import States
 from constants import (
-    LOG_LEVEL,
     BELL_REQUEST_TIMEOUT,
     PIN_LEDS,
     PIN_BUTTON,
@@ -24,8 +23,7 @@ from constants import (
     LEDS_BOTTOM
 )
 
-logger = logging.getLogger(__name__)
-logger.setLevel(LOG_LEVEL)
+logger = get_logger(__name__)
 
 
 class NineLight:
