@@ -28,16 +28,15 @@ class NineLightRemote:
         self.skip_once: bool = False
         self.set_expiration(expiration)
 
-        logger.debug("Remote with endpoint %s:%d initialized.", self.ip_addr,
-                     self.port)
+        logger.debug("Remote with endpoint %s initialized.", self.ip_addr)
 
     def send_update(self, state: str, remotes: List[str]) -> None:
         """Send a HTTP request to the remote including the current 9light
         state."""
         # Skip if this very remote has triggered the state change
         if self.skip_once:
-            logger.info("Skipping update for remote with endpoint %s:%d.",
-                        self.ip_addr, self.port)
+            logger.info("Skipping update for remote with endpoint %s.",
+                        self.ip_addr)
             self.skip_once = False
             return
 
@@ -53,8 +52,8 @@ class NineLightRemote:
             sock.connect((self.ip_addr, self.port))
             sock.sendall(http_request.encode("ascii"))
         except (timeout, ConnectionRefusedError) as err:
-            logging.error("Could not send status update to remote %s:%d: %s",
-                          self.ip_addr, self.port, err)
+            logging.error("Could not send status update to remote %s: %s",
+                          self.ip_addr, err)
         finally:
             sock.close()
 
@@ -63,8 +62,8 @@ class NineLightRemote:
         self.expiration: datetime = expiration or \
             (datetime.now() + REMOTE_EXP_TIMEOUT)
 
-        logger.debug("Expiration for remote with endpoint %s:%d set to %s.",
-                     self.ip_addr, self.port, self.expiration)
+        logger.debug("Expiration for remote with endpoint %s set to %s.",
+                     self.ip_addr, self.expiration)
 
     def is_expired(self) -> bool:
         """Check if this remote's registration is already expired."""

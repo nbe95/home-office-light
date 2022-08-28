@@ -87,8 +87,7 @@ class NineLight:
         self.delete_remote(remote)
         self.remotes.append(remote)
 
-        logger.info("Remote with endpoint %s:%d registered.", remote.ip_addr,
-                    remote.port)
+        logger.info("Remote with endpoint %s registered.", remote.ip_addr)
 
     def delete_remote(self, remote: NineLightRemote) -> None:
         """Remove an existing remote from the registration list by IP."""
@@ -96,8 +95,7 @@ class NineLight:
                                self.remotes))
         self.remotes = new_list
 
-        logger.info("Remote with endpoint %s:%d removed.", remote.ip_addr,
-                    remote.port)
+        logger.info("Remote with endpoint %s removed.", remote.ip_addr)
 
     def update_remotes(self) -> None:
         """Remove expired remotes."""
