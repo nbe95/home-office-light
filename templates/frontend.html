@@ -18,7 +18,7 @@
 <html>
     <head>
         <title>{{ main_title }} Frontend</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='layout.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nl.css') }}" />
         <script type="text/javascript">
             function autoRefresh() {
                 document.location.href = "/";
@@ -35,7 +35,7 @@
 
         <h2>Current State</h2>
         <form action="/" method="post" name="form1">
-            <div id="preview" class="{{ current_state }}">
+            <div id="ninelight" class="{{ current_state }}">
                 <div class="top">Video</div>
                 <div class="middle">
                     <input type="hidden" name="bell-button" value="">
