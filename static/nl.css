@@ -4,10 +4,10 @@
 
 #ninelight div.top,
 #ninelight div.bottom {
-    width: 130px;
-    height: 80px;
-    line-height: 80px;
-    font-size: 35px;
+    width: 240px;
+    height: 140px;
+    line-height: 140px;
+    font-size: 60px;
     font-family: "Arial Narrow", Arial;
     color: #ffffff;
     text-transform: uppercase;
@@ -20,10 +20,10 @@
 }
 
 #ninelight div.middle {
-    width: 130px;
-    height: 25px;
-    line-height: 25px;
-    font-size: 25px;
+    width: 240px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 40px;
     font-family: Arial;
     color: #333300;
     border-width: 0px 1px;
