@@ -7,6 +7,7 @@ from re import match
 from uuid import uuid4
 from typing import Union
 from flask import Flask, render_template, request
+from flask_bootstrap import Bootstrap
 
 from nine_light import NineLight
 from remote import NineLightRemote
@@ -30,6 +31,7 @@ class Frontend:
             static_folder=abspath(static_folder)
         )
         self.app.secret_key = uuid4().hex
+        self.bs: Bootstrap = Bootstrap(self.app)
 
         @self.app.route("/", methods=["GET", "POST"])
         def _route_index():
