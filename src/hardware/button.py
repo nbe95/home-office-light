@@ -4,7 +4,8 @@
 
 from datetime import datetime, timedelta
 from time import sleep
-from typing import Optional, Callable
+from typing import Callable, Optional
+
 from RPi import GPIO
 
 from aux.bg_task import BgTask
@@ -13,11 +14,14 @@ from constants import BELL_DEBOUNCE_TIME
 
 class Button:
     """Helper class for handling and debouncing the button."""
-    def __init__(self,
-                 pin: int,
-                 callback_pressed: Optional[Callable[[], None]] = None,
-                 callback_released: Optional[Callable[[], None]] = None,
-                 threshold: timedelta = BELL_DEBOUNCE_TIME):
+
+    def __init__(
+        self,
+        pin: int,
+        callback_pressed: Optional[Callable[[], None]] = None,
+        callback_released: Optional[Callable[[], None]] = None,
+        threshold: timedelta = BELL_DEBOUNCE_TIME,
+    ):
         self.pin: int = pin
         self.threshold: timedelta = threshold
         self._cb_pressed: Optional[Callable[[], None]] = callback_pressed
@@ -40,7 +44,7 @@ class Button:
 
     def get_button_state(self) -> bool:
         """Fetches the current button state as a boolean value."""
-        return GPIO.input(self.pin)     # type: ignore
+        return GPIO.input(self.pin)  # type: ignore
 
     def on_gpio_edge(self, _) -> None:
         """Internal method which must be called upon ANY detected edge of the
@@ -51,8 +55,7 @@ class Button:
         """Perform internally debouncing operations."""
         end: datetime = datetime.now() + self.threshold
         while datetime.now() < end:
-            if self._debounce_task.is_canceled() \
-               or self.get_button_state() != state:
+            if self._debounce_task.is_canceled() or self.get_button_state() != state:
                 return
             sleep(0.001)
 

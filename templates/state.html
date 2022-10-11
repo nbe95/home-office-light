@@ -3,11 +3,12 @@
 {% block content %}
     <div class="container" role="main">
 
-        <h1>System State</h1>
+        <h1>System Overview</h1>
 
         <div class="row">
-            <div class="col col-md-auto">
 
+            <div class="col col-md-auto">
+                <h3>Live Preview</h3>
                 <div id="ninelight" class="{{ current_state }}">
                     <div class="top">Video</div>
                     <div class="middle">
@@ -15,11 +16,10 @@
                     </div>
                     <div class="bottom">Anruf</div>
                 </div>
-
             </div>
-            <div class="col">
 
-                <h4>Switch state:</h4>
+            <div class="col">
+                <h3>Current State</h3>
 
                 <div class="list-group">
                     <a href="/state?new=none"
@@ -43,8 +43,33 @@
                         I need a coffee&hellip;
                     </a>
                 </div>
-
             </div>
+
+            <div class="col">
+                <h3>System State</h3>
+
+                <div class="row">
+                    <div class="col"><strong>Running since:</strong></div>
+                    <div class="col">{{ stat["start_time"].astimezone() }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Total state changes:</strong></div>
+                    <div class="col">{{ stat["state_changes"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Attached remotes:</strong></div>
+                    <div class="col">{{ stat["num_remotes"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Listen port:</strong></div>
+                    <div class="col">{{ stat["listen_port"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Remote port:</strong></div>
+                    <div class="col">{{ stat["remote_port"] }}</div>
+                </div>
+            </div>
+
         </div>
 
         <!--<script type="text/javascript">

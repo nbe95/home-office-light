@@ -2,10 +2,10 @@
 
 """Helper module for realizing simple timeouts using threads."""
 
+from datetime import datetime, timedelta
 from threading import Thread
 from time import sleep
-from datetime import datetime, timedelta
-from typing import Callable, Any
+from typing import Any, Callable
 
 
 class Timeout(Thread):

@@ -7,6 +7,7 @@ from enum import Enum
 
 class States(Enum):
     """Enumeration of all states with corresponding numerical ID."""
+
     NONE = 0
     CALL = 1
     VIDEO = 2

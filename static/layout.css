@@ -1,13 +1,17 @@
+h1, h2, h3, h4, h5, h6 {
+    margin: 1rem 0 1rem !important;
+}
+
 #ninelight {
     margin: 1em;
 }
 
 #ninelight div.top,
 #ninelight div.bottom {
-    width: 240px;
-    height: 140px;
-    line-height: 140px;
-    font-size: 60px;
+    width: 160px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 45px;
     font-family: "Arial Narrow", Arial;
     color: #ffffff;
     text-transform: uppercase;
@@ -20,10 +24,10 @@
 }
 
 #ninelight div.middle {
-    width: 240px;
-    height: 40px;
-    line-height: 40px;
-    font-size: 40px;
+    width: 160px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 30px;
     font-family: Arial;
     color: #333300;
     border-width: 0px 1px;

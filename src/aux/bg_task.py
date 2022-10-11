@@ -3,14 +3,13 @@
 """Helper module for easy managing of interruptable background tasks."""
 
 from threading import Thread
-from typing import Callable, Optional, Tuple, Any
+from typing import Any, Callable, Optional, Tuple
 
 
 class BgTask:
     """Helper class for running a specific task in the background."""
 
-    def __init__(self, target: Callable[..., Any],
-                 args: Tuple[Any, ...] = ()):
+    def __init__(self, target: Callable[..., Any], args: Tuple[Any, ...] = ()):
         self.target: Callable[..., Any] = target
         self.args: Tuple[Any, ...] = args
         self.count: int = 0

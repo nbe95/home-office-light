@@ -3,10 +3,9 @@
 """Python module to configure various constants."""
 
 import logging
-from os import environ as env
 from datetime import timedelta as td
-from typing import List, Dict
-
+from os import environ as env
+from typing import Dict, List
 
 # General
 _log_mapping: Dict[str, int] = {
@@ -14,10 +13,11 @@ _log_mapping: Dict[str, int] = {
     "INFO": logging.INFO,
     "WARNING": logging.WARNING,
     "ERROR": logging.ERROR,
-    "CRITICAL": logging.CRITICAL
+    "CRITICAL": logging.CRITICAL,
 }
-LOG_LEVEL: int = _log_mapping[env["LOG_LEVEL"]] \
-                 if env["LOG_LEVEL"] in _log_mapping else logging.INFO
+LOG_LEVEL: int = (
+    _log_mapping[env["LOG_LEVEL"]] if env["LOG_LEVEL"] in _log_mapping else logging.INFO
+)
 
 # Flask
 MAIN_TITLE: str = "9Light"

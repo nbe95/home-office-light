@@ -3,15 +3,15 @@
 """Helper module for handling of a WS281x LED strip."""
 
 from datetime import timedelta
-from time import sleep
 from random import randint
+from time import sleep
 from typing import List, Tuple
+
 from rpi_ws281x import Adafruit_NeoPixel
 
 from aux.bg_task import BgTask
 from aux.pulse_wave import PulseWave
 from states import States
-
 
 # pylint: disable=C0103
 rgb = Tuple[int, int, int]
@@ -20,22 +20,23 @@ rgb = Tuple[int, int, int]
 class LedStrip:
     """Helper class for managing the two LED fields of our 9light using a WS281x
     LED strip."""
-    def __init__(self,
-                 led_pin: int,
-                 leds_total: int,
-                 leds_top: List[int],
-                 leds_bottom: List[int]):
+
+    def __init__(
+        self, led_pin: int, leds_total: int, leds_top: List[int], leds_bottom: List[int]
+    ):
         self._leds_top: List[int] = leds_top
         self._leds_bottom: List[int] = leds_bottom
         self._strip = Adafruit_NeoPixel(
             # pylint: disable=C0301
-            leds_total,     # Number of LED pixels
-            led_pin,        # GPIO pin connected to the pixels (18 uses PWM!)
-            800000,         # LED signal frequency in hertz (usually 800khz)
-            10,             # DMA channel to use for generating signal (try 10)
-            False,          # True to invert the signal (when using NPN transistor level shift)             # noqa: E501
-            255,            # Set to 0 for darkest and 255 for brightest
-            1 if led_pin in (13, 19, 41, 45, 53) else 0     # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
+            leds_total,  # Number of LED pixels
+            led_pin,  # GPIO pin connected to the pixels (18 uses PWM!)
+            800000,  # LED signal frequency in hertz (usually 800khz)
+            10,  # DMA channel to use for generating signal (try 10)
+            False,  # True to invert the signal (when using NPN transistor level shift)             # noqa: E501
+            255,  # Set to 0 for darkest and 255 for brightest
+            1
+            if led_pin in (13, 19, 41, 45, 53)
+            else 0,  # Set to '1' for GPIOs 13, 19, 41, 45 or 53     # noqa: E501
         )
         self._strip.begin()
         self.state: States = States.NONE

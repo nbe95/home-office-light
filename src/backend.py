@@ -2,16 +2,15 @@
 
 """9light backend python module."""
 
-from uuid import uuid4
-from typing import Optional
 from json import dumps
+from typing import Optional
+from uuid import uuid4
+
 from flask import Flask, request
 
+from constants import PORT_REMOTE
 from nine_light import NineLight
 from remote import NineLightRemote
-from constants import (
-    PORT_REMOTE
-)
 
 
 class Backend:
@@ -35,10 +34,9 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            self.nl_instance.add_remote(NineLightRemote(
-                str(request.remote_addr),
-                PORT_REMOTE
-            ))
+            self.nl_instance.add_remote(
+                NineLightRemote(str(request.remote_addr), PORT_REMOTE)
+            )
 
             for remote in self.nl_instance.remotes:
                 if remote.ip_addr == str(request.remote_addr):
@@ -48,10 +46,13 @@ class Backend:
         if new_state:
             self.nl_instance.set_state(new_state)
 
-        return dumps({
-            "state": self.nl_instance.get_state(),
-            "remotes": [r.ip_addr for r in self.nl_instance.remotes]
-        }, indent=None)
+        return dumps(
+            {
+                "state": self.nl_instance.get_state(),
+                "remotes": [r.ip_addr for r in self.nl_instance.remotes],
+            },
+            indent=None,
+        )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
         """Trigger the inner run method of the flask application."""
