@@ -1,5 +1,5 @@
 flask
-flask_bootstrap
+bootstrap-flask
 requests
 transitions
 RPi.GPIO

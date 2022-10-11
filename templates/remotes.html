@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container" role="main">
+        <div class="page-header">
+            <h1>Remotes</h1>
+        </div>
+
+        <form action="/remotes" method="POST">
+            <p>
+                Add or update remote endpoint:
+                <input type="text" name="new-remote" value="{{ client_ip }}">
+                <button type="submit" class="btn btn-success" name="add-remote">Add</button>
+            </p>
+            <p>
+                Remove expired registrations:
+                <button type="submit" class="btn btn-danger"
+                    name="update-remotes" value="1">Clean up</button>
+            </p>
+            {% if remotes|length %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>IP endpoint</th>
+                        <th>Expiration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for no, remote in remotes %}
+                    <tr>
+                        <td>{{ no + 1 }}</td>
+                        <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
+                        <td>{{ remote.expiration }}</td>
+                        <td>
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> There are currently no remotes registered.
+                </div>
+            {% endif %}
+        </form>
+
+    </div>
+{% endblock %}

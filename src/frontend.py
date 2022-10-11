@@ -5,9 +5,10 @@
 from os.path import abspath
 from re import match
 from uuid import uuid4
-from typing import Union
+from typing import Union, Dict, List
 from flask import Flask, render_template, request
-from flask_bootstrap import Bootstrap
+#from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap5
 
 from nine_light import NineLight
 from remote import NineLightRemote
@@ -22,6 +23,12 @@ from constants import (
 class Frontend:
     """Container for the frontend flask application."""
 
+    navigation: Dict[str, List[str]] = {
+        "State": ["/state", "/"],
+        "Remotes": ["/remotes"],
+        "Events": ["/events"]
+    }
+
     def __init__(self, nl_instance: NineLight, template_folder: str,
                  static_folder: str) -> None:
         self.nl_instance: NineLight = nl_instance
@@ -31,20 +38,42 @@ class Frontend:
             static_folder=abspath(static_folder)
         )
         self.app.secret_key = uuid4().hex
-        self.bs: Bootstrap = Bootstrap(self.app)
+        self.bs: Bootstrap5 = Bootstrap5(self.app)
 
-        @self.app.route("/", methods=["GET", "POST"])
+        @self.app.route("/", methods=["GET"])
         def _route_index():
-            return self.index()
+            return self.state()
 
-    def index(self) -> str:
-        """Returns the index page of the web application."""
+        @self.app.route("/state", methods=["GET"])
+        def _route_state():
+            return self.state()
 
-        # Trigger actions if requested
+        @self.app.route("/remotes", methods=["GET", "POST"])
+        def _route_remotes():
+            return self.remotes()
+
+        @self.app.route("/events", methods=["GET"])
+        def _route_events():
+            return self.events()
+
+    def state(self) -> str:
+        """Renders the state page of the web application."""
+        if "new" in request.args:
+            self.nl_instance.set_state(request.args["new"])
+
+        if "button" in request.args:
+            self.nl_instance.on_bell_button()
+
+        return render_template(
+            "state.html",
+            title=MAIN_TITLE,
+            nav=self.navigation,
+            current_state=self.nl_instance.get_state()
+        )
+
+    def remotes(self) -> str:
+        """Renders the remotes page of the web application."""
         if request.method == "POST":
-            if "set-state" in request.form:
-                self.nl_instance.set_state(request.form["new-state"])
-
             if "add-remote" in request.form:
                 result = match(r"^((?:\d{1,3}\.){3}\d{1,3})(?:\:(\d+))?$",
                                request.form["new-remote"])
@@ -64,16 +93,21 @@ class Frontend:
                     NineLightRemote(request.form["del-remote"], 0)
                 )
 
-            if "bell-button" in request.form:
-                if request.form["bell-button"] == "1":
-                    self.nl_instance.on_bell_button()
-
         return render_template(
-            "frontend.html",
-            main_title=MAIN_TITLE,
+            "remotes.html",
+            title=MAIN_TITLE,
+            nav=self.navigation,
             client_ip=request.remote_addr,
-            current_state=self.nl_instance.get_state(),
             remotes=list(enumerate(self.nl_instance.remotes))
+        )
+
+    def events(self) -> str:
+        """Renders the events page of the web application."""
+        return render_template(
+            "events.html",
+            title=MAIN_TITLE,
+            nav=self.navigation,
+            events=[]
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
