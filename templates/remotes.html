@@ -2,28 +2,17 @@
 
 {% block content %}
     <div class="container" role="main">
-        <div class="page-header">
-            <h1>Remotes</h1>
-        </div>
+
+        <h1>Remotes</h1>
 
         <form action="/remotes" method="POST">
-            <p>
-                Add or update remote endpoint:
-                <input type="text" name="new-remote" value="{{ client_ip }}">
-                <button type="submit" class="btn btn-success" name="add-remote">Add</button>
-            </p>
-            <p>
-                Remove expired registrations:
-                <button type="submit" class="btn btn-danger"
-                    name="update-remotes" value="1">Clean up</button>
-            </p>
             {% if remotes|length %}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>No.</th>
-                        <th>IP endpoint</th>
-                        <th>Expiration</th>
+                        <th>#</th>
+                        <th>HTTP endpoint</th>
+                        <th>Expiration time</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -33,7 +22,7 @@
                         <td>{{ no + 1 }}</td>
                         <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
                         <td>{{ remote.expiration }}</td>
-                        <td>
+                        <td class="text-end">
                             <button type="submit" class="btn btn-sm btn-danger"
                                 name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
                         </td>
@@ -46,7 +35,24 @@
                     <strong>Warning:</strong> There are currently no remotes registered.
                 </div>
             {% endif %}
-        </form>
 
+            <div class="row">
+                <div class="col">
+                    Update current remote registrations:
+                </div>
+                <div class="col col-6">
+                    <div class="hstack gap-3 ">
+                        <input type="text" class="form-control" name="new-remote"
+                            value="" placeholder="{{ client_ip }}">
+                        <button type="submit" class="btn btn-success"
+                            name="add-remote">Add</button>
+                        <div class="vr"></div>
+                        <button type="submit" class="btn btn-warning"
+                            name="update-remotes" value="1">Clean&nbsp;up</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
     </div>
 {% endblock %}
