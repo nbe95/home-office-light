@@ -11,7 +11,7 @@ from uuid import uuid4
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
-from constants import MAIN_TITLE, PORT_BACKEND, PORT_REMOTE
+from constants import MAIN_TITLE, MAIN_TITLE_NAVBAR, PORT_BACKEND, PORT_REMOTE
 from nine_light import NineLight
 from remote import NineLightRemote
 
@@ -74,7 +74,8 @@ class Frontend:
         return render_template(
             "state.html",
             title=MAIN_TITLE,
-            nav=self.navigation,
+            title_nav=MAIN_TITLE_NAVBAR,
+            navigation=self.navigation,
             stat=statistics,
             current_state=self.nl_instance.get_state(),
         )
@@ -104,7 +105,8 @@ class Frontend:
         return render_template(
             "remotes.html",
             title=MAIN_TITLE,
-            nav=self.navigation,
+            title_nav=MAIN_TITLE_NAVBAR,
+            navigation=self.navigation,
             client_ip=request.remote_addr,
             remotes=list(enumerate(self.nl_instance.remotes)),
         )
