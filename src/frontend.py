@@ -68,7 +68,7 @@ class Frontend:
             "state_changes": self.nl_instance.total_state_changes,
             "num_remotes": len(self.nl_instance.remotes),
             "listen_port": PORT_BACKEND,
-            "remote_port": PORT_REMOTE
+            "remote_port": PORT_REMOTE,
         }
 
         return render_template(

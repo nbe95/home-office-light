@@ -11,8 +11,12 @@ import signal
 from threading import Thread
 
 from backend import Backend
-from constants import (FRONTEND_STATIC_DIR, FRONTEND_TEMPLATE_DIR,
-                       PORT_BACKEND, PORT_FRONTEND)
+from constants import (
+    FRONTEND_STATIC_DIR,
+    FRONTEND_TEMPLATE_DIR,
+    PORT_BACKEND,
+    PORT_FRONTEND,
+)
 from frontend import Frontend
 from logger import get_logger
 from nine_light import NineLight

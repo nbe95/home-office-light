@@ -9,8 +9,15 @@ from typing import List, Optional
 from transitions import Machine, MachineError
 
 from aux.timeout import Timeout
-from constants import (BELL_REQUEST_TIMEOUT, LEDS_BOTTOM, LEDS_TOP, LEDS_TOTAL,
-                       PIN_BUTTON, PIN_BUZZER, PIN_LEDS)
+from constants import (
+    BELL_REQUEST_TIMEOUT,
+    LEDS_BOTTOM,
+    LEDS_TOP,
+    LEDS_TOTAL,
+    PIN_BUTTON,
+    PIN_BUZZER,
+    PIN_LEDS,
+)
 from hardware.button import Button
 from hardware.buzzer import Buzzer
 from hardware.led import LedStrip
