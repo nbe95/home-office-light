@@ -29,7 +29,7 @@ logger = get_logger(__name__)
 
 
 class NineLight:
-    """Business logic class and state machine for our 9Light."""
+    """Business logic class and state machine for our 9light."""
 
     # pylint: disable=E1101
 

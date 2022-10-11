@@ -114,7 +114,11 @@ class Frontend:
     def events(self) -> str:
         """Renders the events page of the web application."""
         return render_template(
-            "events.html", title=MAIN_TITLE, nav=self.navigation, events=[]
+            "events.html",
+            title=MAIN_TITLE,
+            title_nav=MAIN_TITLE_NAVBAR,
+            navigation=self.navigation,
+            events=[]
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

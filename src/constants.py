@@ -20,7 +20,7 @@ LOG_LEVEL: int = (
 )
 
 # Flask
-MAIN_TITLE: str = "9Light"
+MAIN_TITLE: str = "9light"
 MAIN_TITLE_NAVBAR: str = "light"
 FRONTEND_TEMPLATE_DIR: str = "templates/"
 FRONTEND_STATIC_DIR: str = "static/"
