@@ -2,6 +2,11 @@
 
 {% block title %}State{% endblock %}
 
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
 {% block content %}
     <div class="container" role="main">
 
@@ -26,22 +31,27 @@
                 <div class="list-group">
                     <a href="/state?new=none"
                         class="list-group-item list-group-item-action {% if current_state == 'none' %}active {% endif %}">
+                        <i class="fa fa-ban"></i>&ensp;
                         None
                     </a>
                     <a href="/state?new=call"
                         class="list-group-item list-group-item-action {% if current_state == 'call' %}active {% endif %}">
+                        <i class="fa fa-phone"></i>&ensp;
                         Call
                     </a>
                     <a href="/state?new=video"
                         class="list-group-item list-group-item-action {% if current_state == 'video' %}active {% endif %}">
+                        <i class="fa fa-video-camera"></i>&ensp;
                         Video
                     </a>
                     <a href="/state?new=request"
                         class="list-group-item list-group-item-action {% if current_state == 'request' %}active {% endif %}{% if current_state != 'video' %}disabled {% endif %}">
+                        <i class="fa fa-bell"></i>&ensp;
                         Request
                     </a>
                     <a href="/state?new=coffee"
                         class="list-group-item list-group-item-action {% if current_state == 'coffee' %}active {% endif %}{% if current_state != 'none' %}disabled {% endif %}">
+                        <i class="fa fa-coffee"></i>&ensp;
                         I need a coffee&hellip;
                     </a>
                 </div>
