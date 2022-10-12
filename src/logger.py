@@ -13,6 +13,7 @@ from typing import List
 from constants import LOG_BUFFER_CAPACITY, LOG_LEVEL
 
 
+
 class MemoryLogBuffer(BufferingHandler):
     """Simple wrapper around logging.handlers.BufferingHandler, which allows us
     to grab log messages at runtime and e.g. show them on the frontend."""
@@ -61,8 +62,11 @@ class MemoryLogBuffer(BufferingHandler):
         ]
 
     @staticmethod
-    def get_entries() -> List[LogEntry]:
-        return reversed(MemoryLogBuffer.entries)
+    def get_entries(min_level: int = 0) -> List[LogEntry]:
+        return reversed(list(filter(
+            lambda x: x.level >= min_level,
+            MemoryLogBuffer.entries
+        )))
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:

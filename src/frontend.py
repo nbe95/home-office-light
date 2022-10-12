@@ -11,10 +11,11 @@ from uuid import uuid4
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
-from constants import MAIN_TITLE, MAIN_TITLE_NAVBAR, PORT_BACKEND, PORT_REMOTE
+from constants import MAIN_TITLE, MAIN_TITLE_NAVBAR, PORT_BACKEND, PORT_REMOTE, LOG_MAPPING
 from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
+from logging import DEBUG
 
 # pylint: disable=E1101
 
@@ -114,12 +115,18 @@ class Frontend:
 
     def events(self) -> str:
         """Renders the events page of the web application."""
+        filter_name: str = request.args.get("filter", "").upper()
+        if filter_name not in LOG_MAPPING:
+            filter_name = "DEBUG"
+        filter_level: int = LOG_MAPPING.get(filter_name, 0)
         return render_template(
             "events.html",
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             navigation=self.navigation,
-            events=MemoryLogBuffer.get_entries(),
+            events=MemoryLogBuffer.get_entries(filter_level),
+            filter=filter_level,
+            filter_name=filter_name
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

@@ -6,6 +6,27 @@
     <div class="container" role="main">
         <h1>Event Log</h1>
 
+        <div class="row">
+            <div class="col">
+                <div class="hstack gap-3 justify-content-end">
+                    <div>Filter log view:</div>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{ filter_name }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">Debug</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">Info</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">Warning</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">Error</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">Critical</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <table class="table table-striped table-hover align-middle">
             <thead>
                 <tr>

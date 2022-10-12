@@ -7,7 +7,7 @@
 
         <h1>Remotes</h1>
 
-        <form action="/remotes" method="POST">
+        <form action="{{ request.path }}" method="POST">
             {% if remotes|length %}
             <table class="table table-striped table-hover align-middle">
                 <thead>
@@ -43,7 +43,7 @@
                     Update current remote registrations:
                 </div>
                 <div class="col col-6">
-                    <div class="hstack gap-3 ">
+                    <div class="hstack gap-3">
                         <input type="text" class="form-control" name="new-remote"
                             value="" placeholder="{{ client_ip }}">
                         <button type="submit" class="btn btn-success"

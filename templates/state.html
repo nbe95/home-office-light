@@ -19,7 +19,7 @@
                 <div id="ninelight" class="{{ current_state }}">
                     <div class="top">Video</div>
                     <div class="middle">
-                        <a href="/state?button">&#x2B24;</a>
+                        <a href="{{ request.path }}?button">&#x2B24;</a>
                     </div>
                     <div class="bottom">Anruf</div>
                 </div>
@@ -29,27 +29,27 @@
                 <h3>Current State</h3>
 
                 <div class="list-group">
-                    <a href="/state?new=none"
+                    <a href="{{ request.path }}?new=none"
                         class="list-group-item list-group-item-action {% if current_state == 'none' %}active {% endif %}">
                         <i class="fa fa-ban"></i>&ensp;
                         None
                     </a>
-                    <a href="/state?new=call"
+                    <a href="{{ request.path }}?new=call"
                         class="list-group-item list-group-item-action {% if current_state == 'call' %}active {% endif %}">
                         <i class="fa fa-phone"></i>&ensp;
                         Call
                     </a>
-                    <a href="/state?new=video"
+                    <a href="{{ request.path }}?new=video"
                         class="list-group-item list-group-item-action {% if current_state == 'video' %}active {% endif %}">
                         <i class="fa fa-video-camera"></i>&ensp;
                         Video
                     </a>
-                    <a href="/state?new=request"
+                    <a href="{{ request.path }}?new=request"
                         class="list-group-item list-group-item-action {% if current_state == 'request' %}active {% endif %}{% if current_state != 'video' %}disabled {% endif %}">
                         <i class="fa fa-bell"></i>&ensp;
                         Request
                     </a>
-                    <a href="/state?new=coffee"
+                    <a href="{{ request.path }}?new=coffee"
                         class="list-group-item list-group-item-action {% if current_state == 'coffee' %}active {% endif %}{% if current_state != 'none' %}disabled {% endif %}">
                         <i class="fa fa-coffee"></i>&ensp;
                         I need a coffee&hellip;
@@ -83,17 +83,5 @@
             </div>
 
         </div>
-
-        <!--<script type="text/javascript">
-            function autoRefresh() {
-                document.location.href = "/";
-            }
-            function pressBell() {
-                document.forms.form1["bell-button"].value = "1";
-                document.forms.form1.submit();
-            }
-            window.setTimeout(autoRefresh, 15 * 1000);
-        </script>-->
-
     </div>
 {% endblock %}
