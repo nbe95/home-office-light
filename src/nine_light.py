@@ -40,9 +40,21 @@ class NineLight:
             states=States,
             transitions=[
                 # pylint: disable=C0301
-                {"trigger": "none", "source": "*", "dest": States.NONE},  # noqa: E501
-                {"trigger": "call", "source": "*", "dest": States.CALL},  # noqa: E501
-                {"trigger": "video", "source": "*", "dest": States.VIDEO},  # noqa: E501
+                {
+                    "trigger": "none",
+                    "source": "*",
+                    "dest": States.NONE,
+                },  # noqa: E501
+                {
+                    "trigger": "call",
+                    "source": "*",
+                    "dest": States.CALL,
+                },  # noqa: E501
+                {
+                    "trigger": "video",
+                    "source": "*",
+                    "dest": States.VIDEO,
+                },  # noqa: E501
                 {
                     "trigger": "request",
                     "source": States.VIDEO,
@@ -68,8 +80,12 @@ class NineLight:
         self.remotes: List[NineLightRemote] = []
 
         self._buzzer: Buzzer = Buzzer(PIN_BUZZER)
-        self._button: Button = Button(PIN_BUTTON, callback_pressed=self.on_bell_button)
-        self._leds: LedStrip = LedStrip(PIN_LEDS, LEDS_TOTAL, LEDS_TOP, LEDS_BOTTOM)
+        self._button: Button = Button(
+            PIN_BUTTON, callback_pressed=self.on_bell_button
+        )
+        self._leds: LedStrip = LedStrip(
+            PIN_LEDS, LEDS_TOTAL, LEDS_TOP, LEDS_BOTTOM
+        )
         self._bell_timeout: Optional[Timeout] = None
 
         logger.debug("9light instance initialized.")
@@ -123,8 +139,12 @@ class NineLight:
         """Update registered remotes and send current state to all of them."""
         self.update_remotes()
         for remote in self.remotes:
-            remote.send_update(self.get_state(), [r.ip_addr for r in self.remotes])
-            logger.info("State update sent to remote with IP %s.", remote.ip_addr)
+            remote.send_update(
+                self.get_state(), [r.ip_addr for r in self.remotes]
+            )
+            logger.info(
+                "State update sent to remote with IP %s.", remote.ip_addr
+            )
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""

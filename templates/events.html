@@ -40,7 +40,7 @@
             <tbody>
                 {% for entry in events %}
                 <tr>
-                    <td>{{ entry.no }}</td>
+                    <td>{{ entry.number }}</td>
                     <td>{{ entry.time }}</td>
                     <td>
                         {% if entry.level == 10 %}<span class="badge rounded-pill bg-secondary">DEBUG</span>{% endif %}

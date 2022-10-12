@@ -2,20 +2,24 @@
 
 """9light frontend python module."""
 
-from datetime import datetime
 from os.path import abspath
 from re import match
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
-from constants import MAIN_TITLE, MAIN_TITLE_NAVBAR, PORT_BACKEND, PORT_REMOTE, LOG_MAPPING
+from constants import (
+    MAIN_TITLE,
+    MAIN_TITLE_NAVBAR,
+    PORT_BACKEND,
+    PORT_REMOTE,
+    LOG_MAPPING,
+)
 from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
-from logging import DEBUG
 
 # pylint: disable=E1101
 
@@ -39,7 +43,7 @@ class Frontend:
             static_folder=abspath(static_folder),
         )
         self.app.secret_key = uuid4().hex
-        self.bs: Bootstrap5 = Bootstrap5(self.app)
+        self.bootstrap: Bootstrap5 = Bootstrap5(self.app)
 
         @self.app.route("/", methods=["GET"])
         def _route_index():
@@ -94,7 +98,9 @@ class Frontend:
                     groups = result.groups()
                     ip_addr: str = groups[0]
                     port: Union[str, int] = groups[1] or PORT_REMOTE
-                    self.nl_instance.add_remote(NineLightRemote(ip_addr, int(port)))
+                    self.nl_instance.add_remote(
+                        NineLightRemote(ip_addr, int(port))
+                    )
 
             if "update-remotes" in request.form:
                 self.nl_instance.update_remotes()
@@ -126,7 +132,7 @@ class Frontend:
             navigation=self.navigation,
             events=MemoryLogBuffer.get_entries(filter_level),
             filter=filter_level,
-            filter_name=filter_name
+            filter_name=filter_name,
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

@@ -34,14 +34,19 @@ class NineLightRemote:
         state."""
         # Skip if this very remote has triggered the state change
         if self.skip_once:
-            logger.info("Skipping update for remote with endpoint %s.", self.ip_addr)
+            logger.info(
+                "Skipping update for remote with endpoint %s.", self.ip_addr
+            )
             self.skip_once = False
             return
 
         # The payload must be sent as one-line JSON string (with trailing \n)
         payload: str = dumps({"state": state, "remotes": remotes}, indent=None)
         http_request: str = (
-            f"GET /remote HTTP/1.1\n" f"Host: {self.ip_addr}\n" "\n" f"{payload}\n"
+            f"GET /remote HTTP/1.1\n"
+            f"Host: {self.ip_addr}\n"
+            "\n"
+            f"{payload}\n"
         )
         sock: socket = socket(AF_INET, SOCK_STREAM)
         sock.settimeout(1)
@@ -50,14 +55,18 @@ class NineLightRemote:
             sock.sendall(http_request.encode("ascii"))
         except (timeout, ConnectionRefusedError) as err:
             logger.error(
-                "Could not send status update to remote %s: %s", self.ip_addr, err
+                "Could not send status update to remote %s: %s",
+                self.ip_addr,
+                err,
             )
         finally:
             sock.close()
 
     def set_expiration(self, expiration: Optional[datetime] = None) -> None:
         """Set the timestamp when this remote's registration will expire."""
-        self.expiration: datetime = expiration or (datetime.now() + REMOTE_EXP_TIMEOUT)
+        self.expiration: datetime = expiration or (
+            datetime.now() + REMOTE_EXP_TIMEOUT
+        )
 
         logger.debug(
             "Expiration for remote with endpoint %s set to %s.",

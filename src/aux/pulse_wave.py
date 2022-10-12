@@ -27,4 +27,6 @@ class PulseWave:
 
     def get_scaled(self) -> int:
         """Returns the current cosine value as scaled integer."""
-        return int(self.get() * (self.scale[1] - self.scale[0]) + self.scale[0])
+        return int(
+            self.get() * (self.scale[1] - self.scale[0]) + self.scale[0]
+        )
