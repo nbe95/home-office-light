@@ -18,6 +18,7 @@ _log_mapping: Dict[str, int] = {
 LOG_LEVEL: int = (
     _log_mapping[env["LOG_LEVEL"]] if env["LOG_LEVEL"] in _log_mapping else logging.INFO
 )
+LOG_BUFFER_CAPACITY: int = 1000
 
 # Flask
 MAIN_TITLE: str = "9light"

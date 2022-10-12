@@ -12,6 +12,7 @@ from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
 from constants import MAIN_TITLE, MAIN_TITLE_NAVBAR, PORT_BACKEND, PORT_REMOTE
+from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
 
@@ -118,7 +119,7 @@ class Frontend:
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             navigation=self.navigation,
-            events=[]
+            events=MemoryLogBuffer.get_entries(),
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
