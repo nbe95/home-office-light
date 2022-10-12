@@ -41,7 +41,9 @@ def main():
     logger.info("Backend thread set up.")
 
     # Set up frontend thread
-    frontend: Frontend = Frontend(light, FRONTEND_TEMPLATE_DIR, FRONTEND_STATIC_DIR)
+    frontend: Frontend = Frontend(
+        light, FRONTEND_TEMPLATE_DIR, FRONTEND_STATIC_DIR
+    )
     frontend_thread: Thread = Thread(
         target=frontend.run, args=(PORT_FRONTEND,), daemon=True
     )

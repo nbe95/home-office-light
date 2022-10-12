@@ -5,13 +5,12 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from logging import DEBUG, Filter, Formatter, Logger, LogRecord, StreamHandler
+from logging import DEBUG, Formatter, Logger, LogRecord, StreamHandler
 from logging.handlers import BufferingHandler
 from sys import stdout
 from typing import List
 
 from constants import LOG_BUFFER_CAPACITY, LOG_LEVEL
-
 
 
 class MemoryLogBuffer(BufferingHandler):
@@ -20,7 +19,8 @@ class MemoryLogBuffer(BufferingHandler):
 
     @dataclass
     class LogEntry:
-        no: int
+        """Dataclass which holds one single log entry."""
+        number: int
         time: datetime
         logger: str
         level: int
@@ -38,35 +38,42 @@ class MemoryLogBuffer(BufferingHandler):
         self.setLevel(DEBUG)
 
     def flush(self) -> None:
+        """Override flush method of BufferingHandler."""
         record: LogRecord
         for record in self.buffer:
             MemoryLogBuffer.add_entry(record)
         super().flush()
 
     def shouldFlush(self, record: LogRecord) -> bool:
+        """Override shouldFlush method of BufferingHandler."""
         return True
 
+    @staticmethod
     def add_entry(record: LogRecord) -> None:
+        """Add a log entry to the static buffer and increment the counter."""
         MemoryLogBuffer.entry_count += 1
-        MemoryLogBuffer.entries.append(MemoryLogBuffer.LogEntry(
-            MemoryLogBuffer.entry_count,
-            datetime.fromtimestamp(record.created),
-            record.name,
-            record.levelno,
-            record.pathname,
-            record.lineno,
-            record.message,
-        ))
+        MemoryLogBuffer.entries.append(
+            MemoryLogBuffer.LogEntry(
+                MemoryLogBuffer.entry_count,
+                datetime.fromtimestamp(record.created),
+                record.name,
+                record.levelno,
+                record.pathname,
+                record.lineno,
+                record.message,
+            )
+        )
         MemoryLogBuffer.entries = MemoryLogBuffer.entries[
-            -MemoryLogBuffer.capacity :
+            -MemoryLogBuffer.capacity:
         ]
 
     @staticmethod
     def get_entries(min_level: int = 0) -> List[LogEntry]:
-        return reversed(list(filter(
-            lambda x: x.level >= min_level,
-            MemoryLogBuffer.entries
-        )))
+        """Fetch all entries with a given minimum level in the buffer."""
+        entries: List[MemoryLogBuffer.LogEntry] = list(
+            filter(lambda x: x.level >= min_level, MemoryLogBuffer.entries)
+        )
+        return list(reversed(entries))
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:
@@ -75,7 +82,9 @@ def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:
 
     memory_handler = MemoryLogBuffer()
     stdout_handler: StreamHandler = StreamHandler(stdout)
-    stdout_handler.setFormatter(Formatter("%(levelname)s:%(name)s:%(message)s"))
+    stdout_handler.setFormatter(
+        Formatter("%(levelname)s:%(name)s:%(message)s")
+    )
 
     logger.setLevel(log_level)
     logger.addHandler(stdout_handler)

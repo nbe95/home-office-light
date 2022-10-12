@@ -55,7 +55,10 @@ class Button:
         """Perform internally debouncing operations."""
         end: datetime = datetime.now() + self.threshold
         while datetime.now() < end:
-            if self._debounce_task.is_canceled() or self.get_button_state() != state:
+            if (
+                self._debounce_task.is_canceled()
+                or self.get_button_state() != state
+            ):
                 return
             sleep(0.001)
 

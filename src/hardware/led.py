@@ -22,7 +22,11 @@ class LedStrip:
     LED strip."""
 
     def __init__(
-        self, led_pin: int, leds_total: int, leds_top: List[int], leds_bottom: List[int]
+        self,
+        led_pin: int,
+        leds_total: int,
+        leds_top: List[int],
+        leds_bottom: List[int],
     ):
         self._leds_top: List[int] = leds_top
         self._leds_bottom: List[int] = leds_bottom
