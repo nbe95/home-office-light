@@ -19,6 +19,7 @@ class MemoryLogBuffer(BufferingHandler):
 
     @dataclass
     class LogEntry:
+        no: int
         time: datetime
         logger: str
         level: int
@@ -28,6 +29,7 @@ class MemoryLogBuffer(BufferingHandler):
 
     # Static list to hold messages from all loggers
     capacity: int = LOG_BUFFER_CAPACITY
+    entry_count: int = 0
     entries: List[LogEntry] = []
 
     def __init__(self) -> None:
@@ -37,27 +39,30 @@ class MemoryLogBuffer(BufferingHandler):
     def flush(self) -> None:
         record: LogRecord
         for record in self.buffer:
-            MemoryLogBuffer.entries.append(
-                MemoryLogBuffer.LogEntry(
-                    datetime.fromtimestamp(record.created),
-                    record.name,
-                    record.levelno,
-                    record.pathname,
-                    record.lineno,
-                    record.message,
-                )
-            )
-            MemoryLogBuffer.entries = MemoryLogBuffer.entries[
-                -MemoryLogBuffer.capacity :
-            ]
+            MemoryLogBuffer.add_entry(record)
         super().flush()
 
     def shouldFlush(self, record: LogRecord) -> bool:
         return True
 
+    def add_entry(record: LogRecord) -> None:
+        MemoryLogBuffer.entry_count += 1
+        MemoryLogBuffer.entries.append(MemoryLogBuffer.LogEntry(
+            MemoryLogBuffer.entry_count,
+            datetime.fromtimestamp(record.created),
+            record.name,
+            record.levelno,
+            record.pathname,
+            record.lineno,
+            record.message,
+        ))
+        MemoryLogBuffer.entries = MemoryLogBuffer.entries[
+            -MemoryLogBuffer.capacity :
+        ]
+
     @staticmethod
     def get_entries() -> List[LogEntry]:
-        return MemoryLogBuffer.entries
+        return reversed(MemoryLogBuffer.entries)
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:
