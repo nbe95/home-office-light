@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+    <div class="container" role="main">
+        <h1>Event Log</h1>
+
+        <div class="row">
+            <div class="col">
+                <div class="hstack gap-3 justify-content-end">
+                    <div>Filter log view:</div>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{ filter_name }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">Debug</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">Info</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">Warning</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">Error</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">Critical</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Logger</th>
+                    <th>Message and reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in events %}
+                <tr>
+                    <td>{{ entry.no }}</td>
+                    <td>{{ entry.time }}</td>
+                    <td>
+                        {% if entry.level == 10 %}<span class="badge rounded-pill bg-secondary">DEBUG</span>{% endif %}
+                        {% if entry.level == 20 %}<span class="badge rounded-pill bg-primary">INFO</span>{% endif %}
+                        {% if entry.level == 30 %}<span class="badge rounded-pill bg-warning">WARNING</span>{% endif %}
+                        {% if entry.level == 40 %}<span class="badge rounded-pill bg-danger">ERROR</span>{% endif %}
+                        {% if entry.level == 50 %}<span class="badge rounded-pill bg-dark">CRITICAL</span>{% endif %}
+                    </td>
+                    <td>{{ entry.logger }}</td>
+                    <td>
+                        <span>{{ entry.message }}</span>
+                        <span class="small text-muted">&ndash; {{ entry.path }}:{{ entry.line }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

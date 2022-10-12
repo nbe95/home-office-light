@@ -11,15 +11,15 @@ import signal
 from threading import Thread
 
 from backend import Backend
+from constants import (
+    FRONTEND_STATIC_DIR,
+    FRONTEND_TEMPLATE_DIR,
+    PORT_BACKEND,
+    PORT_FRONTEND,
+)
 from frontend import Frontend
 from logger import get_logger
 from nine_light import NineLight
-from constants import (
-    FRONTEND_TEMPLATE_DIR,
-    FRONTEND_STATIC_DIR,
-    PORT_FRONTEND,
-    PORT_BACKEND
-)
 
 logger = get_logger(__name__)
 
@@ -35,20 +35,15 @@ def main():
     # Set up backend thread
     backend: Backend = Backend(light)
     backend_thread: Thread = Thread(
-        target=backend.run,
-        args=(PORT_BACKEND,),
-        daemon=True
+        target=backend.run, args=(PORT_BACKEND,), daemon=True
     )
     backend_thread.start()
     logger.info("Backend thread set up.")
 
     # Set up frontend thread
-    frontend: Frontend = Frontend(light, FRONTEND_TEMPLATE_DIR,
-                                  FRONTEND_STATIC_DIR)
+    frontend: Frontend = Frontend(light, FRONTEND_TEMPLATE_DIR, FRONTEND_STATIC_DIR)
     frontend_thread: Thread = Thread(
-        target=frontend.run,
-        args=(PORT_FRONTEND,),
-        daemon=True
+        target=frontend.run, args=(PORT_FRONTEND,), daemon=True
     )
     frontend_thread.start()
     logger.info("Frontend thread set up.")

@@ -1,27 +1,17 @@
-* {
-    font-family: Arial;
-    color: black;
+h1, h2, h3, h4, h5, h6 {
+    margin: 1rem 0 1rem !important;
 }
 
-.error {
-    color: red;
+#ninelight {
+    margin: 0;
 }
 
-h2 {
-    clear: both;
-}
-
-#preview {
-    float: left;
-    margin: 0px 20px 30px 0px;
-}
-
-#preview div.top,
-#preview div.bottom {
-    width: 130px;
-    height: 80px;
-    line-height: 80px;
-    font-size: 35px;
+#ninelight div.top,
+#ninelight div.bottom {
+    width: 160px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 45px;
     font-family: "Arial Narrow", Arial;
     color: #ffffff;
     text-transform: uppercase;
@@ -33,11 +23,11 @@ h2 {
     font-weight: bold;
 }
 
-#preview div.middle {
-    width: 130px;
-    height: 25px;
-    line-height: 25px;
-    font-size: 25px;
+#ninelight div.middle {
+    width: 160px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 30px;
     font-family: Arial;
     color: #333300;
     border-width: 0px 1px;
@@ -47,18 +37,18 @@ h2 {
     text-align: center;
 }
 
-#preview div.middle a {
+#ninelight div.middle a {
     color: #333300;
     text-decoration: none;
 }
 
-/* Preview colors and animation */
+/* ninelight colors and animation */
 
-#preview.call div.bottom {
+#ninelight.call div.bottom {
     background: #ffcc00;
 }
 
-#preview.video div.top {
+#ninelight.video div.top {
     background: #ff0000;
 }
 
@@ -67,7 +57,7 @@ h2 {
     50%  { background: #eeeeee; }
     100% { background: #00ccff; }
 }
-#preview.request div.top {
+#ninelight.request div.top {
     animation-name: request_animation;
     animation-timing-function: linear;
     animation-duration: 800ms;
@@ -92,13 +82,13 @@ h2 {
     83%  { background: #00ff00; }
     100% { background: #00ffff; }
 }
-#preview.coffee div.top {
+#ninelight.coffee div.top {
     animation-name: coffee_animation_top;
     animation-timing-function: linear;
     animation-duration: 1s;
     animation-iteration-count: infinite;
 }
-#preview.coffee div.bottom {
+#ninelight.coffee div.bottom {
     animation-name: coffee_animation_bottom;
     animation-timing-function: linear;
     animation-duration: 1s;

@@ -3,16 +3,16 @@
 """Helper module for handling a buzzer acting as a classic door bell."""
 
 from time import sleep
+
 from RPi import GPIO
 
 from aux.bg_task import BgTask
-from constants import (
-    BELL_BUZZER_SEQUENCE
-)
+from constants import BELL_BUZZER_SEQUENCE
 
 
 class Buzzer:
     """Helper class handling the buzzer hardware."""
+
     def __init__(self, pin: int):
         self.pin: int = pin
         self._gpio_setup()

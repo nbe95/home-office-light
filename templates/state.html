@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}State{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="container" role="main">
+
+        <h1>System Overview</h1>
+
+        <div class="row">
+
+            <div class="col col-md-auto">
+                <h3>Live Preview</h3>
+                <div id="ninelight" class="{{ current_state }}">
+                    <div class="top">Video</div>
+                    <div class="middle">
+                        <a href="{{ request.path }}?button">&#x2B24;</a>
+                    </div>
+                    <div class="bottom">Anruf</div>
+                </div>
+            </div>
+
+            <div class="col">
+                <h3>Current State</h3>
+
+                <div class="list-group">
+                    <a href="{{ request.path }}?new=none"
+                        class="list-group-item list-group-item-action {% if current_state == 'none' %}active {% endif %}">
+                        <i class="fa fa-ban"></i>&ensp;
+                        None
+                    </a>
+                    <a href="{{ request.path }}?new=call"
+                        class="list-group-item list-group-item-action {% if current_state == 'call' %}active {% endif %}">
+                        <i class="fa fa-phone"></i>&ensp;
+                        Call
+                    </a>
+                    <a href="{{ request.path }}?new=video"
+                        class="list-group-item list-group-item-action {% if current_state == 'video' %}active {% endif %}">
+                        <i class="fa fa-video-camera"></i>&ensp;
+                        Video
+                    </a>
+                    <a href="{{ request.path }}?new=request"
+                        class="list-group-item list-group-item-action {% if current_state == 'request' %}active {% endif %}{% if current_state != 'video' %}disabled {% endif %}">
+                        <i class="fa fa-bell"></i>&ensp;
+                        Request
+                    </a>
+                    <a href="{{ request.path }}?new=coffee"
+                        class="list-group-item list-group-item-action {% if current_state == 'coffee' %}active {% endif %}{% if current_state != 'none' %}disabled {% endif %}">
+                        <i class="fa fa-coffee"></i>&ensp;
+                        I need a coffee&hellip;
+                    </a>
+                </div>
+            </div>
+
+            <div class="col">
+                <h3>System State</h3>
+
+                <div class="row">
+                    <div class="col"><strong>Running since:</strong></div>
+                    <div class="col">{{ stat["start_time"].astimezone() }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Total state changes:</strong></div>
+                    <div class="col">{{ stat["state_changes"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>Attached remotes:</strong></div>
+                    <div class="col">{{ stat["num_remotes"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>TCP listen port:</strong></div>
+                    <div class="col">{{ stat["listen_port"] }}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><strong>TCP remote port:</strong></div>
+                    <div class="col">{{ stat["remote_port"] }}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

@@ -2,17 +2,15 @@
 
 """Helper module for generating pulse waves flawlessly."""
 
-from math import cos, pi
 from datetime import datetime, timedelta
+from math import cos, pi
 from typing import Tuple
 
 
 class PulseWave:
     """Helper class generating a simple cosine wave."""
 
-    def __init__(self,
-                 period: timedelta,
-                 scale: Tuple[int, int] = (0, 100)):
+    def __init__(self, period: timedelta, scale: Tuple[int, int] = (0, 100)):
         self.period: timedelta = period
         self.scale: Tuple[int, int] = scale
         self.reset()

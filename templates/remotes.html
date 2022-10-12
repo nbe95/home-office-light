@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Remotes{% endblock %}
+
+{% block content %}
+    <div class="container" role="main">
+
+        <h1>Remotes</h1>
+
+        <form action="{{ request.path }}" method="POST">
+            {% if remotes|length %}
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>HTTP endpoint</th>
+                        <th>Expiration time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for no, remote in remotes %}
+                    <tr>
+                        <td>{{ no + 1 }}</td>
+                        <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
+                        <td>{{ remote.expiration.astimezone() }}</td>
+                        <td class="text-end">
+                            <button type="submit" class="btn btn-danger"
+                                name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> There are currently no remotes registered.
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col">
+                    <div class="hstack gap-3">
+                        <div class="col col-4">
+                            Update current remote registrations:
+                        </div>
+                        <input type="text" class="form-control" name="new-remote"
+                            value="" placeholder="{{ client_ip }}">
+                        <button type="submit" class="btn btn-success"
+                            name="add-remote">Add</button>
+                        <div class="vr"></div>
+                        <button type="submit" class="btn btn-warning"
+                            name="update-remotes" value="1">Clean&nbsp;up</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
