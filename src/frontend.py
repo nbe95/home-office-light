@@ -13,6 +13,7 @@ from flask_bootstrap import Bootstrap5
 from constants import (
     MAIN_TITLE,
     MAIN_TITLE_NAVBAR,
+    VERSION,
     PORT_BACKEND,
     PORT_REMOTE,
     LOG_MAPPING,
@@ -81,6 +82,7 @@ class Frontend:
             "state.html",
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
+            version=VERSION,
             navigation=self.navigation,
             stat=statistics,
             current_state=self.nl_instance.get_state(),

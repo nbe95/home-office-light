@@ -22,6 +22,7 @@ LOG_BUFFER_CAPACITY: int = 1000
 # Flask
 MAIN_TITLE: str = "9light"
 MAIN_TITLE_NAVBAR: str = "light"
+VERSION: str = env["VERSION"]
 FRONTEND_TEMPLATE_DIR: str = "templates/"
 FRONTEND_STATIC_DIR: str = "static/"
 PORT_FRONTEND: int = 9080
