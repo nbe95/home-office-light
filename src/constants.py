@@ -4,11 +4,14 @@
 
 
 import logging
+import sys
 from datetime import timedelta as td
 from os import environ as env
 from typing import Dict, List
 
 # General
+SW_VERSION: str = str(env["VERSION"])
+PY_VERSION: str = str(sys.version)
 LOG_MAPPING: Dict[str, int] = {
     "DEBUG": logging.DEBUG,
     "INFO": logging.INFO,
@@ -22,7 +25,6 @@ LOG_BUFFER_CAPACITY: int = 1000
 # Flask
 MAIN_TITLE: str = "9light"
 MAIN_TITLE_NAVBAR: str = "light"
-VERSION: str = env["VERSION"]
 FRONTEND_TEMPLATE_DIR: str = "templates/"
 FRONTEND_STATIC_DIR: str = "static/"
 PORT_FRONTEND: int = 9080

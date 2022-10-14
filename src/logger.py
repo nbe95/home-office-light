@@ -20,6 +20,7 @@ class MemoryLogBuffer(BufferingHandler):
     @dataclass
     class LogEntry:
         """Dataclass which holds one single log entry."""
+
         number: int
         time: datetime
         logger: str
@@ -64,7 +65,7 @@ class MemoryLogBuffer(BufferingHandler):
             )
         )
         MemoryLogBuffer.entries = MemoryLogBuffer.entries[
-            -MemoryLogBuffer.capacity:
+            -MemoryLogBuffer.capacity :
         ]
 
     @staticmethod

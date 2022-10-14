@@ -4,19 +4,20 @@
 
 from os.path import abspath
 from re import match
-from typing import Dict, List, Union, Any
+from typing import Any, Dict, List, Union
 from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
 from constants import (
+    LOG_MAPPING,
     MAIN_TITLE,
     MAIN_TITLE_NAVBAR,
-    VERSION,
     PORT_BACKEND,
     PORT_REMOTE,
-    LOG_MAPPING,
+    PY_VERSION,
+    SW_VERSION,
 )
 from logger import MemoryLogBuffer
 from nine_light import NineLight
@@ -82,7 +83,8 @@ class Frontend:
             "state.html",
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            version=VERSION,
+            sw_version=SW_VERSION,
+            py_version=PY_VERSION,
             navigation=self.navigation,
             stat=statistics,
             current_state=self.nl_instance.get_state(),
