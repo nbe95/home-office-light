@@ -1,4 +1,4 @@
-FROM python:3.7-slim-bullseye
+FROM python:3-slim-bullseye
 
 LABEL author="Niklas Bettgen, niklas@bettgen.de"
 WORKDIR /app/
