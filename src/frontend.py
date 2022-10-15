@@ -3,8 +3,7 @@
 """9light frontend python module."""
 
 from os.path import abspath
-from re import match
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 from uuid import uuid4
 
 from flask import Flask, render_template, request
@@ -93,26 +92,23 @@ class Frontend:
     def remotes(self) -> str:
         """Renders the remotes page of the web application."""
         if request.method == "POST":
+            remote: Optional[NineLightRemote]
             if "add-remote" in request.form:
-                result = match(
-                    r"^((?:\d{1,3}\.){3}\d{1,3})(?:\:(\d+))?$",
-                    request.form["new-remote"],
+                remote = NineLightRemote.parse_from_str(
+                    request.form["new-remote"]
                 )
-                if result:
-                    groups = result.groups()
-                    ip_addr: str = groups[0]
-                    port: Union[str, int] = groups[1] or PORT_REMOTE
-                    self.nl_instance.add_remote(
-                        NineLightRemote(ip_addr, int(port))
-                    )
-
-            if "update-remotes" in request.form:
-                self.nl_instance.update_remotes()
+                if remote:
+                    self.nl_instance.add_or_update_remote(remote)
 
             if "del-remote" in request.form:
-                self.nl_instance.delete_remote(
-                    NineLightRemote(request.form["del-remote"], 0)
+                remote = NineLightRemote.parse_from_str(
+                    request.form["del-remote"]
                 )
+                if remote:
+                    self.nl_instance.delete_remote(remote)
+
+            if "update-remotes" in request.form:
+                self.nl_instance.remove_expired_remotes()
 
         return render_template(
             "remotes.html",
@@ -127,7 +123,7 @@ class Frontend:
         """Renders the events page of the web application."""
         filter_name: str = request.args.get("filter", "").upper()
         if filter_name not in LOG_MAPPING:
-            filter_name = "DEBUG"
+            filter_name = "INFO"
         filter_level: int = LOG_MAPPING.get(filter_name, 0)
         return render_template(
             "events.html",

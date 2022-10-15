@@ -4,8 +4,9 @@
 
 from datetime import datetime
 from json import dumps
+from re import match
 from socket import AF_INET, SOCK_STREAM, socket, timeout
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from constants import PORT_REMOTE, REMOTE_EXP_TIMEOUT
 from logger import get_logger
@@ -17,29 +18,53 @@ class NineLightRemote:
     """Subclass for simple handling of 9light remotes."""
 
     def __init__(
-        self,
-        ip_addr: str,
-        port: int = PORT_REMOTE,
-        expiration: Optional[datetime] = None,
-    ):
+        self, ip_addr: str, port: int = PORT_REMOTE, skip_once: bool = False
+    ) -> None:
         self.ip_addr: str = ip_addr
         self.port: int = port
-        self.skip_once: bool = False
-        self.set_expiration(expiration)
+        self.skip_once: bool = skip_once
+        self.tx_count: int = 0
+        self.rx_count: int = 0
+        self.expiration: datetime
 
         logger.debug("%s initialized.", self)
 
-    def send_update(self, state: str, remotes: List[str]) -> None:
+    @staticmethod
+    def parse_from_str(
+        remote_str: str, default_port: int = PORT_REMOTE
+    ) -> Optional["NineLightRemote"]:
+        """Parse a string consisting of an IP address and a port (optional) and
+        creates a remote object.
+        Example: '192.168.0.42' or '192.168.0.69:1234'."""
+
+        result = match(r"^((?:\d{1,3}\.){3}\d{1,3})(?:\:(\d+))?$", remote_str)
+        if not result:
+            return None
+
+        groups = result.groups()
+        ip_addr: str = groups[0]
+        port: Union[str, int] = groups[1] or default_port
+        return NineLightRemote(ip_addr, int(port))
+
+    def send_update(
+        self, state_str: str, remotes: List["NineLightRemote"]
+    ) -> None:
         """Send a HTTP request to the remote including the current 9light
         state."""
         # Skip if this very remote has triggered the state change
         if self.skip_once:
-            logger.info("Skipping update for %s.", self)
+            logger.info("Skipping update for %s once.", self)
             self.skip_once = False
             return
 
         # The payload must be sent as one-line JSON string (with trailing \n)
-        payload: str = dumps({"state": state, "remotes": remotes}, indent=None)
+        payload: str = dumps(
+            {
+                "state": state_str,
+                "remotes": [remote.ip_addr for remote in remotes],
+            },
+            indent=None,
+        )
         http_request: str = (
             f"GET /remote HTTP/1.1\n"
             f"Host: {self.ip_addr}\n"
@@ -55,12 +80,11 @@ class NineLightRemote:
             logger.error("Could not send status update to %s: %s", self, err)
         finally:
             sock.close()
+            self.tx_count += 1
 
     def set_expiration(self, expiration: Optional[datetime] = None) -> None:
         """Set the timestamp when this remote's registration will expire."""
-        self.expiration: datetime = expiration or (
-            datetime.now() + REMOTE_EXP_TIMEOUT
-        )
+        self.expiration = expiration or (datetime.now() + REMOTE_EXP_TIMEOUT)
 
         logger.debug("Expiration for %s set to %s.", self, self.expiration)
 
@@ -71,3 +95,9 @@ class NineLightRemote:
     def __repr__(self) -> str:
         """Overload repr operator for serialized representation."""
         return f"Remote({self.ip_addr})"
+
+    def __eq__(self, other: object) -> bool:
+        """Compare remotes by IP address and port only."""
+        if not isinstance(other, NineLightRemote):
+            return NotImplemented
+        return self.ip_addr == other.ip_addr and self.port == other.port

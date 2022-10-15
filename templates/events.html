@@ -16,11 +16,11 @@
                             {{ filter_name }}
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">Debug</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">Info</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">Warning</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">Error</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">Critical</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">DEBUG</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">INFO (default)</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">WARNING</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">ERROR</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">CRITICAL</a></li>
                         </ul>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 {% for entry in events %}
                 <tr>
                     <th scope="row">{{ entry.number }}</th>
-                    <td>{{ entry.time }}</td>
+                    <td>{{ entry.time.astimezone() }}</td>
                     <td>
                         {% if entry.level == 10 %}<span class="badge rounded-pill bg-secondary">DEBUG</span>{% endif %}
                         {% if entry.level == 20 %}<span class="badge rounded-pill bg-primary">INFO</span>{% endif %}

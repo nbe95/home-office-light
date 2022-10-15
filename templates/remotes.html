@@ -13,20 +13,26 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>HTTP endpoint</th>
+                        <th>IP endpoint</th>
+                        <th>TCP remote port</th>
                         <th>Expiration time</th>
+                        <th>Telegrams received</th>
+                        <th>Telegrams sent</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for no, remote in remotes %}
                     <tr>
-                        <td>{{ no + 1 }}</td>
-                        <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
+                        <th scope="row">{{ no + 1 }}</th>
+                        <td>{{ remote.ip_addr }}</td>
+                        <td>{{ remote.port }}</td>
                         <td>{{ remote.expiration.astimezone() }}</td>
+                        <td>{{ remote.rx_count }}</td>
+                        <td>{{ remote.tx_count }}</td>
                         <td class="text-end">
-                            <button type="submit" class="btn btn-danger"
-                                name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
+                            <button type="submit" class="btn btn-danger" name="del-remote"
+                                value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>
                         </td>
                     </tr>
                     {% endfor %}
