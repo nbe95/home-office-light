@@ -63,6 +63,10 @@
                 <table class="table table-sm">
                     <tbody>
                         <tr>
+                            <td class="fw-bold">Hostname, IP:</td>
+                            <td>{{ hostname }} ({{ ip_addr }})</td>
+                        </tr>
+                        <tr>
                             <td class="fw-bold">Software version:</td>
                             <td>{{ sw_version }}</td>
                         </tr>
@@ -72,23 +76,23 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Running since:</td>
-                            <td>{{ stat["start_time"].astimezone() }}</td>
+                            <td>{{ start_time.astimezone() }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Total state changes:</td>
-                            <td>{{ stat["state_changes"] }}</td>
+                            <td>{{ state_changes }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Attached remotes:</td>
-                            <td>{{ stat["num_remotes"] }}</td>
+                            <td>{{ num_remotes }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">TCP listen port:</td>
-                            <td>{{ stat["listen_port"] }}</td>
+                            <td>{{ port_backend }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">TCP remote port:</td>
-                            <td>{{ stat["remote_port"] }}</td>
+                            <td>{{ port_remote }}</td>
                         </tr>
                     </tbody>
                 </table>
