@@ -112,13 +112,17 @@ class NineLight:
             return False
         return True
 
-    def on_remote_request(self, remote: NineLightRemote) -> None:
+    def on_remote_request(
+        self, remote: NineLightRemote, incr_tx: bool = False
+    ) -> None:
         """Perform actions when an incoming remote request is recognized."""
         self.add_or_update_remote(remote)
         if remote in self.remotes:
             index: int = self.remotes.index(remote)
             self.remotes[index].skip_once = True
             self.remotes[index].rx_count += 1
+            if incr_tx:
+                self.remotes[index].tx_count += 1
 
     def add_or_update_remote(self, remote: NineLightRemote) -> None:
         """Add a new remote or update an existing one."""

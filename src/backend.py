@@ -35,7 +35,7 @@ class Backend:
 
         if "remote" in request.args:
             self.nl_instance.on_remote_request(
-                NineLightRemote(str(request.remote_addr), PORT_REMOTE)
+                NineLightRemote(str(request.remote_addr), PORT_REMOTE), True
             )
 
         new_state: Optional[str] = request.args.get("state")
@@ -45,7 +45,9 @@ class Backend:
         return dumps(
             {
                 "state": self.nl_instance.get_state(),
-                "remotes": self.nl_instance.remotes,
+                "remotes": [
+                    remote.ip_addr for remote in self.nl_instance.remotes
+                ],
             },
             indent=None,
         )
