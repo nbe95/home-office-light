@@ -4,7 +4,7 @@
 
 from os.path import abspath
 from re import match
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 from uuid import uuid4
 
 from flask import Flask, render_template, request
