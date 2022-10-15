@@ -112,39 +112,43 @@ class NineLight:
             return False
         return True
 
-    def add_remote(self, remote: NineLightRemote) -> None:
-        """Add a new remote or update an existing one by IP."""
-        self.delete_remote(remote)
-        self.remotes.append(remote)
+    def add_or_update_remote(self, remote: NineLightRemote) -> None:
+        """Add a new remote or update an existing one."""
+        if remote in self.remotes:
+            index: int = self.remotes.index(remote)
+            self.remotes[index].set_expiration()
+            logger.info("%s registration updated.", remote)
 
-        logger.info("%s registered.", remote)
+        else:
+            remote.set_expiration()
+            self.remotes.append(remote)
+            logger.info("%s registered.", remote)
 
     def delete_remote(self, remote: NineLightRemote) -> None:
-        """Remove an existing remote from the registration list by IP."""
-        new_list: List[NineLightRemote] = list(
-            filter(lambda x: x.ip_addr != remote.ip_addr, self.remotes)
-        )
-        self.remotes = new_list
+        """Remove an existing remote from the registration list."""
+        if remote in self.remotes:
+            self.remotes.remove(remote)
+            logger.info("%s removed.", remote)
 
-        logger.info("%s removed.", remote)
-
-    def update_remotes(self) -> None:
+    def remove_expired_remotes(self) -> None:
         """Remove expired remotes."""
-        len_before: int = len(self.remotes)
-        for remote in self.remotes:
-            if remote.is_expired():
-                self.delete_remote(remote)
 
-        if len(self.remotes) != len_before:
-            logger.info("Auto-removed expired remote registrations.")
+        expired: List[NineLightRemote] = list(
+            filter(lambda x: x.is_expired(), self.remotes)
+        )
+        if len(expired) > 0:
+            logger.info(
+                "Auto-removing %i expired remote registrations.", len(expired)
+            )
+
+        for remote in expired:
+            self.delete_remote(remote)
 
     def send_update_to_remotes(self) -> None:
         """Update registered remotes and send current state to all of them."""
-        self.update_remotes()
+        self.remove_expired_remotes()
         for remote in self.remotes:
-            remote.send_update(
-                self.get_state(), [r.ip_addr for r in self.remotes]
-            )
+            remote.send_update(self.get_state(), self.remotes)
             logger.info("State update sent to %s.", remote)
 
     def on_bell_button(self) -> None:

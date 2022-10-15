@@ -65,7 +65,7 @@ class MemoryLogBuffer(BufferingHandler):
             )
         )
         MemoryLogBuffer.entries = MemoryLogBuffer.entries[
-            -MemoryLogBuffer.capacity:
+            -MemoryLogBuffer.capacity :
         ]
 
     @staticmethod

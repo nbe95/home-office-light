@@ -25,8 +25,8 @@
                         <td>{{ remote.ip_addr }}:{{ remote.port }}</td>
                         <td>{{ remote.expiration.astimezone() }}</td>
                         <td class="text-end">
-                            <button type="submit" class="btn btn-danger"
-                                name="del-remote" value="{{ remote.ip_addr }}">Remove</button>
+                            <button type="submit" class="btn btn-danger" name="del-remote"
+                                value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>
                         </td>
                     </tr>
                     {% endfor %}

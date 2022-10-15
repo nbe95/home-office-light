@@ -34,13 +34,9 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            self.nl_instance.add_remote(
-                NineLightRemote(str(request.remote_addr), PORT_REMOTE)
+            self.nl_instance.add_or_update_remote(
+                NineLightRemote(str(request.remote_addr), PORT_REMOTE, True)
             )
-
-            for remote in self.nl_instance.remotes:
-                if remote.ip_addr == str(request.remote_addr):
-                    remote.skip_once = True
 
         new_state: Optional[str] = request.args.get("state")
         if new_state:
@@ -49,7 +45,7 @@ class Backend:
         return dumps(
             {
                 "state": self.nl_instance.get_state(),
-                "remotes": [r.ip_addr for r in self.nl_instance.remotes],
+                "remotes": self.nl_instance.remotes,
             },
             indent=None,
         )
