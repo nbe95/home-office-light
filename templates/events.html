@@ -41,7 +41,7 @@
                 {% for entry in events %}
                 <tr>
                     <th scope="row">{{ entry.number }}</th>
-                    <td>{{ entry.time }}</td>
+                    <td>{{ entry.time.astimezone() }}</td>
                     <td>
                         {% if entry.level == 10 %}<span class="badge rounded-pill bg-secondary">DEBUG</span>{% endif %}
                         {% if entry.level == 20 %}<span class="badge rounded-pill bg-primary">INFO</span>{% endif %}
