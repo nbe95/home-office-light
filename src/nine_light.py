@@ -163,7 +163,7 @@ class NineLight:
     def on_state_changed(self) -> None:
         """Auto-called function triggered after any transition of the state
         machine."""
-        logger.info("9light state changed to %s.", self.get_state())
+        logger.info("9light state changed to %s.", self.get_state().upper())
         self.total_state_changes += 1
 
         # Control LED strip
