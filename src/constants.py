@@ -2,7 +2,6 @@
 
 """Python module to configure various constants."""
 
-
 import logging
 import sys
 from datetime import timedelta as td
