@@ -4,18 +4,22 @@
 
 from os.path import abspath
 from re import match
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union
 from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
 
 from constants import (
+    HOSTNAME,
+    IP_ADDR,
+    LOG_MAPPING,
     MAIN_TITLE,
     MAIN_TITLE_NAVBAR,
     PORT_BACKEND,
     PORT_REMOTE,
-    LOG_MAPPING,
+    PY_VERSION,
+    SW_VERSION,
 )
 from logger import MemoryLogBuffer
 from nine_light import NineLight
@@ -69,20 +73,20 @@ class Frontend:
         if "button" in request.args:
             self.nl_instance.on_bell_button()
 
-        statistics: Dict[str, Any] = {
-            "start_time": self.nl_instance.start_time,
-            "state_changes": self.nl_instance.total_state_changes,
-            "num_remotes": len(self.nl_instance.remotes),
-            "listen_port": PORT_BACKEND,
-            "remote_port": PORT_REMOTE,
-        }
-
         return render_template(
             "state.html",
+            navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            navigation=self.navigation,
-            stat=statistics,
+            hostname=HOSTNAME,
+            ip_addr=IP_ADDR,
+            sw_version=SW_VERSION,
+            py_version=PY_VERSION,
+            start_time=self.nl_instance.start_time,
+            state_changes=self.nl_instance.total_state_changes,
+            num_remotes=len(self.nl_instance.remotes),
+            port_backend=PORT_BACKEND,
+            port_remote=PORT_REMOTE,
             current_state=self.nl_instance.get_state(),
         )
 
@@ -112,9 +116,9 @@ class Frontend:
 
         return render_template(
             "remotes.html",
+            navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            navigation=self.navigation,
             client_ip=request.remote_addr,
             remotes=list(enumerate(self.nl_instance.remotes)),
         )
@@ -127,9 +131,9 @@ class Frontend:
         filter_level: int = LOG_MAPPING.get(filter_name, 0)
         return render_template(
             "events.html",
+            navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            navigation=self.navigation,
             events=MemoryLogBuffer.get_entries(filter_level),
             filter=filter_level,
             filter_name=filter_name,

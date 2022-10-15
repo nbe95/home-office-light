@@ -60,26 +60,42 @@
             <div class="col">
                 <h3>System State</h3>
 
-                <div class="row">
-                    <div class="col"><strong>Running since:</strong></div>
-                    <div class="col">{{ stat["start_time"].astimezone() }}</div>
-                </div>
-                <div class="row">
-                    <div class="col"><strong>Total state changes:</strong></div>
-                    <div class="col">{{ stat["state_changes"] }}</div>
-                </div>
-                <div class="row">
-                    <div class="col"><strong>Attached remotes:</strong></div>
-                    <div class="col">{{ stat["num_remotes"] }}</div>
-                </div>
-                <div class="row">
-                    <div class="col"><strong>TCP listen port:</strong></div>
-                    <div class="col">{{ stat["listen_port"] }}</div>
-                </div>
-                <div class="row">
-                    <div class="col"><strong>TCP remote port:</strong></div>
-                    <div class="col">{{ stat["remote_port"] }}</div>
-                </div>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Hostname, IP:</td>
+                            <td>{{ hostname }} ({{ ip_addr }})</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Software version:</td>
+                            <td>{{ sw_version }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Python version:</td>
+                            <td>{{ py_version }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Running since:</td>
+                            <td>{{ start_time.astimezone() }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Total state changes:</td>
+                            <td>{{ state_changes }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Attached remotes:</td>
+                            <td>{{ num_remotes }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">TCP listen port:</td>
+                            <td>{{ port_backend }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">TCP remote port:</td>
+                            <td>{{ port_remote }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
         </div>

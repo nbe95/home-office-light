@@ -2,13 +2,20 @@
 
 """Python module to configure various constants."""
 
-
 import logging
+import sys
 from datetime import timedelta as td
 from os import environ as env
+from socket import getfqdn, gethostbyname
 from typing import Dict, List
 
 # General
+HOSTNAME: str = getfqdn()
+IP_ADDR: str = gethostbyname(HOSTNAME)
+SW_VERSION: str = str(env["VERSION"])
+PY_VERSION: str = ".".join(list(map(str, sys.version_info[:3])))
+
+# Logging
 LOG_MAPPING: Dict[str, int] = {
     "DEBUG": logging.DEBUG,
     "INFO": logging.INFO,

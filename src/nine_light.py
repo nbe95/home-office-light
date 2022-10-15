@@ -117,7 +117,7 @@ class NineLight:
         self.delete_remote(remote)
         self.remotes.append(remote)
 
-        logger.info("Remote with endpoint %s registered.", remote.ip_addr)
+        logger.info("%s registered.", remote)
 
     def delete_remote(self, remote: NineLightRemote) -> None:
         """Remove an existing remote from the registration list by IP."""
@@ -126,14 +126,17 @@ class NineLight:
         )
         self.remotes = new_list
 
-        logger.info("Remote with endpoint %s removed.", remote.ip_addr)
+        logger.info("%s removed.", remote)
 
     def update_remotes(self) -> None:
         """Remove expired remotes."""
-        logger.info("Auto-removing expired remote registrations.")
+        len_before: int = len(self.remotes)
         for remote in self.remotes:
             if remote.is_expired():
                 self.delete_remote(remote)
+
+        if len(self.remotes) != len_before:
+            logger.info("Auto-removed expired remote registrations.")
 
     def send_update_to_remotes(self) -> None:
         """Update registered remotes and send current state to all of them."""
@@ -142,9 +145,7 @@ class NineLight:
             remote.send_update(
                 self.get_state(), [r.ip_addr for r in self.remotes]
             )
-            logger.info(
-                "State update sent to remote with IP %s.", remote.ip_addr
-            )
+            logger.info("State update sent to %s.", remote)
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""
