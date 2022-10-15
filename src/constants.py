@@ -11,7 +11,9 @@ from typing import Dict, List
 
 # General
 SW_VERSION: str = str(env["VERSION"])
-PY_VERSION: str = str(sys.version)
+PY_VERSION: str = ".".join(list(map(str, sys.version_info[:3])))
+
+# Logging
 LOG_MAPPING: Dict[str, int] = {
     "DEBUG": logging.DEBUG,
     "INFO": logging.INFO,
