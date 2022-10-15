@@ -12,7 +12,7 @@ from typing import Dict, List
 # General
 HOSTNAME: str = getfqdn()
 IP_ADDR: str = gethostbyname(HOSTNAME)
-SW_VERSION: str = str(env["VERSION"])
+SW_VERSION: str = str(env["GIT_VERSION"])
 PY_VERSION: str = ".".join(list(map(str, sys.version_info[:3])))
 
 # Logging
