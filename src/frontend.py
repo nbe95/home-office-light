@@ -123,7 +123,7 @@ class Frontend:
         """Renders the events page of the web application."""
         filter_name: str = request.args.get("filter", "").upper()
         if filter_name not in LOG_MAPPING:
-            filter_name = "DEBUG"
+            filter_name = "INFO"
         filter_level: int = LOG_MAPPING.get(filter_name, 0)
         return render_template(
             "events.html",
