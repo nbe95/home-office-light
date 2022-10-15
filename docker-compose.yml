@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       - LOG_LEVEL=DEBUG
-      - VERSION=${VERSION-unknown}
+      - GIT_VERSION=${GIT_VERSION-unknown}
     ports:
       - 9000:9000
       - 9080:9080
