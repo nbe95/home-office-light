@@ -34,8 +34,8 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            self.nl_instance.add_or_update_remote(
-                NineLightRemote(str(request.remote_addr), PORT_REMOTE, True)
+            self.nl_instance.on_remote_request(
+                NineLightRemote(str(request.remote_addr), PORT_REMOTE)
             )
 
         new_state: Optional[str] = request.args.get("state")

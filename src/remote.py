@@ -23,6 +23,8 @@ class NineLightRemote:
         self.ip_addr: str = ip_addr
         self.port: int = port
         self.skip_once: bool = skip_once
+        self.tx_count: int = 0
+        self.rx_count: int = 0
         self.expiration: datetime
 
         logger.debug("%s initialized.", self)
@@ -78,6 +80,7 @@ class NineLightRemote:
             logger.error("Could not send status update to %s: %s", self, err)
         finally:
             sock.close()
+            self.tx_count += 1
 
     def set_expiration(self, expiration: Optional[datetime] = None) -> None:
         """Set the timestamp when this remote's registration will expire."""
