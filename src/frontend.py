@@ -140,7 +140,8 @@ class Frontend:
             title_nav=MAIN_TITLE_NAVBAR,
             log_mapping=LOG_MAPPING,
             log_buffer=MemoryLogBuffer,
-            filter_level=LOG_MAPPING[filter_name]
+            filter_name=filter_name,
+            filter_level=LOG_MAPPING[filter_name],
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

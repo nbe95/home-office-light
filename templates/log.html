@@ -8,9 +8,9 @@
 
         <div class="row">
             <div class="col">
-                Showing {{ num_entries_shown }}
-                of {{ num_entries_total }} {% if num_entries_total == 1 %}entry{% else %}entries{% endif %} total
-                (maximum: {{ num_entries_max }}).
+                Showing {{ log_buffer.get_num_of_entries(filter_level, True) }}
+                of {{ log_buffer.get_num_of_entries() }} {% if log_buffer.get_num_of_entries() == 1 %}entry{% else %}entries{% endif %} total
+                (maximum: {{ log_buffer.capacity }}).
             </div>
             <div class="col">
                 <div class="hstack gap-3 justify-content-end">
@@ -22,13 +22,13 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                             {% for name, level in log_mapping.items() %}
-                                <li class="d-flex align-items-center {% if level == filter_level *}bg-warning{% endif %}">
-                                    <a class="dropdown-item {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
-                                        {{ name }} ({{ num_entries["debug"] }})
+                                <li>
+                                    <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
+                                        {{ name[0]|upper }}{{ name[1:] }}
+                                        {% if log_buffer.get_num_of_entries(level) > 0 %}
+                                            <span class="badge bg-secondary border border-light me-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
+                                        {% endif %}
                                     </a>
-                                    {% if num_entries[name] > 0 %}
-                                        <span class="badge bg-secondary border border-light me-2 rounded-pill">{{ num_entries[name] }}</span>
-                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -48,7 +48,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for entry in entries %}
+                {% for entry in log_buffer.get_entries(filter_level) %}
                 <tr>
                     <th scope="row">{{ entry.number }}</th>
                     <td>{{ entry.time.astimezone() }}</td>
