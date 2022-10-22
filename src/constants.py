@@ -17,13 +17,13 @@ PY_VERSION: str = ".".join(list(map(str, sys.version_info[:3])))
 
 # Logging
 LOG_MAPPING: Dict[str, int] = {
-    "DEBUG": logging.DEBUG,
-    "INFO": logging.INFO,
-    "WARNING": logging.WARNING,
-    "ERROR": logging.ERROR,
-    "CRITICAL": logging.CRITICAL,
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "critical": logging.CRITICAL,
 }
-LOG_LEVEL: int = LOG_MAPPING.get(env["LOG_LEVEL"], logging.INFO)
+LOG_LEVEL: int = LOG_MAPPING.get(env["LOG_LEVEL"].lower(), logging.INFO)
 LOG_BUFFER_CAPACITY: int = 1000
 
 # Flask

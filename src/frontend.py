@@ -23,6 +23,7 @@ from constants import (
 from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # pylint: disable=E1101
 
@@ -123,14 +124,27 @@ class Frontend:
         """Renders the events page of the web application."""
         filter_name: str = request.args.get("filter", "").upper()
         if filter_name not in LOG_MAPPING:
-            filter_name = "INFO"
+            filter_name = "info"
         filter_level: int = LOG_MAPPING.get(filter_name, 0)
+
         return render_template(
             "events.html",
             navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            events=MemoryLogBuffer.get_entries(filter_level),
+            entries=MemoryLogBuffer.get_entries(filter_level),
+            num_entries={
+                "debug": MemoryLogBuffer.get_num_of_entries(DEBUG),
+                "info": MemoryLogBuffer.get_num_of_entries(INFO),
+                "warning": MemoryLogBuffer.get_num_of_entries(WARNING),
+                "error": MemoryLogBuffer.get_num_of_entries(ERROR),
+                "critical": MemoryLogBuffer.get_num_of_entries(CRITICAL),
+            },
+            num_entries_shown=MemoryLogBuffer.get_num_of_entries(
+                filter_level, True
+            ),
+            num_entries_total=MemoryLogBuffer.get_num_of_entries(),
+            num_entries_max=MemoryLogBuffer.capacity,
             filter=filter_level,
             filter_name=filter_name,
         )
