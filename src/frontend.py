@@ -34,7 +34,7 @@ class Frontend:
     navigation: Dict[str, List[str]] = {
         "State": ["/state", "/"],
         "Remotes": ["/remotes"],
-        "Events": ["/events"],
+        "Log": ["/log"],
     }
 
     def __init__(
@@ -61,9 +61,9 @@ class Frontend:
         def _route_remotes():
             return self.remotes()
 
-        @self.app.route("/events", methods=["GET"])
-        def _route_events():
-            return self.events()
+        @self.app.route("/log", methods=["GET"])
+        def _route_log():
+            return self.log()
 
     def state(self) -> str:
         """Renders the state page of the web application."""
@@ -120,15 +120,15 @@ class Frontend:
             remotes=list(enumerate(self.nl_instance.remotes)),
         )
 
-    def events(self) -> str:
-        """Renders the events page of the web application."""
-        filter_name: str = request.args.get("filter", "").upper()
+    def log(self) -> str:
+        """Renders the log page of the web application."""
+        filter_name: str = request.args.get("filter", "").lower()
         if filter_name not in LOG_MAPPING:
             filter_name = "info"
         filter_level: int = LOG_MAPPING.get(filter_name, 0)
 
         return render_template(
-            "events.html",
+            "log.html",
             navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,

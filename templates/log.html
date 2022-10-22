@@ -8,19 +8,24 @@
 
         <div class="row">
             <div class="col">
+                Showing {{ num_entries_shown }}
+                of {{ num_entries_total }} {% if num_entries_total == 1 %}entry{% else %}entries{% endif %} total
+                (maximum: {{ num_entries_max }}).
+            </div>
+            <div class="col">
                 <div class="hstack gap-3 justify-content-end">
                     <div>Filter log view:</div>
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            {{ filter_name }}
+                            {{ filter_name[0]|upper }}{{ filter_name[1:] }}
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">DEBUG</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">INFO (default)</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">WARNING</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">ERROR</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">CRITICAL</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">Debug ({{ num_entries["debug"] }})</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">Info ({{ num_entries["info"] }})</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">Warning ({{ num_entries["warning"] }})</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">Error ({{ num_entries["error"] }})</a></li>
+                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">Critical ({{ num_entries["critical"] }})</a></li>
                         </ul>
                     </div>
                 </div>
@@ -38,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for entry in events %}
+                {% for entry in entries %}
                 <tr>
                     <th scope="row">{{ entry.number }}</th>
                     <td>{{ entry.time.astimezone() }}</td>
