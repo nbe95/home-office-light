@@ -44,21 +44,17 @@
                 </div>
             {% endif %}
 
-            <div class="row">
-                <div class="col">
-                    <div class="hstack gap-3">
-                        <div class="col col-4">
-                            Update current remote registrations:
-                        </div>
-                        <input type="text" class="form-control" name="new-remote"
-                            value="" placeholder="{{ client_ip }}">
-                        <button type="submit" class="btn btn-success"
-                            name="add-remote">Add</button>
-                        <div class="vr"></div>
-                        <button type="submit" class="btn btn-warning"
-                            name="update-remotes" value="1">Clean&nbsp;up</button>
-                    </div>
+            <div class="hstack gap-3">
+                <div class="col col-4">
+                    Update current remote registrations:
                 </div>
+                <input type="text" class="form-control" name="new-remote"
+                    value="" placeholder="{{ client_ip }}">
+                <button type="submit" class="btn btn-success"
+                    name="add-remote">Add</button>
+                <div class="vr"></div>
+                <button type="submit" class="btn btn-warning"
+                    name="update-remotes" value="1">Clean&nbsp;up</button>
             </div>
 
         </form>

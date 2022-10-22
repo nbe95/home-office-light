@@ -3,37 +3,36 @@
 {% block title %}Events{% endblock %}
 
 {% block content %}
+    {% set filter_name = log_mapping[filter_level][0] %}
+    {% set filter_context = log_mapping[filter_level][1] %}
     <div class="container" role="main">
         <h1>Event Log</h1>
 
-        <div class="row">
-            <div class="col">
+        <div class="hstack gap-3 justify-content-end">
+            <div>
                 Showing {{ log_buffer.get_num_of_entries(filter_level, True) }}
                 of {{ log_buffer.get_num_of_entries() }} {% if log_buffer.get_num_of_entries() == 1 %}entry{% else %}entries{% endif %} total
                 (maximum: {{ log_buffer.capacity }}).
             </div>
-            <div class="col">
-                <div class="hstack gap-3 justify-content-end">
-                    <div>Filter log view:</div>
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            {{ filter_name[0]|upper }}{{ filter_name[1:] }}
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            {% for name, level in log_mapping.items() %}
-                                <li>
-                                    <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
-                                        {{ name[0]|upper }}{{ name[1:] }}
-                                        {% if log_buffer.get_num_of_entries(level) > 0 %}
-                                            <span class="badge bg-secondary border border-light me-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+            <div class="ms-auto">Filter log view:</div>
+            <div class="dropdown">
+                <button class="btn btn-{{ filter_context }} dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ filter_name[0]|upper }}{{ filter_name[1:] }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                    {% for level, properties in log_mapping.items() %}
+                        {% set name = properties[0] %}
+                        {% set context = properties[1] %}
+                        <li>
+                            <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
+                                {{ name[0]|upper }}{{ name[1:] }}
+                                {% if log_buffer.get_num_of_entries(level) > 0 %}
+                                    <span class="badge bg-{{ context }} border border-light me-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 
@@ -53,11 +52,15 @@
                     <th scope="row">{{ entry.number }}</th>
                     <td>{{ entry.time.astimezone() }}</td>
                     <td>
-                        {% if entry.level == 10 %}<span class="badge rounded-pill bg-secondary">DEBUG</span>{% endif %}
-                        {% if entry.level == 20 %}<span class="badge rounded-pill bg-primary">INFO</span>{% endif %}
-                        {% if entry.level == 30 %}<span class="badge rounded-pill bg-warning">WARNING</span>{% endif %}
-                        {% if entry.level == 40 %}<span class="badge rounded-pill bg-danger">ERROR</span>{% endif %}
-                        {% if entry.level == 50 %}<span class="badge rounded-pill bg-dark">CRITICAL</span>{% endif %}
+                        {% for level, properties in log_mapping.items() %}
+                            {% if entry.level == level %}
+                                {% set name = properties[0] %}
+                                {% set context = properties[1] %}
+                                <span class="badge rounded-pill bg-{{ context }}">
+                                    {{ name|upper }}
+                                </span>
+                            {% endif %}
+                        {% endfor %}
                     </td>
                     <td class="fw-bold">{{ entry.logger }}</td>
                     <td>

@@ -132,6 +132,10 @@ class Frontend:
             "info" if "filter" not in request.args
             else request.args["filter"].lower()
         )
+        filter_level: int = INFO
+        for level, properties in LOG_MAPPING.items():
+            if properties[0].lower() == filter_name.lower():
+                filter_level = level
 
         return render_template(
             "log.html",
@@ -140,8 +144,7 @@ class Frontend:
             title_nav=MAIN_TITLE_NAVBAR,
             log_mapping=LOG_MAPPING,
             log_buffer=MemoryLogBuffer,
-            filter_name=filter_name,
-            filter_level=LOG_MAPPING[filter_name],
+            filter_level=filter_level,
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
