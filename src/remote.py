@@ -23,8 +23,9 @@ class NineLightRemote:
         self.ip_addr: str = ip_addr
         self.port: int = port
         self.skip_once: bool = skip_once
-        self.tx_count: int = 0
         self.rx_count: int = 0
+        self.tx_count: int = 0
+        self.tx_errors: int = 0
         self.expiration: datetime
 
         logger.debug("%s initialized.", self)
@@ -78,6 +79,7 @@ class NineLightRemote:
             sock.sendall(http_request.encode("ascii"))
         except (timeout, ConnectionRefusedError) as err:
             logger.error("Could not send status update to %s: %s", self, err)
+            self.tx_errors += 1
         finally:
             sock.close()
             self.tx_count += 1

@@ -16,8 +16,9 @@
                         <th>IP endpoint</th>
                         <th>TCP remote port</th>
                         <th>Expiration time</th>
-                        <th>Telegrams received</th>
-                        <th>Telegrams sent</th>
+                        <th>Received telegrams</th>
+                        <th>Sent telegrams</th>
+                        <th>Failed transmissions</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -30,6 +31,7 @@
                         <td>{{ remote.expiration.astimezone() }}</td>
                         <td>{{ remote.rx_count }}</td>
                         <td>{{ remote.tx_count }}</td>
+                        <td class="{% if remote.tx_errors > 0 %}text-danger{%endif%}">{{ remote.tx_errors }}</td>
                         <td class="text-end">
                             <button type="submit" class="btn btn-danger" name="del-remote"
                                 value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>

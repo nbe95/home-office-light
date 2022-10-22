@@ -68,12 +68,19 @@
                             <td>{{ nl_instance.remotes|length }}</td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">TCP listen port:</td>
-                            <td>{{ port_backend }}</td>
+                            <td class="fw-bold">Remote telegrams:</td>
+                            <td>
+                                {{ nl_instance.remotes | sum(attribute='rx_count') }} received,
+                                {{ nl_instance.remotes | sum(attribute='tx_count') }} sent,
+                                {{ nl_instance.remotes | sum(attribute='tx_errors') }} failed
+                            </td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">TCP remote port:</td>
-                            <td>{{ port_remote }}</td>
+                            <td class="fw-bold">Remote TCP ports:</td>
+                            <td>
+                                RX: {{ port_backend }},
+                                TX: {{ port_remote }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
