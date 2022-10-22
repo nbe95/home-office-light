@@ -12,11 +12,11 @@
 
         <h1>System Overview</h1>
 
-        <div class="row">
+        <div class="row gap-4">
 
             <div class="col col-md-auto">
                 <h3>Live Preview</h3>
-                <div id="ninelight" class="{{ current_state }}">
+                <div id="ninelight" class="{{ nl_instance.get_state() }}">
                     <div class="top">Video</div>
                     <div class="middle">
                         <a href="{{ request.path }}?button">&#x2B24;</a>
@@ -29,31 +29,12 @@
                 <h3>Current State</h3>
 
                 <div class="list-group">
-                    <a href="{{ request.path }}?new=none"
-                        class="list-group-item list-group-item-action {% if current_state == 'none' %}active {% endif %}">
-                        <i class="fa fa-ban"></i>&ensp;
-                        None
-                    </a>
-                    <a href="{{ request.path }}?new=call"
-                        class="list-group-item list-group-item-action {% if current_state == 'call' %}active {% endif %}">
-                        <i class="fa fa-phone"></i>&ensp;
-                        Call
-                    </a>
-                    <a href="{{ request.path }}?new=video"
-                        class="list-group-item list-group-item-action {% if current_state == 'video' %}active {% endif %}">
-                        <i class="fa fa-video-camera"></i>&ensp;
-                        Video
-                    </a>
-                    <a href="{{ request.path }}?new=request"
-                        class="list-group-item list-group-item-action {% if current_state == 'request' %}active {% endif %}{% if current_state != 'video' %}disabled {% endif %}">
-                        <i class="fa fa-bell"></i>&ensp;
-                        Request
-                    </a>
-                    <a href="{{ request.path }}?new=coffee"
-                        class="list-group-item list-group-item-action {% if current_state == 'coffee' %}active {% endif %}{% if current_state != 'none' %}disabled {% endif %}">
-                        <i class="fa fa-coffee"></i>&ensp;
-                        I need a coffee&hellip;
-                    </a>
+                    {% for name, text, icon, disabled in state_mapping %}
+                        <a href="{{ request.path }}?set={{ name }}"
+                            class="list-group-item list-group-item-action {% if nl_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
+                            <i class="fa {{ icon }}"></i>&ensp;{{ text }}
+                        </a>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -76,23 +57,30 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Running since:</td>
-                            <td>{{ start_time.astimezone() }}</td>
+                            <td>{{ nl_instance.start_time.astimezone() }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Total state changes:</td>
-                            <td>{{ state_changes }}</td>
+                            <td>{{ nl_instance.total_state_changes }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Attached remotes:</td>
-                            <td>{{ num_remotes }}</td>
+                            <td>{{ nl_instance.remotes|length }}</td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">TCP listen port:</td>
-                            <td>{{ port_backend }}</td>
+                            <td class="fw-bold">Remote telegrams:</td>
+                            <td>
+                                {{ nl_instance.remotes | sum(attribute='rx_count') }} received,
+                                {{ nl_instance.remotes | sum(attribute='tx_count') }} sent,
+                                {{ nl_instance.remotes | sum(attribute='tx_errors') }} failed
+                            </td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">TCP remote port:</td>
-                            <td>{{ port_remote }}</td>
+                            <td class="fw-bold">Remote TCP ports:</td>
+                            <td>
+                                RX: {{ port_backend }},
+                                TX: {{ port_remote }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>

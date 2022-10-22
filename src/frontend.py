@@ -23,6 +23,8 @@ from constants import (
 from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from states import States
 
 # pylint: disable=E1101
 
@@ -33,7 +35,7 @@ class Frontend:
     navigation: Dict[str, List[str]] = {
         "State": ["/state", "/"],
         "Remotes": ["/remotes"],
-        "Events": ["/events"],
+        "Log": ["/log"],
     }
 
     def __init__(
@@ -60,14 +62,14 @@ class Frontend:
         def _route_remotes():
             return self.remotes()
 
-        @self.app.route("/events", methods=["GET"])
-        def _route_events():
-            return self.events()
+        @self.app.route("/log", methods=["GET"])
+        def _route_log():
+            return self.log()
 
     def state(self) -> str:
         """Renders the state page of the web application."""
-        if "new" in request.args:
-            self.nl_instance.set_state(request.args["new"])
+        if "set" in request.args:
+            self.nl_instance.set_state(request.args["set"])
 
         if "button" in request.args:
             self.nl_instance.on_bell_button()
@@ -81,12 +83,17 @@ class Frontend:
             ip_addr=IP_ADDR,
             sw_version=SW_VERSION,
             py_version=PY_VERSION,
-            start_time=self.nl_instance.start_time,
-            state_changes=self.nl_instance.total_state_changes,
-            num_remotes=len(self.nl_instance.remotes),
+            nl_instance=self.nl_instance,
             port_backend=PORT_BACKEND,
             port_remote=PORT_REMOTE,
-            current_state=self.nl_instance.get_state(),
+            state_mapping=(
+                # name, text, icon, disabled
+                ("none", "None", "fa-ban", False),
+                ("call", "Call", "fa-phone", False),
+                ("video", "Video", "fa-camera", False),
+                ("request", "Request", "fa-bell", self.nl_instance.state != States.VIDEO),
+                ("coffee", "I need a coffee…", "fa-coffee", self.nl_instance.state != States.NONE),
+            )
         )
 
     def remotes(self) -> str:
@@ -119,20 +126,25 @@ class Frontend:
             remotes=list(enumerate(self.nl_instance.remotes)),
         )
 
-    def events(self) -> str:
-        """Renders the events page of the web application."""
-        filter_name: str = request.args.get("filter", "").upper()
-        if filter_name not in LOG_MAPPING:
-            filter_name = "INFO"
-        filter_level: int = LOG_MAPPING.get(filter_name, 0)
+    def log(self) -> str:
+        """Renders the log page of the web application."""
+        filter_name: str = (
+            "info" if "filter" not in request.args
+            else request.args["filter"].lower()
+        )
+        filter_level: int = INFO
+        for level, properties in LOG_MAPPING.items():
+            if properties[0].lower() == filter_name.lower():
+                filter_level = level
+
         return render_template(
-            "events.html",
+            "log.html",
             navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            events=MemoryLogBuffer.get_entries(filter_level),
-            filter=filter_level,
-            filter_name=filter_name,
+            log_mapping=LOG_MAPPING,
+            log_buffer=MemoryLogBuffer,
+            filter_level=filter_level,
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:

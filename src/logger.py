@@ -8,7 +8,7 @@ from datetime import datetime
 from logging import DEBUG, Formatter, Logger, LogRecord, StreamHandler
 from logging.handlers import BufferingHandler
 from sys import stdout
-from typing import List
+from typing import List, Optional
 
 from constants import LOG_BUFFER_CAPACITY, LOG_LEVEL
 
@@ -75,6 +75,23 @@ class MemoryLogBuffer(BufferingHandler):
             filter(lambda x: x.level >= min_level, MemoryLogBuffer.entries)
         )
         return list(reversed(entries))
+
+    @staticmethod
+    def get_num_of_entries(
+        level: Optional[int] = None, include_lower: bool = False
+    ) -> int:
+        """Fetch the number of all entries or, if set, all of them with a
+        specified level in the buffer."""
+        if level is None:
+            return len(MemoryLogBuffer.entries)
+        return sum(
+            (
+                entry.level >= level if include_lower
+                else entry.level == level
+            )
+            for entry in MemoryLogBuffer.entries
+        )
+
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:

@@ -16,14 +16,18 @@ SW_VERSION: str = str(env["GIT_VERSION"])
 PY_VERSION: str = ".".join(list(map(str, sys.version_info[:3])))
 
 # Logging
-LOG_MAPPING: Dict[str, int] = {
-    "DEBUG": logging.DEBUG,
-    "INFO": logging.INFO,
-    "WARNING": logging.WARNING,
-    "ERROR": logging.ERROR,
-    "CRITICAL": logging.CRITICAL,
+LOG_MAPPING: Dict[int, tuple[str, str]] = {
+    # log level, name, bootstrap context
+    logging.DEBUG: ("Debug", "secondary"),
+    logging.INFO: ("Info", "primary"),
+    logging.WARNING: ("Warning", "warning"),
+    logging.ERROR: ("Error", "danger"),
+    logging.CRITICAL: ("Critical", "dark"),
 }
-LOG_LEVEL: int = LOG_MAPPING.get(env["LOG_LEVEL"], logging.INFO)
+LOG_LEVEL: int = logging.INFO
+for level, properties in LOG_MAPPING.items():
+    if properties[0].lower() == env["LOG_LEVEL"].lower():
+        LOG_LEVEL = level
 LOG_BUFFER_CAPACITY: int = 1000
 
 # Flask
