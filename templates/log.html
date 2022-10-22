@@ -21,11 +21,16 @@
                             {{ filter_name[0]|upper }}{{ filter_name[1:] }}
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=debug">Debug ({{ num_entries["debug"] }})</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=info">Info ({{ num_entries["info"] }})</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=warning">Warning ({{ num_entries["warning"] }})</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=error">Error ({{ num_entries["error"] }})</a></li>
-                            <li><a class="dropdown-item" href="{{ request.path }}?filter=critical">Critical ({{ num_entries["critical"] }})</a></li>
+                            {% for name, level in log_mapping.items() %}
+                                <li class="d-flex align-items-center {% if level == filter_level *}bg-warning{% endif %}">
+                                    <a class="dropdown-item {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
+                                        {{ name }} ({{ num_entries["debug"] }})
+                                    </a>
+                                    {% if num_entries[name] > 0 %}
+                                        <span class="badge bg-secondary border border-light me-2 rounded-pill">{{ num_entries[name] }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>

@@ -24,6 +24,7 @@ from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from states import States
 
 # pylint: disable=E1101
 
@@ -67,8 +68,8 @@ class Frontend:
 
     def state(self) -> str:
         """Renders the state page of the web application."""
-        if "new" in request.args:
-            self.nl_instance.set_state(request.args["new"])
+        if "set" in request.args:
+            self.nl_instance.set_state(request.args["set"])
 
         if "button" in request.args:
             self.nl_instance.on_bell_button()
@@ -82,12 +83,17 @@ class Frontend:
             ip_addr=IP_ADDR,
             sw_version=SW_VERSION,
             py_version=PY_VERSION,
-            start_time=self.nl_instance.start_time,
-            state_changes=self.nl_instance.total_state_changes,
-            num_remotes=len(self.nl_instance.remotes),
+            nl_instance=self.nl_instance,
             port_backend=PORT_BACKEND,
             port_remote=PORT_REMOTE,
-            current_state=self.nl_instance.get_state(),
+            state_mapping=(
+                # name, text, icon, disabled
+                ("none", "None", "fa-ban", False),
+                ("call", "Call", "fa-phone", False),
+                ("video", "Video", "fa-camera", False),
+                ("request", "Request", "fa-bell", self.nl_instance.state != States.VIDEO),
+                ("coffee", "I need a coffee…", "fa-coffee", self.nl_instance.state != States.NONE),
+            )
         )
 
     def remotes(self) -> str:
@@ -122,31 +128,19 @@ class Frontend:
 
     def log(self) -> str:
         """Renders the log page of the web application."""
-        filter_name: str = request.args.get("filter", "").lower()
-        if filter_name not in LOG_MAPPING:
-            filter_name = "info"
-        filter_level: int = LOG_MAPPING.get(filter_name, 0)
+        filter_name: str = (
+            "info" if "filter" not in request.args
+            else request.args["filter"].lower()
+        )
 
         return render_template(
             "log.html",
             navigation=self.navigation,
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
-            entries=MemoryLogBuffer.get_entries(filter_level),
-            num_entries={
-                "debug": MemoryLogBuffer.get_num_of_entries(DEBUG),
-                "info": MemoryLogBuffer.get_num_of_entries(INFO),
-                "warning": MemoryLogBuffer.get_num_of_entries(WARNING),
-                "error": MemoryLogBuffer.get_num_of_entries(ERROR),
-                "critical": MemoryLogBuffer.get_num_of_entries(CRITICAL),
-            },
-            num_entries_shown=MemoryLogBuffer.get_num_of_entries(
-                filter_level, True
-            ),
-            num_entries_total=MemoryLogBuffer.get_num_of_entries(),
-            num_entries_max=MemoryLogBuffer.capacity,
-            filter=filter_level,
-            filter_name=filter_name,
+            log_mapping=LOG_MAPPING,
+            log_buffer=MemoryLogBuffer,
+            filter_level=LOG_MAPPING[filter_name]
         )
 
     def run(self, port, host: str = "0.0.0.0") -> None:
