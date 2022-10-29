@@ -19,8 +19,13 @@
                 <table class="table table-sm">
                     <tbody>
                         <tr>
-                            <td class="fw-bold">Hostname, IP:</td>
-                            <td>{{ hostname }} ({{ ip_addr }})</td>
+                            <td class="fw-bold">Container name, IP:</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ hostname }}</div>
+                                    <div>({{ ip_addr }})</div>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Software version:</td>
