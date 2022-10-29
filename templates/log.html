@@ -50,7 +50,7 @@
                 {% for entry in log_buffer.get_entries(filter_level) %}
                 <tr class="{% if entry.is_new %}table-primary{% endif %}">
                     <th scope="row">{{ entry.number }}</th>
-                    <td>{{ entry.time.astimezone() }}</td>
+                    <td>{{ entry.time.isoformat(sep=' ', timespec='milliseconds') }}</td>
                     <td>
                         {% for level, properties in log_mapping.items() %}
                             {% if entry.level == level %}

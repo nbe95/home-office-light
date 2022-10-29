@@ -37,7 +37,7 @@
                                 {{ remote.last_contact|humanize_naturaltime() }}
                                 <span class="small text-muted">
                                     &ensp;
-                                    ({{ remote.last_contact.strftime("%Y-%m-%d %H:%M:%S") }})
+                                    ({{ remote.last_contact.strftime("%F %T") }})
                                 </span>
                             {% else %}
                                 unknown

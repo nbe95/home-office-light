@@ -85,7 +85,7 @@ class NineLightRemote:
             logger.info("State update sent to %s.", self)
 
         except (timeout, ConnectionRefusedError) as err:
-            logger.error("Could not send status update to %s: %s", self, err)
+            logger.error("Could not send status update to %s (%s).", self, err)
             self.tx_errors += 1
 
         finally:
