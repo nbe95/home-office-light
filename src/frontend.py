@@ -66,12 +66,16 @@ class Frontend:
             return self.log()
 
     def generate_navigation(
-        self
+        self,
     ) -> Dict[str, Tuple[List[str], Optional[Tuple[str, int]]]]:
         """Generate a dict containing all navigation items and badges."""
 
-        num_warnings: int = MemoryLogBuffer.get_num_of_entries(WARNING)
-        num_errors_critical: int = MemoryLogBuffer.get_num_of_entries(ERROR) + MemoryLogBuffer.get_num_of_entries(CRITICAL)
+        num_warnings: int = MemoryLogBuffer.get_num_of_entries(
+            WARNING, only_new=True
+        )
+        num_errors_critical: int = MemoryLogBuffer.get_num_of_entries(
+            ERROR, only_new=True
+        ) + MemoryLogBuffer.get_num_of_entries(CRITICAL, only_new=True)
         log_badge: Optional[Tuple[str, int]] = None
         if num_errors_critical > 0:
             log_badge = ("danger", num_errors_critical)
@@ -80,18 +84,12 @@ class Frontend:
 
         # link text, (URLs), (badge context, number)
         return {
-            "State": (
-                ["/state", "/"],
-                None
-            ),
+            "State": (["/state", "/"], None),
             "Remotes": (
                 ["/remotes"],
-                ("secondary", len(self.nl_instance.remotes))
+                ("secondary", len(self.nl_instance.remotes)),
             ),
-            "Log": (
-                ["/log"],
-                log_badge
-            ),
+            "Log": (["/log"], log_badge),
         }
 
     def state(self) -> str:
