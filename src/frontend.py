@@ -5,7 +5,7 @@
 from datetime import datetime
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
 from os.path import abspath
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from uuid import uuid4
 
 from flask import Flask, render_template, request
@@ -32,12 +32,6 @@ from states import States
 
 class Frontend:
     """Container for the frontend flask application."""
-
-    navigation: Dict[str, List[str]] = {
-        "State": ["/state", "/"],
-        "Remotes": ["/remotes"],
-        "Log": ["/log"],
-    }
 
     def __init__(
         self, nl_instance: NineLight, template_folder: str, static_folder: str
@@ -71,6 +65,35 @@ class Frontend:
         def _route_log():
             return self.log()
 
+    def generate_navigation(
+        self
+    ) -> Dict[str, Tuple[List[str], Optional[Tuple[str, int]]]]:
+        """Generate a dict containing all navigation items and badges."""
+
+        num_warnings: int = MemoryLogBuffer.get_num_of_entries(WARNING)
+        num_errors_critical: int = MemoryLogBuffer.get_num_of_entries(ERROR) + MemoryLogBuffer.get_num_of_entries(CRITICAL)
+        log_badge: Optional[Tuple[str, int]] = None
+        if num_errors_critical > 0:
+            log_badge = ("danger", num_errors_critical)
+        elif num_warnings > 0:
+            log_badge = ("warning", num_warnings)
+
+        # link text, (URLs), (badge context, number)
+        return {
+            "State": (
+                ["/state", "/"],
+                None
+            ),
+            "Remotes": (
+                ["/remotes"],
+                ("secondary", len(self.nl_instance.remotes))
+            ),
+            "Log": (
+                ["/log"],
+                log_badge
+            ),
+        }
+
     def state(self) -> str:
         """Renders the state page of the web application."""
         if "set" in request.args:
@@ -81,7 +104,7 @@ class Frontend:
 
         return render_template(
             "state.html",
-            navigation=self.navigation,
+            navigation=self.generate_navigation(),
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             hostname=HOSTNAME,
@@ -145,7 +168,7 @@ class Frontend:
 
         return render_template(
             "remotes.html",
-            navigation=self.navigation,
+            navigation=self.generate_navigation(),
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             client_ip=request.remote_addr,
@@ -167,7 +190,7 @@ class Frontend:
 
         return render_template(
             "log.html",
-            navigation=self.navigation,
+            navigation=self.generate_navigation(),
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             log_mapping=LOG_MAPPING,
