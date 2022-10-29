@@ -13,31 +13,6 @@
         <h1>System Overview</h1>
 
         <div class="row gap-4">
-
-            <div class="col col-md-auto">
-                <h3>Live Preview</h3>
-                <div id="ninelight" class="{{ nl_instance.get_state() }}">
-                    <div class="top">Video</div>
-                    <div class="middle">
-                        <a href="{{ request.path }}?button">&#x2B24;</a>
-                    </div>
-                    <div class="bottom">Anruf</div>
-                </div>
-            </div>
-
-            <div class="col">
-                <h3>Current State</h3>
-
-                <div class="list-group">
-                    {% for name, text, icon, disabled in state_mapping %}
-                        <a href="{{ request.path }}?set={{ name }}"
-                            class="list-group-item list-group-item-action {% if nl_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
-                            <i class="fa {{ icon }}"></i>&ensp;{{ text }}
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-
             <div class="col">
                 <h3>System State</h3>
 
@@ -99,8 +74,34 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
 
+            </div>
+            <div class="col col-md-auto">
+
+                <div class="card">
+                    <div class="card-header fw-bold">
+                        State and preview
+                    </div>
+                    <div class="card-body">
+                        <div id="ninelight" class="{{ nl_instance.get_state() }} my-3 mx-5">
+                            <div class="top">Video</div>
+                            <div class="middle">
+                                <a href="{{ request.path }}?button">&#x2B24;</a>
+                            </div>
+                            <div class="bottom">Anruf</div>
+                        </div>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for name, text, icon, disabled in state_mapping %}
+                            <a href="{{ request.path }}?set={{ name }}"
+                                class="list-group-item list-group-item-action {% if nl_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
+                                <i class="fa {{ icon }}"></i>&ensp;{{ text }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 {% endblock %}
