@@ -13,9 +13,8 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>IP endpoint</th>
-                        <th>TCP remote port</th>
-                        <th>Expiration time</th>
+                        <th>TCP/IP endpoint</th>
+                        <th>Last contact</th>
                         <th>Received telegrams</th>
                         <th>Sent telegrams</th>
                         <th>Failed transmissions</th>
@@ -25,14 +24,43 @@
                 <tbody>
                     {% for no, remote in remotes %}
                     <tr>
-                        <th scope="row">{{ no + 1 }}</th>
-                        <td>{{ remote.ip_addr }}</td>
-                        <td>{{ remote.port }}</td>
-                        <td>{{ remote.expiration.astimezone() }}</td>
-                        <td>{{ remote.rx_count }}</td>
-                        <td>{{ remote.tx_count }}</td>
-                        <td class="{% if remote.tx_errors > 0 %}text-danger{%endif%}">{{ remote.tx_errors }}</td>
+                        <th class="{% if not remote.is_active() %}text-muted{% endif %}" scope="row">
+                            {{ no + 1 }}
+                        </th>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.ip_addr }}:{{ remote.port }}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {% if remote.last_contact is not none %}
+                                {{ remote.last_contact|humanize_naturaltime() }}
+                                <span class="small text-muted">
+                                    &ensp;
+                                    ({{ remote.last_contact.strftime("%Y-%m-%d %H:%M:%S") }})
+                                </span>
+                            {% else %}
+                                unknown
+                            {% endif %}
+                            {% if not remote.is_active() %}
+                                <span class="badge rounded-pill bg-secondary">inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.rx_count }}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.tx_count }}
+                        </td>
+                        <td class="{% if remote.tx_errors > 0 %}fw-bold text-danger{% elif not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.tx_errors }}
+                        </td>
                         <td class="text-end">
+                            {% if remote.is_active() %}
+                                <button type="submit" class="btn btn-warning" name="deact-remote"
+                                    value="{{ remote.ip_addr }}:{{ remote.port }}">Deactivate</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-success" name="act-remote"
+                                    value="{{ remote.ip_addr }}:{{ remote.port }}">Activate</button>
+                            {% endif %}
                             <button type="submit" class="btn btn-danger" name="del-remote"
                                 value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>
                         </td>
@@ -46,18 +74,18 @@
                 </div>
             {% endif %}
 
-            <div class="hstack gap-3">
-                <div class="col col-4">
-                    Update current remote registrations:
+            <div class="hstack gap-3 justify-content-end">
+                <div class="col col-4 text-end">
+                    Add new remote:
                 </div>
-                <input type="text" class="form-control" name="new-remote"
-                    value="" placeholder="{{ client_ip }}">
+                <div class="form-outline w-25">
+                    <input type="text" class="form-control" name="new-remote"
+                        value="" placeholder="{{ client_ip }}:[{{ port_remote }}]">
+                </div>
                 <button type="submit" class="btn btn-success"
                     name="add-remote">Add</button>
-                <div class="vr"></div>
-                <button type="submit" class="btn btn-warning"
-                    name="update-remotes" value="1">Clean&nbsp;up</button>
             </div>
+        </div>
 
         </form>
     </div>

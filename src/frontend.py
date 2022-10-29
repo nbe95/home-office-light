@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
-from humanize import naturaldelta
 
 from constants import (
     HOSTNAME,
@@ -50,6 +49,10 @@ class Frontend:
             static_folder=abspath(static_folder),
         )
         self.app.secret_key = uuid4().hex
+        self.app.jinja_options["extensions"] = [
+            "jinja2_humanize_extension.HumanizeExtension"
+        ]
+
         self.bootstrap: Bootstrap5 = Bootstrap5(self.app)
 
         @self.app.route("/", methods=["GET"])
@@ -82,10 +85,6 @@ class Frontend:
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             hostname=HOSTNAME,
-            start_time=self.nl_instance.start_time,
-            start_time_str=naturaldelta(
-                datetime.now() - self.nl_instance.start_time
-            ),
             ip_addr=IP_ADDR,
             sw_version=SW_VERSION,
             py_version=PY_VERSION,
@@ -130,8 +129,19 @@ class Frontend:
                 if remote:
                     self.nl_instance.delete_remote(remote)
 
-            if "update-remotes" in request.form:
-                self.nl_instance.remove_expired_remotes()
+            if "act-remote" in request.form:
+                remote = NineLightRemote.parse_from_str(
+                    request.form["act-remote"]
+                )
+                if remote:
+                    self.nl_instance.activate_remote(remote)
+
+            if "deact-remote" in request.form:
+                remote = NineLightRemote.parse_from_str(
+                    request.form["deact-remote"]
+                )
+                if remote:
+                    self.nl_instance.deactivate_remote(remote)
 
         return render_template(
             "remotes.html",
@@ -139,6 +149,7 @@ class Frontend:
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             client_ip=request.remote_addr,
+            port_remote=PORT_REMOTE,
             remotes=list(enumerate(self.nl_instance.remotes)),
         )
 

@@ -56,11 +56,12 @@
                             <td>{{ py_version }}</td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">Running since:</td>
+                            <td class="fw-bold">Start-up time:</td>
                             <td>
-                                {{ start_time_str }}&ensp;
+                                {{ nl_instance.start_time|humanize_naturaltime() }}
                                 <span class="small text-muted">
-                                    ({{ start_time.strftime("%Y-%m-%d %H:%M") }})
+                                    &ensp;
+                                    ({{ nl_instance.start_time.strftime("%Y-%m-%d %H:%M:%S") }})
                                 </span>
                             </td>
                         </tr>
