@@ -57,7 +57,12 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Running since:</td>
-                            <td>{{ nl_instance.start_time.astimezone() }}</td>
+                            <td>
+                                {{ start_time_str }}&ensp;
+                                <span class="small text-muted">
+                                    ({{ start_time.strftime("%Y-%m-%d %H:%M") }})
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Total state changes:</td>

@@ -1,5 +1,6 @@
-flask
 bootstrap-flask
+flask
+humanize
 requests
 transitions
 RPi.GPIO

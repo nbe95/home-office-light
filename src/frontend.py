@@ -2,12 +2,15 @@
 
 """9light frontend python module."""
 
+from datetime import datetime
+from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
 from os.path import abspath
 from typing import Dict, List, Optional
 from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap5
+from humanize import naturaldelta
 
 from constants import (
     HOSTNAME,
@@ -23,7 +26,6 @@ from constants import (
 from logger import MemoryLogBuffer
 from nine_light import NineLight
 from remote import NineLightRemote
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 from states import States
 
 # pylint: disable=E1101
@@ -80,6 +82,10 @@ class Frontend:
             title=MAIN_TITLE,
             title_nav=MAIN_TITLE_NAVBAR,
             hostname=HOSTNAME,
+            start_time=self.nl_instance.start_time,
+            start_time_str=naturaldelta(
+                datetime.now() - self.nl_instance.start_time
+            ),
             ip_addr=IP_ADDR,
             sw_version=SW_VERSION,
             py_version=PY_VERSION,
@@ -91,9 +97,19 @@ class Frontend:
                 ("none", "None", "fa-ban", False),
                 ("call", "Call", "fa-phone", False),
                 ("video", "Video", "fa-camera", False),
-                ("request", "Request", "fa-bell", self.nl_instance.state != States.VIDEO),
-                ("coffee", "I need a coffee…", "fa-coffee", self.nl_instance.state != States.NONE),
-            )
+                (
+                    "request",
+                    "Request",
+                    "fa-bell",
+                    self.nl_instance.state != States.VIDEO,
+                ),
+                (
+                    "coffee",
+                    "I need a coffee…",
+                    "fa-coffee",
+                    self.nl_instance.state != States.NONE,
+                ),
+            ),
         )
 
     def remotes(self) -> str:
@@ -129,7 +145,8 @@ class Frontend:
     def log(self) -> str:
         """Renders the log page of the web application."""
         filter_name: str = (
-            "info" if "filter" not in request.args
+            "info"
+            if "filter" not in request.args
             else request.args["filter"].lower()
         )
         filter_level: int = INFO

@@ -85,13 +85,9 @@ class MemoryLogBuffer(BufferingHandler):
         if level is None:
             return len(MemoryLogBuffer.entries)
         return sum(
-            (
-                entry.level >= level if include_lower
-                else entry.level == level
-            )
+            (entry.level >= level if include_lower else entry.level == level)
             for entry in MemoryLogBuffer.entries
         )
-
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:
