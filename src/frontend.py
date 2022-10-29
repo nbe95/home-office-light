@@ -87,7 +87,13 @@ class Frontend:
             "State": (["/state", "/"], None),
             "Remotes": (
                 ["/remotes"],
-                ("secondary", len(self.nl_instance.remotes)),
+                (
+                    "secondary",
+                    len(list(filter(
+                        lambda x: x.is_active(),
+                        self.nl_instance.remotes,
+                    ))),
+                ),
             ),
             "Log": (["/log"], log_badge),
         }
@@ -112,6 +118,14 @@ class Frontend:
             nl_instance=self.nl_instance,
             port_backend=PORT_BACKEND,
             port_remote=PORT_REMOTE,
+            num_remotes_active=len(list(filter(
+                lambda x: x.is_active(),
+                self.nl_instance.remotes
+            ))),
+            num_remotes_inactive=len(list(filter(
+                lambda x: not x.is_active(),
+                self.nl_instance.remotes
+            ))),
             state_mapping=(
                 # name, text, icon, disabled
                 ("none", "None", "fa-ban", False),

@@ -37,11 +37,15 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            remote: NineLightRemote = NineLightRemote(str(request.remote_addr), PORT_REMOTE)
+            remote: NineLightRemote = NineLightRemote(
+                str(request.remote_addr), PORT_REMOTE
+            )
             logger.debug("Incoming HTTP request from %s.", remote)
             self.nl_instance.on_remote_request(remote, True)
         else:
-            logger.debug("Incoming HTTP request from IP %s.", request.remote_addr)
+            logger.debug(
+                "Incoming HTTP request from IP %s.", request.remote_addr
+            )
 
         new_state: Optional[str] = request.args.get("state")
         if new_state:
