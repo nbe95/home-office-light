@@ -6,9 +6,18 @@
         </a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
-                {% for text, urls in navigation.items() %}
+                {% for text, data in navigation.items() %}
+                    {% set urls = data[0] %}
+                    {% set badge = data[1] %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path in urls %}active {% endif %}" href="{{ urls[0] }}">{{ text }}</a>
+                        <a class="nav-link {% if request.path in urls %}active {% endif %}" href="{{ urls[0] }}">
+                            {{ text }}
+                            {% if badge %}
+                                {% set context = badge[0] %}
+                                {% set number = badge[1] %}
+                                <span class="badge rounded-pill bg-{{ context }}">{{ number }}</span>
+                            {% endif %}
+                        </a>
                     </li>
                 {% endfor %}
             </ul>

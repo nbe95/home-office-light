@@ -27,7 +27,7 @@
                             <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
                                 {{ name[0]|upper }}{{ name[1:] }}
                                 {% if log_buffer.get_num_of_entries(level) > 0 %}
-                                    <span class="badge bg-{{ context }} border border-light me-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
+                                    <span class="badge bg-{{ context }} border border-light mx-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
                                 {% endif %}
                             </a>
                         </li>
@@ -48,7 +48,7 @@
             </thead>
             <tbody>
                 {% for entry in log_buffer.get_entries(filter_level) %}
-                <tr>
+                <tr class="{% if entry.is_new %}table-primary{% endif %}">
                     <th scope="row">{{ entry.number }}</th>
                     <td>{{ entry.time.astimezone() }}</td>
                     <td>

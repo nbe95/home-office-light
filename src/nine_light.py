@@ -124,15 +124,20 @@ class NineLight:
             if incr_tx:
                 self.remotes[index].tx_count += 1
 
+    def get_remote(self, remote: NineLightRemote) -> Optional[NineLightRemote]:
+        """Fetch the actual remote object by passing a reference object with
+        matching IP and port."""
+        return next(filter(lambda x: x == remote, self.remotes), None)
+
     def add_or_update_remote(self, remote: NineLightRemote) -> None:
         """Add a new remote or update an existing one."""
-        if remote in self.remotes:
-            index: int = self.remotes.index(remote)
-            self.remotes[index].set_expiration()
-            logger.info("%s registration updated.", remote)
+        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        if act_remote:
+            act_remote.set_timestamp(datetime.now())
+            logger.info("%s registration updated.", act_remote)
 
         else:
-            remote.set_expiration()
+            remote.set_timestamp(datetime.now())
             self.remotes.append(remote)
             logger.info("%s registered.", remote)
 
@@ -142,26 +147,24 @@ class NineLight:
             self.remotes.remove(remote)
             logger.info("%s removed.", remote)
 
-    def remove_expired_remotes(self) -> None:
-        """Remove expired remotes."""
+    def activate_remote(self, remote: NineLightRemote) -> None:
+        """Activate an existing remote from the registration list."""
+        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        if act_remote:
+            act_remote.set_timestamp(datetime.now())
+            logger.info("%s activated.", remote)
 
-        expired: List[NineLightRemote] = list(
-            filter(lambda x: x.is_expired(), self.remotes)
-        )
-        if len(expired) > 0:
-            logger.info(
-                "Auto-removing %i expired remote registrations.", len(expired)
-            )
-
-        for remote in expired:
-            self.delete_remote(remote)
+    def deactivate_remote(self, remote: NineLightRemote) -> None:
+        """Deactivate an existing remote from the registration list."""
+        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        if act_remote:
+            act_remote.set_timestamp(None)
+            logger.info("%s deactivated.", remote)
 
     def send_update_to_remotes(self) -> None:
-        """Update registered remotes and send current state to all of them."""
-        self.remove_expired_remotes()
+        """Send the current state to all active remotes."""
         for remote in self.remotes:
             remote.send_update(self.get_state(), self.remotes)
-            logger.info("State update sent to %s.", remote)
 
     def on_bell_button(self) -> None:
         """Trigger correct action when someone pushed the button."""

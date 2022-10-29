@@ -3,6 +3,7 @@
 """Helper module for simple logger configuration."""
 
 import logging
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from logging import DEBUG, Formatter, Logger, LogRecord, StreamHandler
@@ -28,6 +29,7 @@ class MemoryLogBuffer(BufferingHandler):
         path: str
         line: int
         message: str
+        is_new: bool = True
 
     # Static list to hold messages from all loggers
     capacity: int = LOG_BUFFER_CAPACITY
@@ -74,24 +76,29 @@ class MemoryLogBuffer(BufferingHandler):
         entries: List[MemoryLogBuffer.LogEntry] = list(
             filter(lambda x: x.level >= min_level, MemoryLogBuffer.entries)
         )
-        return list(reversed(entries))
+        entries_copy = deepcopy(entries)
+
+        # After fetching them, mark every entry as seen in the original list
+        for entry in entries:
+            entry.is_new = False
+        return list(reversed(entries_copy))
 
     @staticmethod
     def get_num_of_entries(
-        level: Optional[int] = None, include_lower: bool = False
+        level: Optional[int] = None,
+        include_lower: bool = False,
+        only_new: bool = False,
     ) -> int:
         """Fetch the number of all entries or, if set, all of them with a
         specified level in the buffer."""
         if level is None:
             return len(MemoryLogBuffer.entries)
         return sum(
-            (
-                entry.level >= level if include_lower
-                else entry.level == level
+            (entry.level >= level if include_lower else entry.level == level)
+            for entry in filter(
+                lambda x: not only_new or x.is_new, MemoryLogBuffer.entries
             )
-            for entry in MemoryLogBuffer.entries
         )
-
 
 
 def get_logger(name: str, log_level: int = LOG_LEVEL) -> Logger:

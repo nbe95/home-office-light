@@ -17,6 +17,8 @@ logger = get_logger(__name__)
 class NineLightRemote:
     """Subclass for simple handling of 9light remotes."""
 
+    _SOCKET_TIMEOUT_SEC: int = 1
+
     def __init__(
         self, ip_addr: str, port: int = PORT_REMOTE, skip_once: bool = False
     ) -> None:
@@ -26,7 +28,7 @@ class NineLightRemote:
         self.rx_count: int = 0
         self.tx_count: int = 0
         self.tx_errors: int = 0
-        self.expiration: datetime
+        self.last_contact: Optional[datetime]
 
         logger.debug("%s initialized.", self)
 
@@ -52,8 +54,8 @@ class NineLightRemote:
     ) -> None:
         """Send a HTTP request to the remote including the current 9light
         state."""
-        # Skip if this very remote has triggered the state change
-        if self.skip_once:
+        # Skip if this remote has triggered the state change or is disabled
+        if self.skip_once or not self.is_active():
             logger.info("Skipping update for %s once.", self)
             self.skip_once = False
             return
@@ -73,29 +75,35 @@ class NineLightRemote:
             f"{payload}\n"
         )
         sock: socket = socket(AF_INET, SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(self._SOCKET_TIMEOUT_SEC)
         try:
             sock.connect((self.ip_addr, self.port))
             sock.sendall(http_request.encode("ascii"))
+            logger.info("State update sent to %s.", self)
+
         except (timeout, ConnectionRefusedError) as err:
             logger.error("Could not send status update to %s: %s", self, err)
             self.tx_errors += 1
+
         finally:
             sock.close()
             self.tx_count += 1
 
-    def set_expiration(self, expiration: Optional[datetime] = None) -> None:
-        """Set the timestamp when this remote's registration will expire."""
-        self.expiration = expiration or (datetime.now() + REMOTE_EXP_TIMEOUT)
+    def set_timestamp(self, last_contact: Optional[datetime]) -> None:
+        """Set the timestamp of this remote's last contact with us."""
+        self.last_contact = last_contact
+        logger.debug("Timestamp for %s set to %s.", self, self.last_contact)
 
-        logger.debug("Expiration for %s set to %s.", self, self.expiration)
+    def is_active(self) -> bool:
+        """Check if this remote's registration is expired."""
+        return (
+            False
+            if self.last_contact is None
+            else self.last_contact + REMOTE_EXP_TIMEOUT >= datetime.now()
+        )
 
-    def is_expired(self) -> bool:
-        """Check if this remote's registration is already expired."""
-        return self.expiration <= datetime.now()
-
-    def __repr__(self) -> str:
-        """Overload repr operator for serialized representation."""
+    def __str__(self) -> str:
+        """Overload str operator for a serialized representation."""
         return f"Remote({self.ip_addr})"
 
     def __eq__(self, other: object) -> bool:

@@ -56,8 +56,14 @@
                             <td>{{ py_version }}</td>
                         </tr>
                         <tr>
-                            <td class="fw-bold">Running since:</td>
-                            <td>{{ nl_instance.start_time.astimezone() }}</td>
+                            <td class="fw-bold">Start-up time:</td>
+                            <td>
+                                {{ nl_instance.start_time|humanize_naturaltime() }}
+                                <span class="small text-muted">
+                                    &ensp;
+                                    ({{ nl_instance.start_time.strftime("%Y-%m-%d %H:%M:%S") }})
+                                </span>
+                            </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Total state changes:</td>
@@ -78,8 +84,8 @@
                         <tr>
                             <td class="fw-bold">Remote TCP ports:</td>
                             <td>
-                                RX: {{ port_backend }},
-                                TX: {{ port_remote }}
+                                {{ port_backend }} (RX),
+                                {{ port_remote }} (TX)
                             </td>
                         </tr>
                     </tbody>
