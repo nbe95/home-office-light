@@ -1,7 +1,7 @@
 bootstrap-flask
 flask
-humanize
+jinja2_humanize_extension
 requests
-transitions
 RPi.GPIO
 rpi_ws281x
+transitions
