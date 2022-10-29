@@ -16,7 +16,8 @@
             </div>
             <div class="ms-auto">Filter log view:</div>
             <div class="dropdown">
-                <button class="btn btn-{{ filter_context }} dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-{{ filter_context }} dropdown-toggle" type="button"
+                    id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ filter_name[0]|upper }}{{ filter_name[1:] }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
@@ -24,10 +25,13 @@
                         {% set name = properties[0] %}
                         {% set context = properties[1] %}
                         <li>
-                            <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}" href="{{ request.path }}?filter={{ name }}">
+                            <a class="dropdown-item justify-content-between d-flex align-items-center {% if level == filter_level %}active{% endif %}"
+                                href="{{ request.path }}?filter={{ name|lower }}">
                                 {{ name[0]|upper }}{{ name[1:] }}
                                 {% if log_buffer.get_num_of_entries(level) > 0 %}
-                                    <span class="badge bg-{{ context }} border border-light mx-2 rounded-pill">{{ log_buffer.get_num_of_entries(level) }}</span>
+                                    <span class="badge bg-{{ context }} border border-light mx-2 rounded-pill">
+                                        {{ log_buffer.get_num_of_entries(level) }}
+                                    </span>
                                 {% endif %}
                             </a>
                         </li>

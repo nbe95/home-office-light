@@ -143,26 +143,26 @@ class Frontend:
                 if remote:
                     self.nl_instance.add_or_update_remote(remote)
 
-            if "del-remote" in request.form:
-                remote = NineLightRemote.parse_from_str(
-                    request.form["del-remote"]
-                )
-                if remote:
-                    self.nl_instance.delete_remote(remote)
-
-            if "act-remote" in request.form:
+            elif "act-remote" in request.form:
                 remote = NineLightRemote.parse_from_str(
                     request.form["act-remote"]
                 )
                 if remote:
                     self.nl_instance.activate_remote(remote)
 
-            if "deact-remote" in request.form:
+            elif "deact-remote" in request.form:
                 remote = NineLightRemote.parse_from_str(
                     request.form["deact-remote"]
                 )
                 if remote:
                     self.nl_instance.deactivate_remote(remote)
+
+            elif "del-remote" in request.form:
+                remote = NineLightRemote.parse_from_str(
+                    request.form["del-remote"]
+                )
+                if remote:
+                    self.nl_instance.delete_remote(remote)
 
         return render_template(
             "remotes.html",
