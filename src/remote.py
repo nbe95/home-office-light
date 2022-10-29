@@ -55,8 +55,11 @@ class NineLightRemote:
         """Send a HTTP request to the remote including the current 9light
         state."""
         # Skip if this remote has triggered the state change or is disabled
-        if self.skip_once or not self.is_active():
-            logger.info("Skipping update for %s once.", self)
+        if not self.is_active():
+            return
+
+        if self.skip_once:
+            logger.debug("Skipping update for %s once.", self)
             self.skip_once = False
             return
 
@@ -102,9 +105,14 @@ class NineLightRemote:
             else self.last_contact + REMOTE_EXP_TIMEOUT >= datetime.now()
         )
 
+    def __repr__(self) -> str:
+        """Overload repr operator for a serialized representation for debugging
+        purposes."""
+        return f"NineLightRemote({self.ip_addr}, {self.port})"
+
     def __str__(self) -> str:
         """Overload str operator for a serialized representation."""
-        return f"Remote({self.ip_addr})"
+        return f"Remote {self.ip_addr}:{self.port}"
 
     def __eq__(self, other: object) -> bool:
         """Compare remotes by IP address and port only."""

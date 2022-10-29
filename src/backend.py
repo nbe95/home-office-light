@@ -9,8 +9,11 @@ from uuid import uuid4
 from flask import Flask, request
 
 from constants import PORT_REMOTE
+from logger import get_logger
 from nine_light import NineLight
 from remote import NineLightRemote
+
+logger = get_logger(__name__)
 
 
 class Backend:
@@ -34,9 +37,11 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            self.nl_instance.on_remote_request(
-                NineLightRemote(str(request.remote_addr), PORT_REMOTE), True
-            )
+            remote: NineLightRemote = NineLightRemote(str(request.remote_addr), PORT_REMOTE)
+            logger.debug("Incoming HTTP request from %s.", remote)
+            self.nl_instance.on_remote_request(remote, True)
+        else:
+            logger.debug("Incoming HTTP request from IP %s.", request.remote_addr)
 
         new_state: Optional[str] = request.args.get("state")
         if new_state:

@@ -30,7 +30,7 @@ def main():
 
     # Create 9light object
     light = NineLight()
-    logger.info("9light instance created.")
+    logger.debug("9light instance created.")
 
     # Set up backend thread
     backend: Backend = Backend(light)
@@ -38,7 +38,7 @@ def main():
         target=backend.run, args=(PORT_BACKEND,), daemon=True
     )
     backend_thread.start()
-    logger.info("Backend thread set up.")
+    logger.debug("Backend thread set up.")
 
     # Set up frontend thread
     frontend: Frontend = Frontend(
@@ -48,7 +48,7 @@ def main():
         target=frontend.run, args=(PORT_FRONTEND,), daemon=True
     )
     frontend_thread.start()
-    logger.info("Frontend thread set up.")
+    logger.debug("Frontend thread set up.")
 
     # Run until interrupted...
     logger.info("Setup finished. Running until interrupted.")
