@@ -8,6 +8,8 @@
         <h1>Remotes</h1>
 
         <form action="{{ request.path }}" method="POST">
+            <input type="hidden" name="del-remote" value="">
+
             {% if remotes|length %}
             <table class="table table-striped table-hover align-middle">
                 <thead>
@@ -55,14 +57,20 @@
                         </td>
                         <td class="text-end">
                             {% if remote.is_active() %}
-                                <button type="submit" class="btn btn-warning" name="deact-remote"
-                                    value="{{ remote.ip_addr }}:{{ remote.port }}">Deactivate</button>
+                                <button type="submit" class="btn btn-warning" name="deact-remote" value="{{ remote.ip_addr }}:{{ remote.port }}">
+                                    Deactivate
+                                </button>
                             {% else %}
-                                <button type="submit" class="btn btn-success" name="act-remote"
-                                    value="{{ remote.ip_addr }}:{{ remote.port }}">Activate</button>
+                                <button type="submit" class="btn btn-success" name="act-remote" value="{{ remote.ip_addr }}:{{ remote.port }}">
+                                    Activate
+                                </button>
                             {% endif %}
-                            <button type="submit" class="btn btn-danger" name="del-remote"
-                                value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>
+                            <!--<button type="submit" class="btn btn-danger" name="del-remote"
+                                value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>-->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                onclick="this.form['del-remote'].value = '{{ remote.ip_addr }}:{{ remote.port }}';">
+                                Remove
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,7 +93,25 @@
                 <button type="submit" class="btn btn-success"
                     name="add-remote">Add</button>
             </div>
-        </div>
+
+            <!-- Delete modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete remote</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to permanently delete this remote?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </form>
     </div>
