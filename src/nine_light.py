@@ -134,7 +134,6 @@ class NineLight:
         act_remote: Optional[NineLightRemote] = self.get_remote(remote)
         if act_remote:
             act_remote.set_timestamp(datetime.now())
-            logger.info("%s registration updated.", act_remote)
 
         else:
             remote.set_timestamp(datetime.now())

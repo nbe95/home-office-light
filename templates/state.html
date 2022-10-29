@@ -61,7 +61,7 @@
                                 {{ nl_instance.start_time|humanize_naturaltime() }}
                                 <span class="small text-muted">
                                     &ensp;
-                                    ({{ nl_instance.start_time.strftime("%Y-%m-%d %H:%M:%S") }})
+                                    ({{ nl_instance.start_time.strftime("%F %T") }})
                                 </span>
                             </td>
                         </tr>
@@ -71,21 +71,30 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Attached remotes:</td>
-                            <td>{{ nl_instance.remotes|length }}</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ num_remotes_active }} active</div>
+                                    <div>{{ num_remotes_inactive }} inactive</div>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Remote telegrams:</td>
                             <td>
-                                {{ nl_instance.remotes | sum(attribute='rx_count') }} received,
-                                {{ nl_instance.remotes | sum(attribute='tx_count') }} sent,
-                                {{ nl_instance.remotes | sum(attribute='tx_errors') }} failed
+                                <div class="hstack gap-3">
+                                    <div>{{ nl_instance.remotes | sum(attribute='rx_count') }} received</div>
+                                    <div>{{ nl_instance.remotes | sum(attribute='tx_count') }} sent</div>
+                                    <div>{{ nl_instance.remotes | sum(attribute='tx_errors') }} failed</div>
+                                </div>
                             </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Remote TCP ports:</td>
                             <td>
-                                {{ port_backend }} (RX),
-                                {{ port_remote }} (TX)
+                                <div class="hstack gap-3">
+                                    <div>{{ port_backend }} RX</div>
+                                    <div>{{ port_remote }} TX</div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
