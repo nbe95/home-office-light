@@ -21,6 +21,7 @@ h1, h2, h3, h4, h5, h6 {
     background: #eeeeee;
     text-align: center;
     font-weight: bold;
+    margin: auto;
 }
 
 #ninelight div.middle {
@@ -35,6 +36,7 @@ h1, h2, h3, h4, h5, h6 {
     border-style: solid;
     background: sandybrown;
     text-align: center;
+    margin: auto;
 }
 
 #ninelight div.middle a {

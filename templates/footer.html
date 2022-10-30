@@ -1,0 +1,23 @@
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container justify-content">
+        <div class="hstack gap-1 justify-content">
+
+            <div>
+                <small class="text-muted">
+                    {{ title }} version <b>{{ sw_version }}</b> running in container {{ hostname }}.
+                    Page generated at {{ timestamp.isoformat(sep=' ', timespec='milliseconds') }}.
+                </small>
+            </div>
+
+            <div class="ms-auto">
+                <form action="#" name="autoRefreshForm">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="autoRefreshCheckbox" checked>
+                        <label class="form-check-label" for="autoRefreshCheckbox">Auto-refresh</label>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</footer>
