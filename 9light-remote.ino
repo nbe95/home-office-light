@@ -11,7 +11,7 @@ const NineLightRemote::led_config led_config = {
 };
 
 const NineLightRemote::api_config api_config = {
-    .endpoint       = "http://192.168.1.22",
+    .endpoint       = "http://192.168.1.21",
     .uri_get        = "/state/get",
     .uri_set        = "/state/set",
     .port           = 9000,
