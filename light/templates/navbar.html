@@ -1,0 +1,26 @@
+<nav class="navbar navbar-expand sticky-top navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="/static/icon-inverse.ico" width="30" height="30" class="d-inline-block align-top" alt="9">
+            {{ title_nav }}
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                {% for text, data in navigation.items() %}
+                    {% set urls = data[0] %}
+                    {% set badge = data[1] %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path in urls %}active {% endif %}" href="{{ urls[0] }}">
+                            {{ text }}
+                            {% if badge %}
+                                {% set context = badge[0] %}
+                                {% set number = badge[1] %}
+                                <span class="badge rounded-pill bg-{{ context }}">{{ number }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</nav>

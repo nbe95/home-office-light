@@ -1,0 +1,7 @@
+bootstrap-flask
+flask
+jinja2_humanize_extension
+requests
+RPi.GPIO
+rpi_ws281x
+transitions

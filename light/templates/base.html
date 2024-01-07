@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        {% block head %}
+            <!-- Required meta tags -->
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+            {% block styles %}
+                <link rel="icon" href="/static/icon.ico" type="image/x-icon">
+                <link rel="stylesheet" type="text/css" href="/static/layout.css">
+                <!-- Bootstrap CSS -->
+                {{ bootstrap.load_css() }}
+            {% endblock %}
+
+            <title>{% block title %}Index{% endblock %} | {{ title }}</title>
+        {% endblock %}
+    </head>
+    <body class="d-flex flex-column h-100">
+        <!-- Navbar -->
+        {% block navbar %}
+            {% include "navbar.html" %}
+        {% endblock %}
+
+        <!-- Page content -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+        {% block footer %}
+            {% include "footer.html" %}
+        {% endblock %}
+
+        {% block scripts %}
+            <!-- Optional JavaScript -->
+            <script type="text/javascript" src="/static/cookies.js"></script>
+            <script type="text/javascript" src="/static/auto-refresh.js"></script>
+            {{ bootstrap.load_js() }}
+        {% endblock %}
+    </body>
+
+</html>

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Remotes{% endblock %}
+
+{% block content %}
+    <div class="container" role="main">
+
+        <h1>Remotes</h1>
+
+        <form action="{{ request.path }}" method="POST">
+            <input type="hidden" name="del-remote" value="">
+
+            {% if remotes|length %}
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>TCP/IP endpoint</th>
+                        <th>Last contact</th>
+                        <th>Received telegrams</th>
+                        <th>Sent telegrams</th>
+                        <th>Failed transmissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for no, remote in remotes %}
+                    <tr>
+                        <th class="{% if not remote.is_active() %}text-muted{% endif %}" scope="row">
+                            {{ no + 1 }}
+                        </th>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.ip_addr }}:{{ remote.port }}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {% if remote.last_contact is not none %}
+                                {{ remote.last_contact|humanize_naturaltime() }}
+                                <span class="small text-muted">
+                                    &ensp;
+                                    ({{ remote.last_contact.strftime("%F %T") }})
+                                </span>
+                            {% else %}
+                                unknown
+                            {% endif %}
+                            {% if not remote.is_active() %}
+                                <span class="badge rounded-pill bg-secondary">inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.rx_count }}
+                        </td>
+                        <td class="{% if not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.tx_count }}
+                        </td>
+                        <td class="{% if remote.tx_errors > 0 %}fw-bold text-danger{% elif not remote.is_active() %}text-muted{% endif %}">
+                            {{ remote.tx_errors }}
+                        </td>
+                        <td class="text-end">
+                            {% if remote.is_active() %}
+                                <button type="submit" class="btn btn-warning" name="deact-remote" value="{{ remote.ip_addr }}:{{ remote.port }}">
+                                    Deactivate
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-success" name="act-remote" value="{{ remote.ip_addr }}:{{ remote.port }}">
+                                    Activate
+                                </button>
+                            {% endif %}
+                            <!--<button type="submit" class="btn btn-danger" name="del-remote"
+                                value="{{ remote.ip_addr }}:{{ remote.port }}">Remove</button>-->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                onclick="this.form['del-remote'].value = '{{ remote.ip_addr }}:{{ remote.port }}';">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> There are currently no remotes registered.
+                </div>
+            {% endif %}
+
+            <div class="hstack gap-3 justify-content-end">
+                <div class="col col-4 text-end">
+                    Add new remote:
+                </div>
+                <div class="form-outline w-25">
+                    <input type="text" class="form-control" name="new-remote"
+                        value="" placeholder="{{ client_ip }}:[{{ port_remote }}]">
+                </div>
+                <button type="submit" class="btn btn-success"
+                    name="add-remote">Add</button>
+            </div>
+
+            <!-- Delete modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete remote</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to permanently delete this remote?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

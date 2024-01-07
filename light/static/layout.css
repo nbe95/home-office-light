@@ -1,0 +1,98 @@
+h1, h2, h3, h4, h5, h6 {
+    margin: 1rem 0 1rem !important;
+}
+
+#ninelight {
+    margin: 0;
+}
+
+#ninelight div.top,
+#ninelight div.bottom {
+    width: 160px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 45px;
+    font-family: "Arial Narrow", Arial;
+    color: #ffffff;
+    text-transform: uppercase;
+    border-width: 1px;
+    border-color: #000000;
+    border-style: solid;
+    background: #eeeeee;
+    text-align: center;
+    font-weight: bold;
+    margin: auto;
+}
+
+#ninelight div.middle {
+    width: 160px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 30px;
+    font-family: Arial;
+    color: #333300;
+    border-width: 0px 1px;
+    border-color: #000000;
+    border-style: solid;
+    background: sandybrown;
+    text-align: center;
+    margin: auto;
+}
+
+#ninelight div.middle a {
+    color: #333300;
+    text-decoration: none;
+}
+
+/* ninelight colors and animation */
+
+#ninelight.call div.bottom {
+    background: #ffcc00;
+}
+
+#ninelight.video div.top {
+    background: #ff0000;
+}
+
+@keyframes request_animation {
+    0%   { background: #00ccff; }
+    50%  { background: #eeeeee; }
+    100% { background: #00ccff; }
+}
+#ninelight.request div.top {
+    animation-name: request_animation;
+    animation-timing-function: linear;
+    animation-duration: 800ms;
+    animation-iteration-count: infinite;
+}
+
+@keyframes coffee_animation_top {
+    0%   { background: #ff0000; }
+    17%  { background: #ffff00; }
+    33%  { background: #00ff00; }
+    50%  { background: #00ffff; }
+    66%  { background: #0000ff; }
+    83%  { background: #ff00ff; }
+    100% { background: #ff0000; }
+}
+@keyframes coffee_animation_bottom {
+    0%   { background: #00ffff; }
+    17%  { background: #0000ff; }
+    33%  { background: #ff00ff; }
+    50%  { background: #ff0000; }
+    66%  { background: #ffff00; }
+    83%  { background: #00ff00; }
+    100% { background: #00ffff; }
+}
+#ninelight.coffee div.top {
+    animation-name: coffee_animation_top;
+    animation-timing-function: linear;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+}
+#ninelight.coffee div.bottom {
+    animation-name: coffee_animation_bottom;
+    animation-timing-function: linear;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+}

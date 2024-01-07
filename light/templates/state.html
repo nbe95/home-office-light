@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}State{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="container" role="main">
+
+        <h1>System Overview</h1>
+
+        <div class="row gap-4">
+            <div class="col">
+                <h3>System State</h3>
+
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Container name, IP:</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ hostname }}</div>
+                                    <div>({{ ip_addr }})</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Software version:</td>
+                            <td>{{ sw_version }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Python version:</td>
+                            <td>{{ py_version }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Start-up time:</td>
+                            <td>
+                                {{ nl_instance.start_time|humanize_naturaltime() }}
+                                <span class="small text-muted">
+                                    &ensp;
+                                    ({{ nl_instance.start_time.strftime("%F %T") }})
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Total state changes:</td>
+                            <td>{{ nl_instance.total_state_changes }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Attached remotes:</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ num_remotes_active }} active</div>
+                                    <div>{{ num_remotes_inactive }} inactive</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Remote telegrams:</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ nl_instance.remotes | sum(attribute='rx_count') }} received</div>
+                                    <div>{{ nl_instance.remotes | sum(attribute='tx_count') }} sent</div>
+                                    <div>{{ nl_instance.remotes | sum(attribute='tx_errors') }} failed</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Remote TCP ports:</td>
+                            <td>
+                                <div class="hstack gap-3">
+                                    <div>{{ port_backend }} RX</div>
+                                    <div>{{ port_remote }} TX</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="col col-md-auto">
+
+                <div class="card">
+                    <div class="card-header fw-bold">
+                        State and preview
+                    </div>
+                    <div class="card-body">
+                        <div id="ninelight" class="{{ nl_instance.get_state() }} my-3 mx-5">
+                            <div class="top">Video</div>
+                            <div class="middle">
+                                <a href="{{ request.path }}?button">&#x2B24;</a>
+                            </div>
+                            <div class="bottom">Anruf</div>
+                        </div>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for name, text, icon, disabled in state_mapping %}
+                            <a href="{{ request.path }}?set={{ name }}"
+                                class="list-group-item list-group-item-action {% if nl_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
+                                <i class="fa {{ icon }}"></i>&ensp;{{ text }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
