@@ -53,9 +53,9 @@ the real action (e.g. the Unicorn mode! :cry:), sorry! However, I edited the
 
 ## :joystick: The Remote
 
-![!Remote](doc/remote.jpg)
-
 These 4 little membrane keys directly control the state of the Home Office
 Indicator. When pressed, they trigger the attached Arduino to send a state
 request to the Raspberry Pi controlling the Home Office Indicator instance.
 (Again, this is unfortunately the only photo I've got.)
+
+![!Remote](doc/remote.jpg)
