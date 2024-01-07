@@ -18,8 +18,8 @@ network. Of course, the light can also be turned to any state from any device
 within the local network, too.
 
 > Since I'm no longer living in the apartment when I had this Home Office
-Indicator up and running, I archived this repo and won't keep it up to
-date. :headstone:
+Indicator up and running, I archived this repo and won't keep it up
+to date. :headstone:
 
 ## :traffic_light: The Light
 
