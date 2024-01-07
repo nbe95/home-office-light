@@ -3,7 +3,7 @@
 #ifndef SRC_ANIMATION_H_
 #define SRC_ANIMATION_H_
 
-#include "timer.h"
+#include "lib/timer/timer.h"
 
 
 // Base class for each animation

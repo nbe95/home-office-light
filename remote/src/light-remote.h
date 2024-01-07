@@ -11,7 +11,7 @@
 #include "hardware/debouncer.h"
 #include "animation.h"
 #include "macros.h"
-#include "timer.h"
+#include "lib/timer/timer.h"
 
 
 class LightRemote {

@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 #include "pin.h"
-#include "../timer.h"
+#include "../lib/timer/timer.h"
 
 
 // Debouncer class for any kind of data type
