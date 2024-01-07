@@ -1,9 +1,8 @@
 version: "3"
 
 services:
-  9light:
+  HomeOfficeLight:
     build: .
-    container_name: 9light
     restart: always
     environment:
       - LOG_LEVEL=DEBUG

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Helper module for handling the 9light bell button."""
+"""Helper module for handling the HomeOfficeLight bell button."""
 
 from datetime import datetime, timedelta
 from time import sleep

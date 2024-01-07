@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Main python module for 9light app.
+"""Main python module for HomeOfficeLight app.
 
 This python module is the main entry point of the app and manages all internal
 functionalities. It sets up a backend server for API access as well as a simple
@@ -19,7 +19,7 @@ from constants import (
 )
 from frontend import Frontend
 from logger import get_logger
-from nine_light import NineLight
+from home_office_light import HomeOfficeLight
 
 logger = get_logger(__name__)
 
@@ -28,9 +28,9 @@ def main():
     """Execute the main app task."""
     logger.info("Starting main thread.")
 
-    # Create 9light object
-    light = NineLight()
-    logger.debug("9light instance created.")
+    # Create HomeOfficeLight object
+    light = HomeOfficeLight()
+    logger.debug("HomeOfficeLight instance created.")
 
     # Set up backend thread
     backend: Backend = Backend(light)

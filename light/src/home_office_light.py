@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Python module which handles the main 9light interfaces and functions."""
+"""Python module which handles the main HomeOfficeLight interfaces and functions."""
 
 from datetime import datetime
 from types import FrameType
@@ -22,14 +22,14 @@ from hardware.button import Button
 from hardware.buzzer import Buzzer
 from hardware.led import LedStrip
 from logger import get_logger
-from remote import NineLightRemote
+from remote import HomeOfficeLightRemote
 from states import States
 
 logger = get_logger(__name__)
 
 
-class NineLight:
-    """Business logic class and state machine for our 9light."""
+class HomeOfficeLight:
+    """Business logic class and state machine for our HomeOfficeLight."""
 
     # pylint: disable=E1101
 
@@ -77,7 +77,7 @@ class NineLight:
 
         self.start_time: datetime = datetime.now()
         self.total_state_changes: int = 0
-        self.remotes: List[NineLightRemote] = []
+        self.remotes: List[HomeOfficeLightRemote] = []
 
         self._buzzer: Buzzer = Buzzer(PIN_BUZZER)
         self._button: Button = Button(
@@ -88,7 +88,7 @@ class NineLight:
         )
         self._bell_timeout: Optional[Timeout] = None
 
-        logger.debug("9light instance initialized.")
+        logger.debug("HomeOfficeLight instance initialized.")
 
     def on_exit(
         self, _sig: Optional[int] = None, _frame: Optional[FrameType] = None
@@ -113,7 +113,7 @@ class NineLight:
         return True
 
     def on_remote_request(
-        self, remote: NineLightRemote, incr_tx: bool = False
+        self, remote: HomeOfficeLightRemote, incr_tx: bool = False
     ) -> None:
         """Perform actions when an incoming remote request is recognized."""
         self.add_or_update_remote(remote)
@@ -124,14 +124,14 @@ class NineLight:
             if incr_tx:
                 self.remotes[index].tx_count += 1
 
-    def get_remote(self, remote: NineLightRemote) -> Optional[NineLightRemote]:
+    def get_remote(self, remote: HomeOfficeLightRemote) -> Optional[HomeOfficeLightRemote]:
         """Fetch the actual remote object by passing a reference object with
         matching IP and port."""
         return next(filter(lambda x: x == remote, self.remotes), None)
 
-    def add_or_update_remote(self, remote: NineLightRemote) -> None:
+    def add_or_update_remote(self, remote: HomeOfficeLightRemote) -> None:
         """Add a new remote or update an existing one."""
-        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        act_remote: Optional[HomeOfficeLightRemote] = self.get_remote(remote)
         if act_remote:
             act_remote.set_timestamp(datetime.now())
 
@@ -140,22 +140,22 @@ class NineLight:
             self.remotes.append(remote)
             logger.info("%s registered.", remote)
 
-    def delete_remote(self, remote: NineLightRemote) -> None:
+    def delete_remote(self, remote: HomeOfficeLightRemote) -> None:
         """Remove an existing remote from the registration list."""
         if remote in self.remotes:
             self.remotes.remove(remote)
             logger.info("%s removed.", remote)
 
-    def activate_remote(self, remote: NineLightRemote) -> None:
+    def activate_remote(self, remote: HomeOfficeLightRemote) -> None:
         """Activate an existing remote from the registration list."""
-        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        act_remote: Optional[HomeOfficeLightRemote] = self.get_remote(remote)
         if act_remote:
             act_remote.set_timestamp(datetime.now())
             logger.info("%s activated.", remote)
 
-    def deactivate_remote(self, remote: NineLightRemote) -> None:
+    def deactivate_remote(self, remote: HomeOfficeLightRemote) -> None:
         """Deactivate an existing remote from the registration list."""
-        act_remote: Optional[NineLightRemote] = self.get_remote(remote)
+        act_remote: Optional[HomeOfficeLightRemote] = self.get_remote(remote)
         if act_remote:
             act_remote.set_timestamp(None)
             logger.info("%s deactivated.", remote)
@@ -177,7 +177,7 @@ class NineLight:
     def on_state_changed(self) -> None:
         """Auto-called function triggered after any transition of the state
         machine."""
-        logger.info("9light state changed to %s.", self.get_state().upper())
+        logger.info("HomeOfficeLight state changed to %s.", self.get_state().upper())
         self.total_state_changes += 1
 
         # Control LED strip

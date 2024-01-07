@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""List of all system states of our 9light."""
+"""List of all system states of our HomeOfficeLight."""
 
 from enum import Enum
 

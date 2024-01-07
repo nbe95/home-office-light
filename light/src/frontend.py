@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""9light frontend python module."""
+"""HomeOfficeLight frontend python module."""
 
 from datetime import datetime
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
@@ -23,8 +23,8 @@ from constants import (
     SW_VERSION,
 )
 from logger import MemoryLogBuffer
-from nine_light import NineLight
-from remote import NineLightRemote
+from home_office_light import HomeOfficeLight
+from remote import HomeOfficeLightRemote
 from states import States
 
 # pylint: disable=E1101
@@ -34,9 +34,9 @@ class Frontend:
     """Container for the frontend flask application."""
 
     def __init__(
-        self, nl_instance: NineLight, template_folder: str, static_folder: str
+        self, hol_instance: HomeOfficeLight, template_folder: str, static_folder: str
     ) -> None:
-        self.nl_instance: NineLight = nl_instance
+        self.hol_instance: HomeOfficeLight = hol_instance
         self.app: Flask = Flask(
             __name__,
             template_folder=abspath(template_folder),
@@ -91,7 +91,7 @@ class Frontend:
                     "secondary",
                     len(list(filter(
                         lambda x: x.is_active(),
-                        self.nl_instance.remotes,
+                        self.hol_instance.remotes,
                     ))),
                 ),
             ),
@@ -101,10 +101,10 @@ class Frontend:
     def state(self) -> str:
         """Renders the state page of the web application."""
         if "set" in request.args:
-            self.nl_instance.set_state(request.args["set"])
+            self.hol_instance.set_state(request.args["set"])
 
         if "button" in request.args:
-            self.nl_instance.on_bell_button()
+            self.hol_instance.on_bell_button()
 
         return render_template(
             "state.html",
@@ -116,16 +116,16 @@ class Frontend:
             sw_version=SW_VERSION,
             py_version=PY_VERSION,
             ip_addr=IP_ADDR,
-            nl_instance=self.nl_instance,
+            hol_instance=self.hol_instance,
             port_backend=PORT_BACKEND,
             port_remote=PORT_REMOTE,
             num_remotes_active=len(list(filter(
                 lambda x: x.is_active(),
-                self.nl_instance.remotes
+                self.hol_instance.remotes
             ))),
             num_remotes_inactive=len(list(filter(
                 lambda x: not x.is_active(),
-                self.nl_instance.remotes
+                self.hol_instance.remotes
             ))),
             state_mapping=(
                 # name, text, icon, disabled
@@ -136,13 +136,13 @@ class Frontend:
                     "request",
                     "Request",
                     "fa-bell",
-                    self.nl_instance.state != States.VIDEO,
+                    self.hol_instance.state != States.VIDEO,
                 ),
                 (
                     "coffee",
                     "I need a coffee…",
                     "fa-coffee",
-                    self.nl_instance.state != States.NONE,
+                    self.hol_instance.state != States.NONE,
                 ),
             ),
         )
@@ -150,34 +150,34 @@ class Frontend:
     def remotes(self) -> str:
         """Renders the remotes page of the web application."""
         if request.method == "POST":
-            remote: Optional[NineLightRemote]
+            remote: Optional[HomeOfficeLightRemote]
             if "add-remote" in request.form:
-                remote = NineLightRemote.parse_from_str(
+                remote = HomeOfficeLightRemote.parse_from_str(
                     request.form["new-remote"]
                 )
                 if remote:
-                    self.nl_instance.add_or_update_remote(remote)
+                    self.hol_instance.add_or_update_remote(remote)
 
             elif "act-remote" in request.form:
-                remote = NineLightRemote.parse_from_str(
+                remote = HomeOfficeLightRemote.parse_from_str(
                     request.form["act-remote"]
                 )
                 if remote:
-                    self.nl_instance.activate_remote(remote)
+                    self.hol_instance.activate_remote(remote)
 
             elif "deact-remote" in request.form:
-                remote = NineLightRemote.parse_from_str(
+                remote = HomeOfficeLightRemote.parse_from_str(
                     request.form["deact-remote"]
                 )
                 if remote:
-                    self.nl_instance.deactivate_remote(remote)
+                    self.hol_instance.deactivate_remote(remote)
 
             elif "del-remote" in request.form:
-                remote = NineLightRemote.parse_from_str(
+                remote = HomeOfficeLightRemote.parse_from_str(
                     request.form["del-remote"]
                 )
                 if remote:
-                    self.nl_instance.delete_remote(remote)
+                    self.hol_instance.delete_remote(remote)
 
         return render_template(
             "remotes.html",
@@ -189,7 +189,7 @@ class Frontend:
             sw_version=SW_VERSION,
             client_ip=request.remote_addr,
             port_remote=PORT_REMOTE,
-            remotes=list(enumerate(self.nl_instance.remotes)),
+            remotes=list(enumerate(self.hol_instance.remotes)),
         )
 
     def log(self) -> str:

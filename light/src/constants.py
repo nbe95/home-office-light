@@ -31,7 +31,7 @@ for level, properties in LOG_MAPPING.items():
 LOG_BUFFER_CAPACITY: int = 1000
 
 # Flask
-MAIN_TITLE: str = "9light"
+MAIN_TITLE: str = "HomeOfficeLight"
 MAIN_TITLE_NAVBAR: str = "light"
 FRONTEND_TEMPLATE_DIR: str = "templates/"
 FRONTEND_STATIC_DIR: str = "static/"

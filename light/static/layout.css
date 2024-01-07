@@ -2,12 +2,12 @@ h1, h2, h3, h4, h5, h6 {
     margin: 1rem 0 1rem !important;
 }
 
-#ninelight {
+#homeofficelight {
     margin: 0;
 }
 
-#ninelight div.top,
-#ninelight div.bottom {
+#homeofficelight div.top,
+#homeofficelight div.bottom {
     width: 160px;
     height: 100px;
     line-height: 100px;
@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: auto;
 }
 
-#ninelight div.middle {
+#homeofficelight div.middle {
     width: 160px;
     height: 30px;
     line-height: 30px;
@@ -39,18 +39,18 @@ h1, h2, h3, h4, h5, h6 {
     margin: auto;
 }
 
-#ninelight div.middle a {
+#homeofficelight div.middle a {
     color: #333300;
     text-decoration: none;
 }
 
-/* ninelight colors and animation */
+/* homeofficelight colors and animation */
 
-#ninelight.call div.bottom {
+#homeofficelight.call div.bottom {
     background: #ffcc00;
 }
 
-#ninelight.video div.top {
+#homeofficelight.video div.top {
     background: #ff0000;
 }
 
@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {
     50%  { background: #eeeeee; }
     100% { background: #00ccff; }
 }
-#ninelight.request div.top {
+#homeofficelight.request div.top {
     animation-name: request_animation;
     animation-timing-function: linear;
     animation-duration: 800ms;
@@ -84,13 +84,13 @@ h1, h2, h3, h4, h5, h6 {
     83%  { background: #00ff00; }
     100% { background: #00ffff; }
 }
-#ninelight.coffee div.top {
+#homeofficelight.coffee div.top {
     animation-name: coffee_animation_top;
     animation-timing-function: linear;
     animation-duration: 1s;
     animation-iteration-count: infinite;
 }
-#ninelight.coffee div.bottom {
+#homeofficelight.coffee div.bottom {
     animation-name: coffee_animation_bottom;
     animation-timing-function: linear;
     animation-duration: 1s;

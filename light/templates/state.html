@@ -38,16 +38,16 @@
                         <tr>
                             <td class="fw-bold">Start-up time:</td>
                             <td>
-                                {{ nl_instance.start_time|humanize_naturaltime() }}
+                                {{ hol_instance.start_time|humanize_naturaltime() }}
                                 <span class="small text-muted">
                                     &ensp;
-                                    ({{ nl_instance.start_time.strftime("%F %T") }})
+                                    ({{ hol_instance.start_time.strftime("%F %T") }})
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Total state changes:</td>
-                            <td>{{ nl_instance.total_state_changes }}</td>
+                            <td>{{ hol_instance.total_state_changes }}</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Attached remotes:</td>
@@ -62,9 +62,9 @@
                             <td class="fw-bold">Remote telegrams:</td>
                             <td>
                                 <div class="hstack gap-3">
-                                    <div>{{ nl_instance.remotes | sum(attribute='rx_count') }} received</div>
-                                    <div>{{ nl_instance.remotes | sum(attribute='tx_count') }} sent</div>
-                                    <div>{{ nl_instance.remotes | sum(attribute='tx_errors') }} failed</div>
+                                    <div>{{ hol_instance.remotes | sum(attribute='rx_count') }} received</div>
+                                    <div>{{ hol_instance.remotes | sum(attribute='tx_count') }} sent</div>
+                                    <div>{{ hol_instance.remotes | sum(attribute='tx_errors') }} failed</div>
                                 </div>
                             </td>
                         </tr>
@@ -88,7 +88,7 @@
                         State and preview
                     </div>
                     <div class="card-body">
-                        <div id="ninelight" class="{{ nl_instance.get_state() }} my-3 mx-5">
+                        <div id="homeofficelight" class="{{ hol_instance.get_state() }} my-3 mx-5">
                             <div class="top">Video</div>
                             <div class="middle">
                                 <a href="{{ request.path }}?button">&#x2B24;</a>
@@ -99,7 +99,7 @@
                     <div class="list-group list-group-flush">
                         {% for name, text, icon, disabled in state_mapping %}
                             <a href="{{ request.path }}?set={{ name }}"
-                                class="list-group-item list-group-item-action {% if nl_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
+                                class="list-group-item list-group-item-action {% if hol_instance.get_state() == name %}active{% endif %} {% if disabled %}disabled{% endif %}">
                                 <i class="fa {{ icon }}"></i>&ensp;{{ text }}
                             </a>
                         {% endfor %}

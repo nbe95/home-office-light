@@ -18,7 +18,7 @@ rgb = Tuple[int, int, int]
 
 
 class LedStrip:
-    """Helper class for managing the two LED fields of our 9light using a WS281x
+    """Helper class for managing the two LED fields of our HomeOfficeLight using a WS281x
     LED strip."""
 
     def __init__(
@@ -80,11 +80,11 @@ class LedStrip:
         self.set_brightness(255)
 
     def on_state_changed(self, state: States) -> None:
-        """Callback to be triggered on any 9light state change."""
+        """Callback to be triggered on any HomeOfficeLight state change."""
         self._light_task.restart((state,))
 
     def _run_light_task(self, state: States) -> None:
-        """Internal method which controls the 9light LED lightning according to
+        """Internal method which controls the HomeOfficeLight LED lightning according to
         the provided state information."""
         self.clear()
 

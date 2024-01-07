@@ -1,20 +1,20 @@
 // Copyright (c) 2022 Niklas Bettgen
 
-#include "9light-remote.h"
+#include "light-remote.h"
 
 #define HTTP_READ_TIMEOUT 10
 
 
-NineLightRemote::NineLightRemote(const api_config* const api_config, const led_config* const led_config) :
+LightRemote::LightRemote(const api_config* const api_config, const led_config* const led_config) :
 m_api_config(api_config),
 m_led_config(led_config),
 m_pixels(new Adafruit_NeoPixel(led_config->num_leds, led_config->do_pin.getPin(), led_config->options)),
-m_button_map(4, NineLightRemote::state::UNDEFINED, nullptr) {
+m_button_map(4, LightRemote::state::UNDEFINED, nullptr) {
     m_pixels->begin();
 }
 
 
-NineLightRemote::~NineLightRemote() {
+LightRemote::~LightRemote() {
     delete m_pixels;
     delete m_http_server;
     delete m_http_client;
@@ -25,7 +25,7 @@ NineLightRemote::~NineLightRemote() {
 }
 
 
-BridgeServer* NineLightRemote::getHttpServer() {
+BridgeServer* LightRemote::getHttpServer() {
     if (!m_http_server) {
         m_http_server = new BridgeServer(m_api_config->remote_port);
         m_http_server->noListenOnLocalhost();
@@ -35,7 +35,7 @@ BridgeServer* NineLightRemote::getHttpServer() {
 }
 
 
-BridgeHttpClient* NineLightRemote::getHttpClient() {
+BridgeHttpClient* LightRemote::getHttpClient() {
     if (!m_http_client) {
         m_http_client = new BridgeHttpClient();
         m_http_client->setTimeout(HTTP_READ_TIMEOUT);
@@ -44,7 +44,7 @@ BridgeHttpClient* NineLightRemote::getHttpClient() {
 }
 
 
-bool NineLightRemote::registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time) {
+bool LightRemote::registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time) {
     if (!button_pin.isValid())
         return false;
 
@@ -56,12 +56,12 @@ bool NineLightRemote::registerButton(const state target_state, const Pin button_
 }
 
 
-void NineLightRemote::setupIdleRequest(const Timer::ms interval) {
+void LightRemote::setupIdleRequest(const Timer::ms interval) {
     m_idle_timer.setDuration(interval);
 }
 
 
-void NineLightRemote::updateLeds() {
+void LightRemote::updateLeds() {
     // LED state machine
     if (m_leds_state != m_state) {
         // Clear old animation
@@ -111,7 +111,7 @@ void NineLightRemote::updateLeds() {
 }
 
 
-void NineLightRemote::pollButtons() {
+void LightRemote::pollButtons() {
     for (ButtonMap::iter it = m_button_map.begin(); it < m_button_map.end(); it++) {
         DebouncedSwitch* button = it->value;
         if (button != nullptr) {
@@ -125,7 +125,7 @@ void NineLightRemote::pollButtons() {
 }
 
 
-void NineLightRemote::receiveRemoteRequest() {
+void LightRemote::receiveRemoteRequest() {
     BridgeClient client = getHttpServer()->accept();
     if (client) {
         // Find beginning of JSON payload (i.e. line starting with '{')
@@ -151,7 +151,7 @@ void NineLightRemote::receiveRemoteRequest() {
 }
 
 
-void NineLightRemote::sendRequestIfIdle() {
+void LightRemote::sendRequestIfIdle() {
     if (!m_idle_timer.isSet())
         return;
 
@@ -163,8 +163,8 @@ void NineLightRemote::sendRequestIfIdle() {
 }
 
 
-// Will set the 9Light state if state_req is set, otherwise will only get the current state.
-void NineLightRemote::sendStateRequest(const state state_req) {
+// Will set the light state if state_req is set, otherwise will only get the current state.
+void LightRemote::sendStateRequest(const state state_req) {
     char query[80] = {0};
     if (state_req != state::UNDEFINED) {
         char state_str[10] = "undefined";
@@ -193,7 +193,7 @@ void NineLightRemote::sendStateRequest(const state state_req) {
 }
 
 
-bool NineLightRemote::StateToCStr(const state state, char* const target) {
+bool LightRemote::StateToCStr(const state state, char* const target) {
     switch (state) {
         case state::NONE:
             sprintf_P(target, PSTR("none"));
@@ -215,7 +215,7 @@ bool NineLightRemote::StateToCStr(const state state, char* const target) {
 }
 
 
-NineLightRemote::state NineLightRemote::StateFromCStr(const char* const buffer) {
+LightRemote::state LightRemote::StateFromCStr(const char* const buffer) {
     const char status_none[]    = "none";
     const char status_call[]    = "call";
     const char status_video[]   = "video";
@@ -237,7 +237,7 @@ NineLightRemote::state NineLightRemote::StateFromCStr(const char* const buffer) 
 }
 
 
-NineLightRemote::state NineLightRemote::ParseJsonState(const char* const buffer) {
+LightRemote::state LightRemote::ParseJsonState(const char* const buffer) {
     // Look for JSON key
     const char key[] = "\"state\":";
     char *ptr = strstr(buffer, key);

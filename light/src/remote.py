@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Python module which handles 9light remotes."""
+"""Python module which handles HomeOfficeLight remotes."""
 
 from datetime import datetime
 from json import dumps
@@ -14,8 +14,8 @@ from logger import get_logger
 logger = get_logger(__name__)
 
 
-class NineLightRemote:
-    """Subclass for simple handling of 9light remotes."""
+class HomeOfficeLightRemote:
+    """Subclass for simple handling of HomeOfficeLight remotes."""
 
     _SOCKET_TIMEOUT_SEC: int = 1
 
@@ -35,7 +35,7 @@ class NineLightRemote:
     @staticmethod
     def parse_from_str(
         remote_str: str, default_port: int = PORT_REMOTE
-    ) -> Optional["NineLightRemote"]:
+    ) -> Optional["HomeOfficeLightRemote"]:
         """Parse a string consisting of an IP address and a port (optional) and
         creates a remote object.
         Example: '192.168.0.42' or '192.168.0.69:1234'."""
@@ -47,12 +47,12 @@ class NineLightRemote:
         groups = result.groups()
         ip_addr: str = groups[0]
         port: Union[str, int] = groups[1] or default_port
-        return NineLightRemote(ip_addr, int(port))
+        return HomeOfficeLightRemote(ip_addr, int(port))
 
     def send_update(
-        self, state_str: str, remotes: List["NineLightRemote"]
+        self, state_str: str, remotes: List["HomeOfficeLightRemote"]
     ) -> None:
-        """Send a HTTP request to the remote including the current 9light
+        """Send a HTTP request to the remote including the current HomeOfficeLight
         state."""
         # Skip if this remote has triggered the state change or is disabled
         if not self.is_active():
@@ -108,7 +108,7 @@ class NineLightRemote:
     def __repr__(self) -> str:
         """Overload repr operator for a serialized representation for debugging
         purposes."""
-        return f"NineLightRemote({self.ip_addr}, {self.port})"
+        return f"HomeOfficeLightRemote({self.ip_addr}, {self.port})"
 
     def __str__(self) -> str:
         """Overload str operator for a serialized representation."""
@@ -116,6 +116,6 @@ class NineLightRemote:
 
     def __eq__(self, other: object) -> bool:
         """Compare remotes by IP address and port only."""
-        if not isinstance(other, NineLightRemote):
+        if not isinstance(other, HomeOfficeLightRemote):
             return NotImplemented
         return self.ip_addr == other.ip_addr and self.port == other.port

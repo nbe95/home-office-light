@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""9light backend python module."""
+"""HomeOfficeLight backend python module."""
 
 from json import dumps
 from typing import Optional
@@ -10,8 +10,8 @@ from flask import Flask, request
 
 from constants import PORT_REMOTE
 from logger import get_logger
-from nine_light import NineLight
-from remote import NineLightRemote
+from home_office_light import HomeOfficeLight
+from remote import HomeOfficeLightRemote
 
 logger = get_logger(__name__)
 
@@ -19,8 +19,8 @@ logger = get_logger(__name__)
 class Backend:
     """Container for the backend flask application."""
 
-    def __init__(self, nl_instance: NineLight) -> None:
-        self.nl_instance: NineLight = nl_instance
+    def __init__(self, hol_instance: HomeOfficeLight) -> None:
+        self.hol_instance: HomeOfficeLight = hol_instance
         self.app: Flask = Flask(__name__)
         self.app.secret_key = uuid4().hex
 
@@ -37,11 +37,11 @@ class Backend:
         remote registration."""
 
         if "remote" in request.args:
-            remote: NineLightRemote = NineLightRemote(
+            remote: HomeOfficeLightRemote = HomeOfficeLightRemote(
                 str(request.remote_addr), PORT_REMOTE
             )
             logger.debug("Incoming HTTP request from %s.", remote)
-            self.nl_instance.on_remote_request(remote, True)
+            self.hol_instance.on_remote_request(remote, True)
         else:
             logger.debug(
                 "Incoming HTTP request from IP %s.", request.remote_addr
@@ -49,13 +49,13 @@ class Backend:
 
         new_state: Optional[str] = request.args.get("state")
         if new_state:
-            self.nl_instance.set_state(new_state)
+            self.hol_instance.set_state(new_state)
 
         return dumps(
             {
-                "state": self.nl_instance.get_state(),
+                "state": self.hol_instance.get_state(),
                 "remotes": [
-                    remote.ip_addr for remote in self.nl_instance.remotes
+                    remote.ip_addr for remote in self.hol_instance.remotes
                 ],
             },
             indent=None,

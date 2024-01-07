@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Niklas Bettgen
 
-#ifndef SRC_9LIGHT_REMOTE_H_
-#define SRC_9LIGHT_REMOTE_H_
+#ifndef SRC_LIGHT_REMOTE_H_
+#define SRC_LIGHT_REMOTE_H_
 
 #include <BridgeClient.h>
 #include <BridgeHttpClient.h>
@@ -14,7 +14,7 @@
 #include "timer.h"
 
 
-class NineLightRemote {
+class LightRemote {
  public:
     // Type definitions
     enum state { UNDEFINED = 0, NONE, CALL, VIDEO, REQUEST, COFFEE };
@@ -32,8 +32,8 @@ class NineLightRemote {
     };
 
     // Constructor and destructor
-    NineLightRemote(const api_config* const api_config, const led_config* const led_config);
-    ~NineLightRemote();
+    LightRemote(const api_config* const api_config, const led_config* const led_config);
+    ~LightRemote();
 
     // General methods
     void                setState(const state state) { m_state = state; }
@@ -49,7 +49,7 @@ class NineLightRemote {
     void                pollButtons();
     void                updateLeds();
 
-    // 9Light interface methods
+    // HomeOfficeLight interface methods
     void                sendStateRequest(const state state = state::UNDEFINED);
 
  private:
@@ -79,9 +79,9 @@ class NineLightRemote {
     state               m_leds_state = state::UNDEFINED;
     Animation*          m_animation;
 
-    // 9Light server and client
+    // HomeOfficeLight server and client
     BridgeHttpClient*   m_http_client;
     BridgeServer*       m_http_server;
 };
 
-#endif  // SRC_9LIGHT_REMOTE_H_
+#endif  // SRC_LIGHT_REMOTE_H_
