@@ -19,11 +19,12 @@ the local network, too.
 
 > :headstone: Since I'm no longer living in the apartment when I had this Home
 Office Indicator up and running, I archived this repo and won't keep it up to
-date. But feel free to use!
+date. But feel free to use it!
 
 ## :traffic_light: The Light
 
-The light implements a simple state machine running 5 modes/states in total.
+The indicator light implements a simple state machine running 5 modes/states in
+total.
 
 |Idle|Call|Video|Ring (flashing)|
 |---|---|---|---|
@@ -39,21 +40,22 @@ The light implements a simple state machine running 5 modes/states in total.
   request to the inside. A buzzer sounds once as an acoustic signal, too. After
   30s, the light automatically falls back to "Video" mode.
 - **:rainbow::unicorn: Unicorn mode:** The device goes completely crazy and
-  flashes in all rainbow colors very quickly! While this mode is a must-have and
-  only intended for fun, it may considered as a signal that you're really
-  annoyed of a specific customer and need a cup of coffee *very quickly*...
+  flashes in all rainbow colors very quickly! While this mode is a must-have
+  and, of course, only intended for fun, it may be considered as a signal that
+  you're really annoyed of a specific customer and need a cup of coffee *very
+  quickly*...
 
 > When I moved out of the apartment, I realized that I had no photos of the
 device at all, so I quickly made one right before disassembling it. At this
 time, I already cut the data cable, so I could not take a picture or video of
-the real action (e.g. the Unicorn mode! :cry:), so I just edited the "Idle"
-photo to give you a vague impression how it looked like.
+the real action (e.g. the Unicorn mode! :cry:), sorry! However, I edited the
+"Idle" photo above to give you a vague impression of how it looked like.
 
 ## :joystick: The Remote
 
-These 4 little membrane keys directly control the state of the Home Office
-Indicator. They trigger the attached Arduino to send a state request to the
-Raspberry Pi controlling the light instance. (Again, this is unfortunately the
-only photo I've got.)
-
 ![!Remote](doc/remote.jpg)
+
+These 4 little membrane keys directly control the state of the Home Office
+Indicator. When pressed, they trigger the attached Arduino to send a state
+request to the Raspberry Pi controlling the Home Office Indicator instance.
+(Again, this is unfortunately the only photo I've got.)
