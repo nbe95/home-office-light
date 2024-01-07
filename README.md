@@ -7,19 +7,19 @@ and a crucial test for anyone living in an apartment with at least one roommate.
 
 This is why I ~~got bored and~~ made a Home Office Indicator light using **LED
 strips attached to two engraved glass tiles**! Those tiles are mounted outside
-my (very small) office room and indicate to the outside world whether I am in an
-important call or video conference, not wanting to be disturbed. Plus, a ring
-button is attached to it which produces a buzzer sound inside.
+my (very small) office room and indicate to the outside world whether I am in a
+very important call or video conference, not wanting to be disturbed. Plus, a
+ring button is attached to it, which produces a buzzer sound inside.
 
-The entire device is running on a Raspberry Pi in a Docker container with a web
-frontend. A few push buttons mounted at my desk and attached to an Arduino Yún -
-which I call *the Remote* - control the state of the Home Office Light via
-network. Of course, the light can also be turned to any state from any device
-within the local network, too.
+The entire device is running on a Raspberry Pi in a Docker container and also
+offers a web frontend. A few push buttons mounted at my desk and attached to an
+Arduino Yún - which I pretentiously call *the Remote* - control the state of the
+light via network. Of course, it can be turned to any state from devices within
+the local network, too.
 
-> Since I'm no longer living in the apartment when I had this Home Office
-Indicator up and running, I archived this repo and won't keep it up
-to date. :headstone:
+> :headstone: Since I'm no longer living in the apartment when I had this Home
+Office Indicator up and running, I archived this repo and won't keep it up to
+date. But feel free to use!
 
 ## :traffic_light: The Light
 
