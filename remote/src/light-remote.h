@@ -7,10 +7,10 @@
 #include <BridgeHttpClient.h>
 #include <BridgeServer.h>
 #include <Adafruit_NeoPixel.h>
-#include "container/map.h"
-#include "hardware/debouncer.h"
+#include "map.h"
 #include "animation.h"
 #include "macros.h"
+#include "lib/debouncer/debouncer.h"
 #include "lib/timer/timer.h"
 
 
@@ -26,7 +26,7 @@ class LightRemote {
         unsigned int    remote_port;
     };
     struct led_config {
-        Pin         do_pin;
+        uint8_t     do_pin;
         uint16_t    num_leds;
         uint16_t    options;
     };
@@ -40,7 +40,7 @@ class LightRemote {
     state               getState() const { return m_state; }
 
     // Setup
-    bool                registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time);
+    bool                registerButton(const state target_state, const uint8_t button_pin, const Timer::ms debounce_time);
     void                setupIdleRequest(const Timer::ms interval);
 
     // Cylic routines

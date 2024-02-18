@@ -8,7 +8,7 @@
 LightRemote::LightRemote(const api_config* const api_config, const led_config* const led_config) :
 m_api_config(api_config),
 m_led_config(led_config),
-m_pixels(new Adafruit_NeoPixel(led_config->num_leds, led_config->do_pin.getPin(), led_config->options)),
+m_pixels(new Adafruit_NeoPixel(led_config->num_leds, led_config->do_pin, led_config->options)),
 m_button_map(4, LightRemote::state::UNDEFINED, nullptr) {
     m_pixels->begin();
 }
@@ -44,11 +44,11 @@ BridgeHttpClient* LightRemote::getHttpClient() {
 }
 
 
-bool LightRemote::registerButton(const state target_state, const Pin button_pin, const Timer::ms debounce_time) {
-    if (!button_pin.isValid())
+bool LightRemote::registerButton(const state target_state, const uint8_t button_pin, const Timer::ms debounce_time) {
+    if (button_pin <= 0)
         return false;
 
-    button_pin.setup();
+    pinMode(button_pin, INPUT_PULLUP);
     DebouncedSwitch* button = new DebouncedSwitch(button_pin, debounce_time);
     m_button_map.set(target_state, button);
 

@@ -5,7 +5,7 @@
 
 
 const LightRemote::led_config led_config = {
-    .do_pin         = Pin(9, OUTPUT),
+    .do_pin         = 9,
     .num_leds       = 30,
     .options        = NEO_GRB + NEO_KHZ800
 };
@@ -27,10 +27,10 @@ void setup() {
     SerialUSB.begin(115200);
 
     // Register remote buttons
-    Remote.registerButton(LightRemote::state::CALL,     Pin(10, INPUT_PULLUP),  40);
-    Remote.registerButton(LightRemote::state::VIDEO,    Pin(11, INPUT_PULLUP),  40);
-    Remote.registerButton(LightRemote::state::COFFEE,   Pin(12, INPUT_PULLUP),  40);
-    Remote.registerButton(LightRemote::state::NONE,     Pin(13, INPUT_PULLUP),  40);
+    Remote.registerButton(LightRemote::state::CALL,     10, 40);
+    Remote.registerButton(LightRemote::state::VIDEO,    11, 40);
+    Remote.registerButton(LightRemote::state::COFFEE,   12, 40);
+    Remote.registerButton(LightRemote::state::NONE,     13, 40);
 
     // Setup automatic state requests after being idle (keep remote registration state)
     Remote.setupIdleRequest(2UL * 60 * 60 * 1000);
